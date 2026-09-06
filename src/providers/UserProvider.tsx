@@ -51,7 +51,7 @@ const UserContext = createContext<UserContextType | null>(null);
 
 export const UserProvider = ({
   children,
-  initialUser = mockLoggedAluno,
+  initialUser = mockLoggedAdmin,
 }: {
   children: ReactNode;
   initialUser?: UsuarioType | null;

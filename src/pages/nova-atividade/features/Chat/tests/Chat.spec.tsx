@@ -5,6 +5,10 @@ import { Chat } from '../container/Chat';
 import { generateContent } from '@/services/googleConfig';
 import type { QuestionFormType } from '@/data/schemas/activity';
 import type { ReactNode } from 'react';
+import {
+  NEW_ACTIVITY_STORAGE_KEY,
+  setNewActivityStorage,
+} from '@/data/newActivityStorage';
 
 jest.mock('react-markdown', () => ({
   __esModule: true,
@@ -88,11 +92,26 @@ const typeAndSend = async (text: string) => {
 describe('Chat', () => {
   beforeEach(() => {
     mockedGenerateContent.mockReset();
+    localStorage.clear();
     jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
+  });
+
+  it('restores chat messages from localStorage', () => {
+    setNewActivityStorage({
+      activityName: 'Listas',
+      qtdQuestions: 2,
+      messages: [{ role: 'user', content: 'Crie perguntas sobre listas' }],
+    });
+
+    render(<ChatHarness />);
+
+    expect(
+      screen.getByText('Crie perguntas sobre listas')
+    ).toBeInTheDocument();
   });
 
   it('shows the empty state', () => {
@@ -106,6 +125,11 @@ describe('Chat', () => {
 
   it('sends a prompt and shows the generated question', async () => {
     mockedGenerateContent.mockResolvedValue(generatedJson);
+    setNewActivityStorage({
+      activityName: 'Listas',
+      qtdQuestions: 2,
+      messages: [],
+    });
     render(<ChatHarness />);
 
     await typeAndSend('Crie 1 pergunta sobre listas');
@@ -115,6 +139,18 @@ describe('Chat', () => {
     ).toBeInTheDocument();
     expect(await screen.findByText(/O que é uma lista/)).toBeInTheDocument();
     expect(screen.getByTitle('Limpar conversa')).toBeInTheDocument();
+
+    const stored = JSON.parse(
+      localStorage.getItem(NEW_ACTIVITY_STORAGE_KEY) ?? '{}'
+    );
+    expect(stored.messages).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          role: 'user',
+          content: 'Crie 1 pergunta sobre listas',
+        }),
+      ])
+    );
   });
 
   it('applies a generated question to the activity form', async () => {

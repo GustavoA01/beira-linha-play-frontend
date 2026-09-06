@@ -27,6 +27,6 @@ Nomes do diagrama em `api.ts` (`CursoType`, `ModuloType`, `AtividadeType`). `pos
 
 `nome` é o nome institucional. `apelido` só existe em `AlunoType` e é o que o jogador vê no ranking, mapa e header. Na UI do **monitor** (turma e ranking) os dois aparecem: `nome` para identificar, `apelido` para cruzar com o que o aluno escolheu.
 
-`cursoIds` fica em `UsuarioType`: no aluno é inscrição, no monitor é o que ele ministra. Um curso tem um `monitorId`. O nome do monitor só entra na UI do card em `/cursos`. `codigoAcesso` fica no `CursoType` e só o monitor vê.
+`cursoIds` fica em `UsuarioType`: no aluno é inscrição, no monitor é o que ele ministra. Um curso tem `monitorIds`. Os nomes dos monitores só entram na UI do card em `/cursos`. `codigoAcesso` fica no `CursoType` e só o monitor vê.
 
-O **admin** (`AdminType`, `tipo: 'ADMIN'`) cria, edita e exclui curso. Criar fica na lista `/cursos`; editar e excluir ficam no header do detalhe `/cursos/:cursoId`.
+O **admin** (`AdminType`, `tipo: 'ADMIN'`) cria, edita e exclui curso. Criar fica na lista `/cursos`; editar e excluir ficam no header do detalhe `/cursos/:cursoId`. Também cria outro admin na lista `/cursos`, ao lado de adicionar curso. Admin não tem `cursoIds`, e-mail nem apelido — só `nome` e `senha`.

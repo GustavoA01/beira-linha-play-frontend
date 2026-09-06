@@ -34,7 +34,7 @@ export interface CursoType {
   id: string;
   nome: string;
   codigoAcesso: string;
-  monitorId: string;
+  monitorIds: string[];
   modulos: ModuloType[];
 }
 

@@ -1,15 +1,19 @@
 import {
   questionFormSchema,
-  type NewActivityFormType,
   type QuestionFormType,
 } from '@/data/schemas/activity';
+import {
+  clearNewActivityStorage,
+  getNewActivityStorage,
+  type NewActivityStorageType,
+} from '@/data/newActivityStorage';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 
 export const useNewActivity = () => {
   const [localStorageActivityData, setLocalStorageActivityData] =
-    useState<NewActivityFormType | null>(null);
+    useState<NewActivityStorageType | null>(null);
 
   const methods = useForm<QuestionFormType>({
     resolver: zodResolver(questionFormSchema),
@@ -23,35 +27,29 @@ export const useNewActivity = () => {
   });
 
   useEffect(() => {
-    const data = localStorage.getItem('newActivityData');
+    const newActivityData = getNewActivityStorage();
 
-    if (!data) {
+    if (!newActivityData) {
       setLocalStorageActivityData(null);
       return;
     }
 
-    try {
-      const newActivityData = JSON.parse(data) as NewActivityFormType;
-      setLocalStorageActivityData(newActivityData);
+    setLocalStorageActivityData(newActivityData);
 
-      reset({
-        questions: Array.from({
-          length: newActivityData.qtdQuestions ?? 0,
-        }).map(() => ({
-          statement: '',
-          xp: 1,
-          alternatives: [
-            { text: '', isCorrect: false },
-            { text: '', isCorrect: false },
-            { text: '', isCorrect: false },
-            { text: '', isCorrect: false },
-          ],
-        })),
-      });
-    } catch {
-      setLocalStorageActivityData(null);
-      localStorage.removeItem('newActivityData');
-    }
+    reset({
+      questions: Array.from({
+        length: newActivityData.qtdQuestions ?? 0,
+      }).map(() => ({
+        statement: '',
+        xp: 1,
+        alternatives: [
+          { text: '', isCorrect: false },
+          { text: '', isCorrect: false },
+          { text: '', isCorrect: false },
+          { text: '', isCorrect: false },
+        ],
+      })),
+    });
   }, [reset]);
 
   const handleCreateActivity = (data: QuestionFormType) => {
@@ -75,6 +73,8 @@ export const useNewActivity = () => {
       totalXp,
       questions: questionsFormatted,
     };
+
+    clearNewActivityStorage()
 
     console.log(activityData);
   };

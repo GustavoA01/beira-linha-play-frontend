@@ -6,7 +6,7 @@ export const courseCodeSchema = z.object({
 
 export const newCourseSchema = z.object({
   nome: z.string().trim().min(1, 'Informe o nome do curso'),
-  monitorId: z.string().min(1, 'Selecione um monitor'),
+  monitorIds: z.array(z.string()).min(1, 'Adicione pelo menos um monitor'),
 });
 
 export type CourseCodeFormType = z.infer<typeof courseCodeSchema>;

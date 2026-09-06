@@ -2,6 +2,7 @@ import {
   newActivitySchema,
   type NewActivityFormType,
 } from '@/data/schemas/activity';
+import { setNewActivityStorage } from '@/data/newActivityStorage';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -15,15 +16,11 @@ export const useNewActivityDialog = () => {
   });
 
   const handleNewActivity = (data: NewActivityFormType) => {
-    const activityData = {
+    setNewActivityStorage({
       activityName: data.activityName,
       qtdQuestions: data.qtdQuestions,
-    };
-
-    const oldActivityData = localStorage.getItem('newActivityData');
-    if (oldActivityData) localStorage.removeItem('newActivityData');
-
-    localStorage.setItem('newActivityData', JSON.stringify(activityData));
+      messages: [],
+    });
     navigate(`/cursos/${cursoId}/modulos/${moduloId}/nova-atividade`);
   };
 

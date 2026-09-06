@@ -19,7 +19,7 @@ import {
 import { ErrorFormMessage } from '@/components/ErrorFormMessage';
 import { LabelInput } from '@/components/LabelInput';
 import type { CursoType } from '@/data/types/api';
-import { Controller } from 'react-hook-form';
+import { Plus, X } from 'lucide-react';
 import { useNewCourseDialog } from '../hooks/useNewCourseDialog';
 
 type NewCourseDialogPropsType = {
@@ -35,11 +35,15 @@ export const NewCourseDialog = ({
 }: NewCourseDialogPropsType) => {
   const {
     register,
-    control,
     onSubmit,
     errors,
     handleOpenChange,
-    monitores,
+    pendingMonitorId,
+    setPendingMonitorId,
+    addMonitor,
+    removeMonitor,
+    monitoresDisponiveis,
+    monitoresSelecionados,
     canSubmit,
     isEditing,
   } = useNewCourseDialog(onOpenChange, curso);
@@ -51,8 +55,8 @@ export const NewCourseDialog = ({
           <DialogTitle>{isEditing ? 'Editar curso' : 'Novo curso'}</DialogTitle>
           <DialogDescription>
             {isEditing
-              ? `Altere o nome ou o monitor responsável. Cod. ${curso?.codigoAcesso}`
-              : 'Informe o nome e o monitor responsável. O código de acesso é gerado automaticamente.'}
+              ? `Altere o nome ou os monitores responsáveis. Cod. ${curso?.codigoAcesso}`
+              : 'Informe o nome e adicione os monitores responsáveis. O código de acesso é gerado automaticamente.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -68,30 +72,59 @@ export const NewCourseDialog = ({
 
           <div>
             <Label htmlFor="monitorId">Monitor</Label>
-            <Controller
-              name="monitorId"
-              control={control}
-              render={({ field: { value, onChange } }) => (
-                <Select
-                  value={value || undefined}
-                  onValueChange={onChange}
-                  disabled={monitores.length === 0}
-                >
-                  <SelectTrigger id="monitorId" className="mt-1.5 w-full">
-                    <SelectValue placeholder="Selecione um monitor" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {monitores.map((monitor) => (
-                      <SelectItem key={monitor.id} value={monitor.id}>
-                        {monitor.nome}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+            <div className="mt-1.5 flex gap-2">
+              <Select
+                value={pendingMonitorId || undefined}
+                onValueChange={setPendingMonitorId}
+                disabled={monitoresDisponiveis.length === 0}
+              >
+                <SelectTrigger id="monitorId" className="w-full">
+                  <SelectValue
+                    placeholder={
+                      monitoresDisponiveis.length === 0
+                        ? 'Todos os monitores já foram adicionados'
+                        : 'Selecione um monitor'
+                    }
+                  />
+                </SelectTrigger>
+                <SelectContent>
+                  {monitoresDisponiveis.map((monitor) => (
+                    <SelectItem key={monitor.id} value={monitor.id}>
+                      {monitor.nome}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {pendingMonitorId && (
+                <Button type="button" onClick={addMonitor}>
+                  <Plus />
+                  Adicionar monitor
+                </Button>
               )}
-            />
-            {errors.monitorId?.message && (
-              <ErrorFormMessage message={errors.monitorId.message} />
+            </div>
+            {errors.monitorIds?.message && (
+              <ErrorFormMessage message={errors.monitorIds.message} />
+            )}
+            {monitoresSelecionados.length > 0 && (
+              <ul className="mt-3 space-y-2">
+                {monitoresSelecionados.map((monitor) => (
+                  <li
+                    key={monitor.id}
+                    className="flex items-center justify-between rounded-md border px-3 py-2 text-sm"
+                  >
+                    <span className="font-montserrat">{monitor.nome}</span>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label={`Remover ${monitor.nome}`}
+                      onClick={() => removeMonitor(monitor.id)}
+                    >
+                      <X />
+                    </Button>
+                  </li>
+                ))}
+              </ul>
             )}
             {!isEditing && (
               <p className="mt-1.5 text-xs text-zinc-500">

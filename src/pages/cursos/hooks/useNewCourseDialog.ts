@@ -2,17 +2,17 @@ import { newCourseSchema, type NewCourseFormType } from '@/data/schemas/course';
 import { temporaryMonitores } from '@/data/temporaryMocks/monitores';
 import type { CursoType } from '@/data/types/api';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 const emptyValues: NewCourseFormType = {
   nome: '',
-  monitorId: '',
+  monitorIds: [],
 };
 
 const valuesFromCurso = (curso?: CursoType): NewCourseFormType => {
   if (!curso) return emptyValues;
-  return { nome: curso.nome, monitorId: curso.monitorId };
+  return { nome: curso.nome, monitorIds: curso.monitorIds };
 };
 
 export const useNewCourseDialog = (
@@ -23,16 +23,43 @@ export const useNewCourseDialog = (
     resolver: zodResolver(newCourseSchema),
     defaultValues: valuesFromCurso(curso),
   });
+  const [pendingMonitorId, setPendingMonitorId] = useState('');
 
-  const monitorId = methods.watch('monitorId');
+  const monitorIds = methods.watch('monitorIds');
+  const monitoresDisponiveis = temporaryMonitores.filter(
+    (monitor) => !monitorIds.includes(monitor.id)
+  );
+  const monitoresSelecionados = temporaryMonitores.filter((monitor) =>
+    monitorIds.includes(monitor.id)
+  );
 
   useEffect(() => {
     methods.reset(valuesFromCurso(curso));
+    setPendingMonitorId('');
   }, [curso, methods]);
 
   const handleOpenChange = (nextOpen: boolean) => {
-    if (!nextOpen) methods.reset(valuesFromCurso(curso));
+    if (!nextOpen) {
+      methods.reset(valuesFromCurso(curso));
+      setPendingMonitorId('');
+    }
     onOpenChange(nextOpen);
+  };
+
+  const addMonitor = () => {
+    if (!pendingMonitorId || monitorIds.includes(pendingMonitorId)) return;
+    methods.setValue('monitorIds', [...monitorIds, pendingMonitorId], {
+      shouldValidate: true,
+    });
+    setPendingMonitorId('');
+  };
+
+  const removeMonitor = (id: string) => {
+    methods.setValue(
+      'monitorIds',
+      monitorIds.filter((monitorId) => monitorId !== id),
+      { shouldValidate: true }
+    );
   };
 
   const onSubmit = methods.handleSubmit((data: NewCourseFormType) => {
@@ -43,11 +70,15 @@ export const useNewCourseDialog = (
   return {
     onSubmit,
     register: methods.register,
-    control: methods.control,
     errors: methods.formState.errors,
     handleOpenChange,
-    monitores: temporaryMonitores,
-    canSubmit: Boolean(monitorId) && temporaryMonitores.length > 0,
+    pendingMonitorId,
+    setPendingMonitorId,
+    addMonitor,
+    removeMonitor,
+    monitoresDisponiveis,
+    monitoresSelecionados,
+    canSubmit: monitorIds.length > 0 && temporaryMonitores.length > 0,
     isEditing: Boolean(curso),
   };
 };

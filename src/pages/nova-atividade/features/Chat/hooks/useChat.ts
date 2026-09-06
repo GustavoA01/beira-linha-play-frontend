@@ -1,16 +1,17 @@
 import type { QuestionFormType } from '@/data/schemas/activity';
+import {
+  getNewActivityStorage,
+  setNewActivityChatMessages,
+  type NewActivityChatMessageType,
+} from '@/data/newActivityStorage';
 import { generateContent } from '@/services/googleConfig';
-import { useState, type KeyboardEvent } from 'react';
+import { useEffect, useState, type KeyboardEvent } from 'react';
 import { useForm, useFormContext } from 'react-hook-form';
 import { CHAT_SYSTEM_INSTRUCTION } from '../utils/constants';
 import { formatQuestionsMessage } from '../utils/formatQuestionsMessage';
 import { parseGeneratedQuestions } from '../utils/parseGeneratedQuestions';
 
-export type ChatMessageType = {
-  role: 'user' | 'assistant';
-  content: string;
-  questions?: QuestionFormType['questions'];
-};
+export type ChatMessageType = NewActivityChatMessageType;
 
 const appliedKey = (messageIndex: number, questionIndex: number) =>
   `${messageIndex}-${questionIndex}`;
@@ -25,8 +26,14 @@ export const useChat = () => {
   }>();
   const { getValues, setValue, watch } = useFormContext<QuestionFormType>();
   const [isLoading, setIsLoading] = useState(false);
-  const [messages, setMessages] = useState<ChatMessageType[]>([]);
+  const [messages, setMessages] = useState<ChatMessageType[]>(
+    () => getNewActivityStorage()?.messages ?? []
+  );
   const [appliedQuestionKeys, setAppliedQuestionKeys] = useState<string[]>([]);
+
+  useEffect(() => {
+    setNewActivityChatMessages(messages);
+  }, [messages]);
   const formQuestions = watch('questions');
 
   const formFull =

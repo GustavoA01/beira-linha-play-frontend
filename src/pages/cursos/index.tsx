@@ -2,10 +2,11 @@ import { CourseCard } from '@/pages/cursos/components/CourseCard';
 import { CoursesHeader } from './components/CoursesHeader';
 import { CodeDialog } from './components/CodeDialog';
 import { NewCourseDialog } from './components/NewCourseDialog';
+import { NewAdminDialog } from './components/NewAdminDialog';
 import { useMediaDevice } from '@/hooks/useMediaDevice';
 import { motion } from 'framer-motion';
 import { temporaryCursos } from '@/data/temporaryMocks/cursos';
-import { getMonitorById } from '@/data/temporaryMocks/monitores';
+import { getMonitoresNomes } from '@/data/temporaryMocks/monitores';
 import { useCursos } from './hooks/useCursos';
 import { useAuthUser } from '@/providers/UserProvider';
 import { cn } from '@/lib/utils';
@@ -22,6 +23,7 @@ export const CoursesPage = () => {
     handleCodeSubmit,
   } = useCursos(user);
   const [openCourseDialog, setOpenCourseDialog] = useState(false);
+  const [openAdminDialog, setOpenAdminDialog] = useState(false);
 
   return (
     <div
@@ -34,6 +36,7 @@ export const CoursesPage = () => {
         role={user.tipo}
         isAdmin={isAdmin}
         onAddCourse={() => setOpenCourseDialog(true)}
+        onAddAdmin={() => setOpenAdminDialog(true)}
       />
 
       <div className="flex flex-col scrollbar-hidden overflow-y-auto md:grid md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 mt-4 sm:mt-8 pb-18 pt-2 gap-4">
@@ -50,7 +53,7 @@ export const CoursesPage = () => {
               locked={isLocked(curso.id)}
               codCurso={curso.codigoAcesso}
               onClick={() => handleCourseClick(curso)}
-              monitorNome={getMonitorById(curso.monitorId)?.nome ?? 'Monitor'}
+              monitorNome={getMonitoresNomes(curso.monitorIds)}
             />
           </motion.div>
         ))}
@@ -64,6 +67,10 @@ export const CoursesPage = () => {
       <NewCourseDialog
         open={openCourseDialog}
         onOpenChange={setOpenCourseDialog}
+      />
+      <NewAdminDialog
+        open={openAdminDialog}
+        onOpenChange={setOpenAdminDialog}
       />
     </div>
   );

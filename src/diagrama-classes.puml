@@ -40,7 +40,7 @@ class Curso {
   - id: string
   - nome: string
   - codigoAcesso: string
-  - monitorId: string
+  - monitorIds: string[]
 }
 
 class Modulo {

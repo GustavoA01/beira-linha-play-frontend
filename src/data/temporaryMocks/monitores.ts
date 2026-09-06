@@ -38,6 +38,12 @@ export const temporaryMonitores: MonitorType[] = [
 export const getMonitorById = (id: string) =>
   temporaryMonitores.find((monitor) => monitor.id === id);
 
+export const getMonitoresNomes = (ids: string[]) =>
+  ids
+    .map((id) => getMonitorById(id)?.nome)
+    .filter((nome): nome is string => Boolean(nome))
+    .join(', ') || 'Monitor';
+
 export const findMonitorByCredentials = (email: string, senha: string) =>
   temporaryMonitores.find(
     (monitor) =>

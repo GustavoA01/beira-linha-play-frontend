@@ -1,11 +1,12 @@
 import { Button } from '@/components/ui/button';
 import type { UsuarioType } from '@/data/types/api';
-import { Plus } from 'lucide-react';
+import { Plus, UserPlus } from 'lucide-react';
 
 type CoursesHeaderProps = {
   role: UsuarioType['tipo'];
   isAdmin: boolean;
   onAddCourse: () => void;
+  onAddAdmin: () => void;
 };
 
 const labels = {
@@ -18,6 +19,7 @@ export const CoursesHeader = ({
   role,
   isAdmin,
   onAddCourse,
+  onAddAdmin,
 }: CoursesHeaderProps) => (
   <header className="flex justify-between items-center gap-4">
     <div>
@@ -30,10 +32,16 @@ export const CoursesHeader = ({
     </div>
 
     {isAdmin && (
-      <Button className="max-sm:w-10" onClick={onAddCourse}>
-        <Plus />
-        <p className="max-sm:hidden">Adicionar Curso</p>
-      </Button>
+      <div className="flex shrink-0 items-center gap-2">
+        <Button className="max-sm:w-10" onClick={onAddAdmin}>
+          <UserPlus />
+          <p className="max-sm:hidden">Adicionar Admin</p>
+        </Button>
+        <Button className="max-sm:w-10" onClick={onAddCourse}>
+          <Plus />
+          <p className="max-sm:hidden">Adicionar Curso</p>
+        </Button>
+      </div>
     )}
   </header>
 );

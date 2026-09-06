@@ -103,6 +103,22 @@ export const editAccountSchema = z
     }
   });
 
+export const newAdminSchema = z
+  .object({
+    nome: z.string().trim().min(1, 'Informe o nome'),
+    senha: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),
+    confirmarSenha: z.string().min(1, 'Confirme a senha'),
+  })
+  .superRefine((data, ctx) => {
+    if (data.senha !== data.confirmarSenha) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'As senhas não coincidem',
+        path: ['confirmarSenha'],
+      });
+    }
+  });
+
 export type RegisterFormType = z.infer<typeof registerSchema>;
 export type RegisterRoleType = RegisterFormType['tipo'];
 
@@ -110,3 +126,4 @@ export type LoginFormType = z.infer<typeof loginSchema>;
 export type LoginRoleType = LoginFormType['tipo'];
 
 export type EditAccountFormType = z.infer<typeof editAccountSchema>;
+export type NewAdminFormType = z.infer<typeof newAdminSchema>;
