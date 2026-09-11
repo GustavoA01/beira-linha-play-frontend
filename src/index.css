@@ -169,3 +169,10 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+.react-flow__node-phase {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  box-shadow: none !important;
+}

@@ -13,7 +13,9 @@ describe('PhaseProgressModal', () => {
   it('shows in-progress copy when points are below the minimum', () => {
     renderModal(40, 100);
 
-    expect(screen.getByRole('heading', { name: 'Nível 3' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Nível 3' })
+    ).toBeInTheDocument();
     expect(screen.getByText('Em progresso')).toBeInTheDocument();
     expect(screen.getByText('40%')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Voltar' })).toBeInTheDocument();
@@ -22,7 +24,9 @@ describe('PhaseProgressModal', () => {
   it('shows completed copy when the bar is full', () => {
     renderModal(80, 80, '1');
 
-    expect(screen.getByRole('heading', { name: 'Nível 1' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Nível 1' })
+    ).toBeInTheDocument();
     expect(screen.getByText('Concluído')).toBeInTheDocument();
     expect(screen.getByText('100%')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Legal!' })).toBeInTheDocument();

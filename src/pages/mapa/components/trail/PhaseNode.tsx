@@ -1,4 +1,5 @@
 import { Handle, Position } from '@xyflow/react';
+import { motion } from 'motion/react';
 import { PhaseProgressModal } from '@/pages/mapa/components/ProgressModal/PhaseProgressModal';
 import type { PhaseNodeProps } from '@/data/types/reactFlow';
 import { usePhaseNode } from '@/pages/mapa/hooks/usePhaseNode';
@@ -12,11 +13,11 @@ export const PhaseNode = ({ id, data: { minPoints } }: PhaseNodeProps) => {
     setOpenDialog,
     isInteractive,
     points,
-    baseBgClass,
-    shineClass,
+    glowColors,
     iconClassName,
-    overlayGradientClass,
   } = usePhaseNode(minPoints);
+
+  const pulseDelay = ((Number(id) || 1) % 5) * 0.6;
 
   return (
     <>
@@ -28,21 +29,18 @@ export const PhaseNode = ({ id, data: { minPoints } }: PhaseNodeProps) => {
             'transition-all ease-in hover:scale-105 cursor-pointer'
         )}
       >
-        <div className={cn('absolute inset-0 rounded-full', baseBgClass)} />
-
-        <div
-          className={cn(
-            'absolute inset-0 bottom-[3px] rounded-full',
-            overlayGradientClass
-          )}
+        <motion.div
+          className="absolute inset-0 rounded-full ring-1 ring-inset ring-black/10"
+          animate={{ backgroundColor: glowColors }}
+          transition={{
+            duration: 6,
+            delay: pulseDelay,
+            repeat: Infinity,
+            ease: 'easeInOut',
+          }}
         />
 
-        <div
-          className={cn(
-            'pointer-events-none absolute inset-0 rounded-full',
-            shineClass
-          )}
-        />
+        <div className="pointer-events-none absolute inset-0 bottom-[3px] rounded-full bg-linear-to-b from-white/25 to-transparent" />
 
         <div className="absolute inset-0 flex items-center justify-center">
           <Icon size={32} className={cn('drop-shadow-sm', iconClassName)} />

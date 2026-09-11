@@ -26,7 +26,11 @@ export const useChat = () => {
   } = useForm<{
     message: string;
   }>();
-  const { getValues, setValue, watch:watchQuestions } = useFormContext<QuestionFormType>();
+  const {
+    getValues,
+    setValue,
+    watch: watchQuestions,
+  } = useFormContext<QuestionFormType>();
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<ChatMessageType[]>(
     () => getNewActivityStorage()?.messages ?? []

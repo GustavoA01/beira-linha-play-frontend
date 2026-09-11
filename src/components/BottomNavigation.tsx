@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { motion } from 'motion/react';
+import { LayoutGroup, motion } from 'motion/react';
 import { getBottomNavigateButtons } from '@/data/constants';
 import { useAuthUser } from '@/providers/UserProvider';
 import { cn } from '@/lib/utils';
@@ -9,32 +9,38 @@ export const BottomNavigation = () => {
   const { isMonitor } = useAuthUser();
 
   return (
-    <motion.nav
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="fixed bottom-6 z-40 items-center w-50 left-1/2 -translate-x-1/2 rounded-full gap-6 bg-white shadow-md py-2 flex justify-center sm:hidden"
-    >
-      {getBottomNavigateButtons(isMonitor).map((button) => {
-        const selected = pathname === button.to;
+    <LayoutGroup>
+      <motion.nav
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="fixed bottom-6 z-40 flex items-center justify-center gap-6 w-50 left-1/2 -translate-x-1/2 rounded-full bg-white shadow-md py-2 sm:hidden"
+      >
+        {getBottomNavigateButtons(isMonitor).map((button) => {
+          const selected = pathname === button.to;
 
-        return (
-          <Link key={button.to} to={button.to} className="relative">
-            <motion.div
-              initial={false}
-              className={cn('rounded-full', selected && 'text-white p-3')}
-              animate={{
-                backgroundColor: selected ? '#2d5586' : '#ffffff',
-                transition: { stiffness: 300, damping: 20, type: 'spring' },
-                opacity: selected ? 1 : 0.3,
-                scale: selected ? 1.1 : 1,
-                y: selected ? -3 : 0,
-              }}
+          return (
+            <Link
+              key={button.to}
+              to={button.to}
+              className="relative flex size-11 items-center justify-center"
             >
-              <button.icon />
-            </motion.div>
-          </Link>
-        );
-      })}
-    </motion.nav>
+              {selected && (
+                <motion.span
+                  layoutId="bottom-nav-ball"
+                  className="absolute inset-0 rounded-full bg-primary"
+                  transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+                />
+              )}
+              <button.icon
+                className={cn(
+                  'relative z-10 transition-colors duration-200',
+                  selected ? 'text-white' : 'text-zinc-400'
+                )}
+              />
+            </Link>
+          );
+        })}
+      </motion.nav>
+    </LayoutGroup>
   );
 };

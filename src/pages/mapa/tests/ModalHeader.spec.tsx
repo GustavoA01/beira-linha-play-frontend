@@ -14,7 +14,9 @@ describe('ModalHeader', () => {
   it('shows the level and in-progress status', () => {
     renderHeader(<ModalHeader level="2" concluded={false} />);
 
-    expect(screen.getByRole('heading', { name: 'Nível 2' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Nível 2' })
+    ).toBeInTheDocument();
     expect(screen.getByText('Em progresso')).toBeInTheDocument();
     expect(screen.queryByText('Concluído')).not.toBeInTheDocument();
   });
@@ -22,7 +24,9 @@ describe('ModalHeader', () => {
   it('shows the completed status', () => {
     renderHeader(<ModalHeader level="5" concluded />);
 
-    expect(screen.getByRole('heading', { name: 'Nível 5' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Nível 5' })
+    ).toBeInTheDocument();
     expect(screen.getByText('Concluído')).toBeInTheDocument();
     expect(screen.queryByText('Em progresso')).not.toBeInTheDocument();
   });

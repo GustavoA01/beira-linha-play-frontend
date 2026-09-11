@@ -20,7 +20,9 @@ jest.mock('@/components/ui/drawer', () => ({
     <header>{children}</header>
   ),
   DrawerTitle: ({ children }: { children: ReactNode }) => <h2>{children}</h2>,
-  DrawerDescription: ({ children }: { children: ReactNode }) => <p>{children}</p>,
+  DrawerDescription: ({ children }: { children: ReactNode }) => (
+    <p>{children}</p>
+  ),
   DrawerClose: ({ children }: { children: ReactNode }) => children,
 }));
 
@@ -109,9 +111,7 @@ describe('Chat', () => {
 
     render(<ChatHarness />);
 
-    expect(
-      screen.getByText('Crie perguntas sobre listas')
-    ).toBeInTheDocument();
+    expect(screen.getByText('Crie perguntas sobre listas')).toBeInTheDocument();
   });
 
   it('shows the empty state', () => {

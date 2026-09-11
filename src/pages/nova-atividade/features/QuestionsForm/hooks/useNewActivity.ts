@@ -74,7 +74,7 @@ export const useNewActivity = () => {
       questions: questionsFormatted,
     };
 
-    clearNewActivityStorage()
+    clearNewActivityStorage();
 
     console.log(activityData);
   };
