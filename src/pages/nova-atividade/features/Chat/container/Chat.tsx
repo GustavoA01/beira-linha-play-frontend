@@ -13,6 +13,7 @@ export const Chat = () => {
     applyAllQuestions,
     isQuestionApplied,
     formFull,
+    canSend,
     clearMessages,
     handleOnKeyDown,
   } = useChat();
@@ -32,6 +33,7 @@ export const Chat = () => {
         onSubmit={onSubmit}
         register={register}
         isLoading={isLoading}
+        canSend={canSend}
         handleOnKeyDown={handleOnKeyDown}
       />
     </div>

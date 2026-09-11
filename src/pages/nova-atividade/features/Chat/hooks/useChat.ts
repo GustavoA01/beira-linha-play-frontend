@@ -21,10 +21,12 @@ export const useChat = () => {
     register,
     handleSubmit,
     reset: resetInput,
+    getValues: getInputValues,
+    watch: watchInput,
   } = useForm<{
     message: string;
   }>();
-  const { getValues, setValue, watch } = useFormContext<QuestionFormType>();
+  const { getValues, setValue, watch:watchQuestions } = useFormContext<QuestionFormType>();
   const [isLoading, setIsLoading] = useState(false);
   const [messages, setMessages] = useState<ChatMessageType[]>(
     () => getNewActivityStorage()?.messages ?? []
@@ -34,14 +36,16 @@ export const useChat = () => {
   useEffect(() => {
     setNewActivityChatMessages(messages);
   }, [messages]);
-  const formQuestions = watch('questions');
+  const formQuestions = watchQuestions('questions');
+  const canSend = !!watchInput('message')?.trim();
 
   const formFull =
     !!formQuestions?.length &&
     formQuestions.every((question) => question.statement.trim() !== '');
 
   const onSubmit = handleSubmit(async (data: { message: string }) => {
-    const userMessage = data.message;
+    const userMessage = data.message.trim();
+    if (!userMessage) return;
 
     resetInput({ message: '' });
     setIsLoading(true);
@@ -134,6 +138,7 @@ export const useChat = () => {
 
   const handleOnKeyDown = (e: KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key !== 'Enter' || e.shiftKey || e.nativeEvent.isComposing) return;
+    if (!getInputValues('message')?.trim()) return;
     e.preventDefault();
     e.currentTarget.form?.requestSubmit();
   };
@@ -147,6 +152,7 @@ export const useChat = () => {
     applyAllQuestions,
     isQuestionApplied,
     formFull,
+    canSend,
     clearMessages,
     handleOnKeyDown,
   };

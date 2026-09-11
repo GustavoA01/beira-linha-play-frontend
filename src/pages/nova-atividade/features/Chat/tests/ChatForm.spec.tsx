@@ -5,37 +5,46 @@ import { ChatForm } from '../components/ChatForm';
 
 const ChatFormHarness = ({
   isLoading = false,
+  canSend,
   onSubmit = jest.fn((event: React.FormEvent<HTMLFormElement>) =>
     event.preventDefault()
   ),
   handleOnKeyDown = jest.fn(),
 }: {
   isLoading?: boolean;
+  canSend?: boolean;
   onSubmit?: (event: React.FormEvent<HTMLFormElement>) => void;
   handleOnKeyDown?: React.KeyboardEventHandler<HTMLTextAreaElement>;
 }) => {
-  const { register } = useForm<{ message: string }>({
+  const { register, watch } = useForm<{ message: string }>({
     defaultValues: { message: '' },
   });
+  const hasText = !!watch('message')?.trim();
 
   return (
     <ChatForm
       onSubmit={onSubmit}
       register={register}
       isLoading={isLoading}
+      canSend={canSend ?? hasText}
       handleOnKeyDown={handleOnKeyDown}
     />
   );
 };
 
-const submitButton = () =>
-  screen
-    .getByPlaceholderText(/Crie perguntas|Aguarde/)
-    .closest('form')
-    ?.querySelector('button[type="submit"]') as HTMLButtonElement;
+const submitButton = () => screen.getByRole('button', { name: 'Enviar' });
 
 describe('ChatForm', () => {
-  it('shows the idle placeholder and submits the form', async () => {
+  it('shows the idle placeholder with a dimmed send button', () => {
+    render(<ChatFormHarness />);
+
+    expect(
+      screen.getByPlaceholderText('Crie perguntas de três níveis sobre...')
+    ).toBeInTheDocument();
+    expect(submitButton()).toBeDisabled();
+  });
+
+  it('enables send when there is text and submits the form', async () => {
     const user = userEvent.setup();
     const onSubmit = jest.fn((event: React.FormEvent<HTMLFormElement>) =>
       event.preventDefault()
@@ -43,9 +52,11 @@ describe('ChatForm', () => {
 
     render(<ChatFormHarness onSubmit={onSubmit} />);
 
-    expect(
-      screen.getByPlaceholderText('Crie perguntas de três níveis sobre...')
-    ).toBeInTheDocument();
+    await user.type(
+      screen.getByPlaceholderText('Crie perguntas de três níveis sobre...'),
+      'crie 2 perguntas'
+    );
+    expect(submitButton()).toBeEnabled();
 
     await user.click(submitButton());
 
@@ -53,7 +64,7 @@ describe('ChatForm', () => {
   });
 
   it('disables the field while loading', () => {
-    render(<ChatFormHarness isLoading />);
+    render(<ChatFormHarness isLoading canSend />);
 
     expect(screen.getByPlaceholderText('Aguarde a resposta...')).toBeDisabled();
     expect(submitButton()).toBeDisabled();
