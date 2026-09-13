@@ -2,14 +2,27 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { UserProvider } from '@/providers/UserProvider';
+import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
+import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
+import { cadastro } from '@/services/auth';
 import { RegisterPage } from '../register';
 
 jest.mock('@/assets/logo-beira-linha.png', () => 'logo.png');
 
+jest.mock('@/services/auth', () => ({
+  login: jest.fn(),
+  cadastro: jest.fn(),
+  me: jest.fn(),
+  refresh: jest.fn(),
+  logout: jest.fn(),
+}));
+
+const mockedCadastro = cadastro as jest.MockedFunction<typeof cadastro>;
+
 const renderPage = () =>
   render(
     <MemoryRouter initialEntries={['/cadastro']}>
-      <UserProvider>
+      <UserProvider initialUser={null}>
         <Routes>
           <Route path="/cadastro" element={<RegisterPage />} />
           <Route path="/" element={<p>Mapa do aluno</p>} />
@@ -21,6 +34,10 @@ const renderPage = () =>
   );
 
 describe('RegisterPage', () => {
+  beforeEach(() => {
+    mockedCadastro.mockReset();
+  });
+
   it('shows the student form by default', () => {
     renderPage();
 
@@ -107,6 +124,7 @@ describe('RegisterPage', () => {
 
   it('registers the student and goes to the map', async () => {
     const user = userEvent.setup();
+    mockedCadastro.mockResolvedValue(mockLoggedAluno);
     renderPage();
 
     await user.type(screen.getByLabelText('Nome'), 'Gustavo Aguiar');
@@ -115,11 +133,18 @@ describe('RegisterPage', () => {
     await user.type(screen.getByLabelText('Confirmar senha'), '123456');
     await user.click(screen.getByRole('button', { name: 'Cadastrar' }));
 
+    expect(mockedCadastro).toHaveBeenCalledWith({
+      tipo: 'ALUNO',
+      nome: 'Gustavo Aguiar',
+      apelido: 'Gu',
+      senha: '123456',
+    });
     expect(await screen.findByText('Mapa do aluno')).toBeInTheDocument();
   });
 
   it('registers the monitor and goes to courses', async () => {
     const user = userEvent.setup();
+    mockedCadastro.mockResolvedValue(mockLoggedMonitor);
     renderPage();
 
     await user.click(
@@ -131,6 +156,12 @@ describe('RegisterPage', () => {
     await user.type(screen.getByLabelText('Confirmar senha'), '123456');
     await user.click(screen.getByRole('button', { name: 'Cadastrar' }));
 
+    expect(mockedCadastro).toHaveBeenCalledWith({
+      tipo: 'MONITOR',
+      nome: 'Maria Souza',
+      email: 'maria.souza@pucminas.br',
+      senha: '123456',
+    });
     expect(await screen.findByText('Lista de cursos')).toBeInTheDocument();
   });
 

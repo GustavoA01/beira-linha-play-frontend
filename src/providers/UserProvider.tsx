@@ -1,6 +1,8 @@
 import {
   createContext,
+  useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -11,9 +13,9 @@ import type {
   MonitorType,
   UsuarioType,
 } from '@/data/types/api';
-import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
-import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
-import { mockLoggedAdmin } from '@/data/temporaryMocks/admins';
+import { me, refresh } from '@/services/auth';
+
+export type SessionStatus = 'loading' | 'anonimo' | 'autenticado';
 
 type SetUserType = (user: UsuarioType | null) => void;
 
@@ -21,6 +23,7 @@ type UserContextType =
   | {
       user: AlunoType;
       setUser: SetUserType;
+      status: SessionStatus;
       isAluno: true;
       isMonitor: false;
       isAdmin: false;
@@ -28,6 +31,7 @@ type UserContextType =
   | {
       user: MonitorType;
       setUser: SetUserType;
+      status: SessionStatus;
       isAluno: false;
       isMonitor: true;
       isAdmin: false;
@@ -35,6 +39,7 @@ type UserContextType =
   | {
       user: AdminType;
       setUser: SetUserType;
+      status: SessionStatus;
       isAluno: false;
       isMonitor: false;
       isAdmin: true;
@@ -42,6 +47,7 @@ type UserContextType =
   | {
       user: null;
       setUser: SetUserType;
+      status: SessionStatus;
       isAluno: false;
       isMonitor: false;
       isAdmin: false;
@@ -49,33 +55,108 @@ type UserContextType =
 
 const UserContext = createContext<UserContextType | null>(null);
 
+const statusFromUser = (user: UsuarioType | null): SessionStatus =>
+  user ? 'autenticado' : 'anonimo';
+
 export const UserProvider = ({
   children,
-  initialUser = mockLoggedAluno,
+  initialUser,
 }: {
   children: ReactNode;
   initialUser?: UsuarioType | null;
 }) => {
-  const [user, setUser] = useState<UsuarioType | null>(initialUser);
+  const skipBoot = initialUser !== undefined;
+  const [user, setUserState] = useState<UsuarioType | null>(
+    initialUser ?? null
+  );
+  const [status, setStatus] = useState<SessionStatus>(
+    skipBoot ? statusFromUser(initialUser ?? null) : 'loading'
+  );
+
+  const setUser = useCallback<SetUserType>((nextUser) => {
+    setUserState(nextUser);
+    setStatus(statusFromUser(nextUser));
+  }, []);
+
+  useEffect(() => {
+    if (skipBoot) {
+      return;
+    }
+
+    let cancelled = false;
+
+    const boot = async () => {
+      try {
+        const current = await me();
+        if (cancelled) {
+          return;
+        }
+
+        if (current) {
+          setUser(current);
+          return;
+        }
+
+        const restored = await refresh();
+        if (cancelled) {
+          return;
+        }
+
+        setUser(restored);
+      } catch {
+        if (!cancelled) {
+          setUser(null);
+        }
+      }
+    };
+
+    void boot();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [setUser, skipBoot]);
 
   const value = useMemo((): UserContextType => {
     if (user?.tipo === 'ALUNO') {
-      return { user, setUser, isAluno: true, isMonitor: false, isAdmin: false };
+      return {
+        user,
+        setUser,
+        status,
+        isAluno: true,
+        isMonitor: false,
+        isAdmin: false,
+      };
     }
     if (user?.tipo === 'MONITOR') {
-      return { user, setUser, isAluno: false, isMonitor: true, isAdmin: false };
+      return {
+        user,
+        setUser,
+        status,
+        isAluno: false,
+        isMonitor: true,
+        isAdmin: false,
+      };
     }
     if (user?.tipo === 'ADMIN') {
-      return { user, setUser, isAluno: false, isMonitor: false, isAdmin: true };
+      return {
+        user,
+        setUser,
+        status,
+        isAluno: false,
+        isMonitor: false,
+        isAdmin: true,
+      };
     }
     return {
       user: null,
       setUser,
+      status,
       isAluno: false,
       isMonitor: false,
       isAdmin: false,
     };
-  }, [user]);
+  }, [setUser, status, user]);
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 };

@@ -12,7 +12,7 @@ const topRanksIcons = [
   <Medal className="text-amber-700" />,
 ];
 
-type RankItemType = Omit<AlunoType, 'tipo' | 'senha' | 'cursoIds'> & {
+type RankItemType = Omit<AlunoType, 'tipo' | 'cursoIds'> & {
   position: number;
 };
 

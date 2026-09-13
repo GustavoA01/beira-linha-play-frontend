@@ -26,6 +26,7 @@ describe('CoursesPage', () => {
     mockedUseAuthUser.mockReturnValue({
       user: mockLoggedMonitor,
       setUser: jest.fn(),
+      status: 'autenticado',
       isAluno: false,
       isMonitor: true,
       isAdmin: false,
@@ -46,6 +47,7 @@ describe('CoursesPage', () => {
     mockedUseAuthUser.mockReturnValue({
       user: mockLoggedAdmin,
       setUser: jest.fn(),
+      status: 'autenticado',
       isAluno: false,
       isMonitor: false,
       isAdmin: true,

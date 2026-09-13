@@ -28,7 +28,6 @@ export const useNewAdminDialog = (onOpenChange: (open: boolean) => void) => {
     const admin: AdminType = {
       id: newAdminId(),
       nome: data.nome,
-      senha: data.senha,
       tipo: 'ADMIN',
     };
     console.log(admin);

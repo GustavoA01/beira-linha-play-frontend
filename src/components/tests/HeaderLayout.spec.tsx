@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { HeaderLayout } from '@/components/layouts/HeaderLayout';
+import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
 import { UserProvider } from '@/providers/UserProvider';
 
 jest.mock('@/assets/logo-beira-linha.png', () => 'logo.png');
@@ -8,7 +9,7 @@ jest.mock('@/assets/logo-beira-linha.png', () => 'logo.png');
 const renderLayout = (route: string) =>
   render(
     <MemoryRouter initialEntries={[route]}>
-      <UserProvider>
+      <UserProvider initialUser={mockLoggedAluno}>
         <Routes>
           <Route element={<HeaderLayout />}>
             <Route path="/cursos" element={<p>Lista de cursos</p>} />

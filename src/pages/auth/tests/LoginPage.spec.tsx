@@ -2,14 +2,27 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { UserProvider } from '@/providers/UserProvider';
+import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
+import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
+import { login } from '@/services/auth';
 import { LoginPage } from '../login';
 
 jest.mock('@/assets/logo-beira-linha.png', () => 'logo.png');
 
+jest.mock('@/services/auth', () => ({
+  login: jest.fn(),
+  cadastro: jest.fn(),
+  me: jest.fn(),
+  refresh: jest.fn(),
+  logout: jest.fn(),
+}));
+
+const mockedLogin = login as jest.MockedFunction<typeof login>;
+
 const renderPage = () =>
   render(
     <MemoryRouter initialEntries={['/login']}>
-      <UserProvider>
+      <UserProvider initialUser={null}>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/" element={<p>Mapa do aluno</p>} />
@@ -21,6 +34,10 @@ const renderPage = () =>
   );
 
 describe('LoginPage', () => {
+  beforeEach(() => {
+    mockedLogin.mockReset();
+  });
+
   it('shows the student form by default', () => {
     renderPage();
 
@@ -83,6 +100,7 @@ describe('LoginPage', () => {
 
   it('shows an error when student credentials are invalid', async () => {
     const user = userEvent.setup();
+    mockedLogin.mockRejectedValue(new Error('Apelido ou senha inválidos'));
     renderPage();
 
     await user.type(screen.getByLabelText('Apelido'), 'Gu');
@@ -96,17 +114,24 @@ describe('LoginPage', () => {
 
   it('logs in the student and goes to the map', async () => {
     const user = userEvent.setup();
+    mockedLogin.mockResolvedValue(mockLoggedAluno);
     renderPage();
 
     await user.type(screen.getByLabelText('Apelido'), 'Gu');
     await user.type(screen.getByLabelText('Senha'), '123456');
     await user.click(screen.getByRole('button', { name: 'Entrar' }));
 
+    expect(mockedLogin).toHaveBeenCalledWith({
+      tipo: 'ALUNO',
+      apelido: 'Gu',
+      senha: '123456',
+    });
     expect(await screen.findByText('Mapa do aluno')).toBeInTheDocument();
   });
 
   it('logs in the monitor and goes to courses', async () => {
     const user = userEvent.setup();
+    mockedLogin.mockResolvedValue(mockLoggedMonitor);
     renderPage();
 
     await user.click(
@@ -116,6 +141,11 @@ describe('LoginPage', () => {
     await user.type(screen.getByLabelText('Senha'), '123456');
     await user.click(screen.getByRole('button', { name: 'Entrar' }));
 
+    expect(mockedLogin).toHaveBeenCalledWith({
+      tipo: 'MONITOR',
+      email: 'maria.souza@pucminas.br',
+      senha: '123456',
+    });
     expect(await screen.findByText('Lista de cursos')).toBeInTheDocument();
   });
 

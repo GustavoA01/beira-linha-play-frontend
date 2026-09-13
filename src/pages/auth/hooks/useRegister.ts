@@ -3,14 +3,11 @@ import {
   type RegisterFormType,
   type RegisterRoleType,
 } from '@/data/schemas/auth';
-import type { AlunoType, MonitorType } from '@/data/types/api';
 import { useUserProvider } from '@/providers/UserProvider';
+import { cadastro } from '@/services/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-
-const newUserId = (prefix: string) =>
-  globalThis.crypto?.randomUUID?.() ?? `${prefix}-${Date.now()}`;
 
 export const useRegister = () => {
   const { setUser } = useUserProvider();
@@ -35,37 +32,24 @@ export const useRegister = () => {
     methods.clearErrors(['apelido', 'email']);
   };
 
-  const handleRole = {
-    ALUNO: (data: RegisterFormType) => {
-      const aluno: AlunoType = {
-        id: newUserId('aluno'),
+  const onSubmit = methods.handleSubmit(async (data: RegisterFormType) => {
+    try {
+      const user = await cadastro({
+        tipo: data.tipo,
         nome: data.nome,
-        apelido: data.apelido,
         senha: data.senha,
-        tipo: 'ALUNO',
-        pontos: 0,
-        imagemPerfil: '',
-        cursoIds: [],
-      };
-      setUser(aluno);
-      navigate('/', { replace: true });
-    },
-    MONITOR: (data: RegisterFormType) => {
-      const monitor: MonitorType = {
-        id: newUserId('monitor'),
-        nome: data.nome,
-        email: data.email,
-        senha: data.senha,
-        tipo: 'MONITOR',
-        cursoIds: [],
-      };
-      setUser(monitor);
-      navigate('/cursos', { replace: true });
-    },
-  };
-
-  const onSubmit = methods.handleSubmit((data: RegisterFormType) => {
-    handleRole[data.tipo](data);
+        ...(data.tipo === 'ALUNO'
+          ? { apelido: data.apelido }
+          : { email: data.email }),
+      });
+      setUser(user);
+      navigate(user.tipo === 'ALUNO' ? '/' : '/cursos', { replace: true });
+    } catch (error) {
+      methods.setError('root', {
+        message:
+          error instanceof Error ? error.message : 'Não foi possível cadastrar',
+      });
+    }
   });
 
   return {

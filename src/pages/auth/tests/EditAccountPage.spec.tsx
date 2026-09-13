@@ -27,6 +27,7 @@ const authOf = (user: UsuarioType, setUser = jest.fn()) => {
     return {
       user,
       setUser,
+      status: 'autenticado' as const,
       isAluno: true as const,
       isMonitor: false as const,
       isAdmin: false as const,
@@ -36,6 +37,7 @@ const authOf = (user: UsuarioType, setUser = jest.fn()) => {
     return {
       user,
       setUser,
+      status: 'autenticado' as const,
       isAluno: false as const,
       isMonitor: true as const,
       isAdmin: false as const,
@@ -44,6 +46,7 @@ const authOf = (user: UsuarioType, setUser = jest.fn()) => {
   return {
     user,
     setUser,
+    status: 'autenticado' as const,
     isAluno: false as const,
     isMonitor: false as const,
     isAdmin: true as const,

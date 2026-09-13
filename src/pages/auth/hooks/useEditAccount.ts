@@ -30,17 +30,15 @@ export const useEditAccount = () => {
     user: UsuarioType,
     data: EditAccountFormType
   ): UsuarioType => {
-    const senha = data.senha.length > 0 ? data.senha : user.senha;
-
     if (user.tipo === 'ALUNO') {
-      return { ...user, nome: data.nome, apelido: data.apelido, senha };
+      return { ...user, nome: data.nome, apelido: data.apelido };
     }
 
     if (user.tipo === 'MONITOR') {
-      return { ...user, nome: data.nome, email: data.email, senha };
+      return { ...user, nome: data.nome, email: data.email };
     }
 
-    return { ...user, nome: data.nome, senha };
+    return { ...user, nome: data.nome };
   };
 
   const onSubmit = methods.handleSubmit((data: EditAccountFormType) => {

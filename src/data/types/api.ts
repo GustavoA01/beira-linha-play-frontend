@@ -1,7 +1,6 @@
 export interface UsuarioBaseType {
   id: string;
   nome: string;
-  senha: string;
   cursoIds: string[];
 }
 
@@ -15,6 +14,7 @@ export interface AlunoType extends UsuarioBaseType {
 export interface MonitorType extends UsuarioBaseType {
   tipo: 'MONITOR';
   email: string;
+  cursoOrigem?: string | null;
 }
 
 export interface AdminType extends Omit<UsuarioBaseType, 'cursoIds'> {

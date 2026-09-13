@@ -1,6 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { RequireAuth } from '@/components/layouts/RequireAuth';
+import { RequireGuest } from '@/components/layouts/RequireGuest';
+import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
+import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
 import { useUserProvider } from '@/providers/UserProvider';
 
 jest.mock('@/providers/UserProvider', () => ({
@@ -11,19 +13,21 @@ const mockedUseUserProvider = useUserProvider as jest.MockedFunction<
   typeof useUserProvider
 >;
 
-const renderGuard = () =>
+const renderGuard = (path = '/login') =>
   render(
-    <MemoryRouter initialEntries={['/cursos']}>
+    <MemoryRouter initialEntries={[path]}>
       <Routes>
-        <Route path="/login" element={<p>Login</p>} />
-        <Route element={<RequireAuth />}>
-          <Route path="/cursos" element={<p>Privado</p>} />
+        <Route element={<RequireGuest />}>
+          <Route path="/login" element={<p>Login</p>} />
+          <Route path="/cadastro" element={<p>Cadastro</p>} />
         </Route>
+        <Route path="/" element={<p>Mapa do aluno</p>} />
+        <Route path="/cursos" element={<p>Lista de cursos</p>} />
       </Routes>
     </MemoryRouter>
   );
 
-describe('RequireAuth', () => {
+describe('RequireGuest', () => {
   it('does not navigate while the session is loading', () => {
     mockedUseUserProvider.mockReturnValue({
       user: null,
@@ -37,10 +41,9 @@ describe('RequireAuth', () => {
     renderGuard();
     expect(screen.getByLabelText('Loading')).toBeInTheDocument();
     expect(screen.queryByText('Login')).not.toBeInTheDocument();
-    expect(screen.queryByText('Privado')).not.toBeInTheDocument();
   });
 
-  it('redirects to login when the session is anonymous', () => {
+  it('shows the public route when the session is anonymous', () => {
     mockedUseUserProvider.mockReturnValue({
       user: null,
       setUser: jest.fn(),
@@ -54,15 +57,23 @@ describe('RequireAuth', () => {
     expect(screen.getByText('Login')).toBeInTheDocument();
   });
 
-  it('allows the route when the session is authenticated', () => {
+  it('sends the student home when already authenticated', () => {
     mockedUseUserProvider.mockReturnValue({
-      user: {
-        id: 'monitor-1',
-        nome: 'Maria Souza',
-        tipo: 'MONITOR',
-        email: 'maria.souza@pucminas.br',
-        cursoIds: ['curso-calculo-1'],
-      },
+      user: mockLoggedAluno,
+      setUser: jest.fn(),
+      status: 'autenticado',
+      isAluno: true,
+      isMonitor: false,
+      isAdmin: false,
+    });
+
+    renderGuard();
+    expect(screen.getByText('Mapa do aluno')).toBeInTheDocument();
+  });
+
+  it('sends the monitor to courses when already authenticated', () => {
+    mockedUseUserProvider.mockReturnValue({
+      user: mockLoggedMonitor,
       setUser: jest.fn(),
       status: 'autenticado',
       isAluno: false,
@@ -71,6 +82,6 @@ describe('RequireAuth', () => {
     });
 
     renderGuard();
-    expect(screen.getByText('Privado')).toBeInTheDocument();
+    expect(screen.getByText('Lista de cursos')).toBeInTheDocument();
   });
 });

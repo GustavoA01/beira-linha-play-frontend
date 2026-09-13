@@ -86,7 +86,6 @@ describe('NewAdminDialog', () => {
     expect(logSpy).toHaveBeenCalledWith(
       expect.objectContaining({
         nome: 'Ana Oliveira',
-        senha: '123456',
         tipo: 'ADMIN',
       })
     );

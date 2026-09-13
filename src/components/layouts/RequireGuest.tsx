@@ -2,15 +2,15 @@ import { Navigate, Outlet } from 'react-router-dom';
 import { SplashScreen } from '@/components/SplashScreen';
 import { useUserProvider } from '@/providers/UserProvider';
 
-export const RequireAuth = () => {
-  const { status } = useUserProvider();
+export const RequireGuest = () => {
+  const { status, user } = useUserProvider();
 
   if (status === 'loading') {
     return <SplashScreen />;
   }
 
-  if (status === 'anonimo') {
-    return <Navigate to="/login" replace />;
+  if (status === 'autenticado' && user) {
+    return <Navigate to={user.tipo === 'ALUNO' ? '/' : '/cursos'} replace />;
   }
 
   return <Outlet />;

@@ -3,9 +3,8 @@ import {
   type LoginFormType,
   type LoginRoleType,
 } from '@/data/schemas/auth';
-import { findMonitorByCredentials } from '@/data/temporaryMocks/monitores';
-import { findAlunoByCredentials } from '@/data/temporaryMocks/usuario';
 import { useUserProvider } from '@/providers/UserProvider';
+import { login } from '@/services/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -31,33 +30,23 @@ export const useLogin = () => {
     methods.clearErrors(['apelido', 'email', 'senha']);
   };
 
-  const handleRole = {
-    ALUNO: (data: LoginFormType) => {
-      const aluno = findAlunoByCredentials(data.apelido, data.senha);
-      if (!aluno) {
-        methods.setError('root', {
-          message: 'Apelido ou senha inválidos',
-        });
-        return;
-      }
-      setUser(aluno);
-      navigate('/', { replace: true });
-    },
-    MONITOR: (data: LoginFormType) => {
-      const monitor = findMonitorByCredentials(data.email, data.senha);
-      if (!monitor) {
-        methods.setError('root', {
-          message: 'E-mail ou senha inválidos',
-        });
-        return;
-      }
-      setUser(monitor);
-      navigate('/cursos', { replace: true });
-    },
-  };
-
-  const onSubmit = methods.handleSubmit((data: LoginFormType) => {
-    handleRole[data.tipo](data);
+  const onSubmit = methods.handleSubmit(async (data: LoginFormType) => {
+    try {
+      const user = await login({
+        tipo: data.tipo,
+        senha: data.senha,
+        ...(data.tipo === 'ALUNO'
+          ? { apelido: data.apelido }
+          : { email: data.email }),
+      });
+      setUser(user);
+      navigate(user.tipo === 'ALUNO' ? '/' : '/cursos', { replace: true });
+    } catch (error) {
+      methods.setError('root', {
+        message:
+          error instanceof Error ? error.message : 'Não foi possível entrar',
+      });
+    }
   });
 
   return {

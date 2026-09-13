@@ -1,6 +1,8 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { HeaderLayout } from './components/layouts/HeaderLayout';
 import { RequireAuth } from './components/layouts/RequireAuth';
+import { RequireGuest } from './components/layouts/RequireGuest';
+import { RequireMonitor } from './components/layouts/RequirePapel';
 import { Map } from './pages/mapa';
 import { CoursesPage } from './pages/cursos';
 import { MedalsPage } from './pages/medalhas';
@@ -22,12 +24,17 @@ export const Router = createBrowserRouter([
     ErrorBoundary: ErrorPage,
     children: [
       {
-        path: '/login',
-        Component: LoginPage,
-      },
-      {
-        path: '/cadastro',
-        Component: RegisterPage,
+        Component: RequireGuest,
+        children: [
+          {
+            path: '/login',
+            Component: LoginPage,
+          },
+          {
+            path: '/cadastro',
+            Component: RegisterPage,
+          },
+        ],
       },
       {
         Component: RequireAuth,
@@ -75,16 +82,21 @@ export const Router = createBrowserRouter([
             Component: ModulePage,
           },
           {
-            path: '/cursos/:cursoId/modulos/:moduloId/nova-atividade',
-            Component: NewActivityPage,
+            Component: RequireMonitor,
+            children: [
+              {
+                path: '/cursos/:cursoId/modulos/:moduloId/nova-atividade',
+                Component: NewActivityPage,
+              },
+              {
+                path: '/cursos/:cursoId/modulos/:moduloId/monitoramento/:atividadeId',
+                Component: ManagementPage,
+              },
+            ],
           },
           {
             path: '/cursos/:cursoId/modulos/:moduloId/atividade/:atividadeId',
             Component: ActivityPage,
-          },
-          {
-            path: '/cursos/:cursoId/modulos/:moduloId/monitoramento/:atividadeId',
-            Component: ManagementPage,
           },
         ],
       },
