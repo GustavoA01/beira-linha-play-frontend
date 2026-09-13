@@ -18,16 +18,18 @@ export const useLogin = () => {
       tipo: 'ALUNO',
       apelido: '',
       email: '',
+      nome: '',
       senha: '',
     },
   });
 
   const tipo = methods.watch('tipo');
   const isAluno = tipo === 'ALUNO';
+  const isAdmin = tipo === 'ADMIN';
 
   const enterAs = (nextTipo: LoginRoleType) => {
     methods.setValue('tipo', nextTipo);
-    methods.clearErrors(['apelido', 'email', 'senha']);
+    methods.clearErrors(['apelido', 'email', 'nome', 'senha']);
   };
 
   const onSubmit = methods.handleSubmit(async (data: LoginFormType) => {
@@ -37,7 +39,9 @@ export const useLogin = () => {
         senha: data.senha,
         ...(data.tipo === 'ALUNO'
           ? { apelido: data.apelido }
-          : { email: data.email }),
+          : data.tipo === 'MONITOR'
+            ? { email: data.email }
+            : { nome: data.nome }),
       });
       setUser(user);
       navigate(user.tipo === 'ALUNO' ? '/' : '/cursos', { replace: true });
@@ -54,7 +58,9 @@ export const useLogin = () => {
     register: methods.register,
     errors: methods.formState.errors,
     isAluno,
+    isAdmin,
     enterAsStudent: () => enterAs('ALUNO'),
     enterAsMonitor: () => enterAs('MONITOR'),
+    enterAsAdmin: () => enterAs('ADMIN'),
   };
 };

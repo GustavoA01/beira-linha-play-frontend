@@ -1,10 +1,13 @@
 import { toast } from '@/components/ui/toast';
 import { addMedalSchema, type AddMedalFormType } from '@/data/schemas/medal';
+import { ApiError } from '@/services/api';
 import { uploadImage } from '@/services/cloudinary';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { useCreateMedal } from './useMutation';
 
 export const useAddMedalDialog = (onOpenChange: (open: boolean) => void) => {
+  const { mutateAsync: addMedal, isPending } = useCreateMedal();
   const methods = useForm<AddMedalFormType>({
     resolver: zodResolver(addMedalSchema),
     defaultValues: {
@@ -19,29 +22,27 @@ export const useAddMedalDialog = (onOpenChange: (open: boolean) => void) => {
   };
 
   const onSubmit = methods.handleSubmit(async (data: AddMedalFormType) => {
-    try {
-      const imagem = data.imagem.item(0);
-      if (!imagem) {
-        toast.add({
-          type: 'error',
-          title: 'Erro ao enviar a imagem',
-        });
-        return;
-      }
+    const imagem = data.imagem.item(0);
+    if (!imagem) {
+      toast.add({
+        type: 'error',
+        title: 'Erro ao enviar a imagem',
+      });
+      return;
+    }
 
+    try {
       const imagemUrl = await uploadImage(imagem);
-      console.log({
+      await addMedal({
         nome: data.nome,
         pontosMin: data.pontosMin,
         imagemUrl,
       });
       handleOpenChange(false);
-      toast.add({
-        type: 'success',
-        title: 'Medalha adicionada',
-      });
     } catch (error) {
-      console.error(error);
+      if (error instanceof ApiError) {
+        return;
+      }
       methods.setError('imagem', {
         message: 'Não foi possível enviar a imagem. Tente de novo.',
       });
@@ -56,7 +57,7 @@ export const useAddMedalDialog = (onOpenChange: (open: boolean) => void) => {
     onSubmit,
     register: methods.register,
     errors: methods.formState.errors,
-    isSubmitting: methods.formState.isSubmitting,
+    isSubmitting: methods.formState.isSubmitting || isPending,
     handleOpenChange,
   };
 };

@@ -1,4 +1,5 @@
 import { api } from './api';
+import { deleteImage } from './cloudinary';
 import { endpoints } from './endpoints';
 import type {
   MedalResponseType,
@@ -19,7 +20,18 @@ export const createMedal = async (payload: SaveMedalPayloadType) => {
   return data;
 };
 
-export const deleteMedal = async (id: string) => {
+export const deleteMedal = async ({
+  id,
+  imagemUrl,
+}: {
+  id: string;
+  imagemUrl: string;
+}) => {
+  try {
+    await deleteImage(imagemUrl);
+  } catch (error) {
+    console.error(error);
+  }
   await api.delete(endpoints.medals.byId(id));
 };
 

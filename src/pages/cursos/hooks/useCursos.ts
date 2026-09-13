@@ -8,7 +8,7 @@ export const useCursos = (user: UsuarioType) => {
   const [selectedCourse, setSelectedCourse] = useState<CursoType | null>(null);
 
   const isLocked = (cursoId: string) =>
-    user.tipo === 'ALUNO' && !user.cursoIds.includes(cursoId);
+    user.tipo !== 'ADMIN' && !user.cursoIds.includes(cursoId);
 
   const openCourse = (curso: CursoType) => navigate(`/cursos/${curso.id}`);
 
@@ -17,6 +17,9 @@ export const useCursos = (user: UsuarioType) => {
       openCourse(curso);
       return;
     }
+
+    if (user.tipo !== 'ALUNO') return;
+
     setSelectedCourse(curso);
     setOpenCodeDialog(true);
   };

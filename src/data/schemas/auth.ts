@@ -37,9 +37,10 @@ export const registerSchema = z
 
 export const loginSchema = z
   .object({
-    tipo: z.enum(['ALUNO', 'MONITOR']),
+    tipo: z.enum(['ALUNO', 'MONITOR', 'ADMIN']),
     apelido: z.string().trim(),
     email: z.string().trim(),
+    nome: z.string().trim(),
     senha: z.string().min(1, 'Informe a senha'),
   })
   .superRefine((data, ctx) => {
@@ -56,6 +57,14 @@ export const loginSchema = z
         code: 'custom',
         message: 'Informe um e-mail válido',
         path: ['email'],
+      });
+    }
+
+    if (data.tipo === 'ADMIN' && data.nome.length === 0) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Informe o nome',
+        path: ['nome'],
       });
     }
   });

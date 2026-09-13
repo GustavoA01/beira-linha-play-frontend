@@ -1,35 +1,40 @@
 import { newCourseSchema, type NewCourseFormType } from '@/data/schemas/course';
-import { temporaryMonitores } from '@/data/temporaryMocks/monitores';
-import type { CursoType } from '@/data/types/api';
+import type { CursoType, MonitorType } from '@/data/types/api';
+import { monitorKeys } from '@/lib/queryClientKeys';
+import { listMonitors } from '@/services/usuarios';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-
-const emptyValues: NewCourseFormType = {
-  nome: '',
-  monitorIds: [],
-};
-
-const valuesFromCurso = (curso?: CursoType): NewCourseFormType => {
-  if (!curso) return emptyValues;
-  return { nome: curso.nome, monitorIds: curso.monitorIds };
-};
+import { useCreateCourse, useUpdateCourse } from './useMutation';
+import { valuesFromCurso } from '../utils';
 
 export const useNewCourseDialog = (
   onOpenChange: (open: boolean) => void,
   curso?: CursoType
 ) => {
+  const { data: users = [] } = useQuery({
+    queryKey: monitorKeys.all,
+    queryFn: listMonitors,
+  });
+  const monitores = users.filter(
+    (user): user is MonitorType => user.tipo === 'MONITOR'
+  );
+  const { mutateAsync: addCourse, isPending: isCreating } = useCreateCourse();
+  const { mutateAsync: editCourse, isPending: isUpdating } = useUpdateCourse();
   const methods = useForm<NewCourseFormType>({
     resolver: zodResolver(newCourseSchema),
     defaultValues: valuesFromCurso(curso),
   });
   const [pendingMonitorId, setPendingMonitorId] = useState('');
+  const isSubmitting =
+    methods.formState.isSubmitting || isCreating || isUpdating;
 
   const monitorIds = methods.watch('monitorIds');
-  const monitoresDisponiveis = temporaryMonitores.filter(
+  const monitoresDisponiveis = monitores.filter(
     (monitor) => !monitorIds.includes(monitor.id)
   );
-  const monitoresSelecionados = temporaryMonitores.filter((monitor) =>
+  const monitoresSelecionados = monitores.filter((monitor) =>
     monitorIds.includes(monitor.id)
   );
 
@@ -62,8 +67,10 @@ export const useNewCourseDialog = (
     );
   };
 
-  const onSubmit = methods.handleSubmit((data: NewCourseFormType) => {
-    console.log(data);
+  const onSubmit = methods.handleSubmit(async (data: NewCourseFormType) => {
+    if (curso) await editCourse({ id: curso.id, payload: data });
+    else await addCourse(data);
+
     handleOpenChange(false);
   });
 
@@ -78,7 +85,8 @@ export const useNewCourseDialog = (
     removeMonitor,
     monitoresDisponiveis,
     monitoresSelecionados,
-    canSubmit: monitorIds.length > 0 && temporaryMonitores.length > 0,
+    canSubmit: monitorIds.length > 0 && !isSubmitting,
+    isSubmitting,
     isEditing: Boolean(curso),
   };
 };

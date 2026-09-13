@@ -2,12 +2,18 @@ import { useState } from 'react';
 import { CourseHeader } from './components/CourseHeader';
 import { ModuleCard } from './components/ModuleCard';
 import { NewModuleDialog } from './components/NewModuleDialog';
+import { DeleteModuleDialog } from './components/DeleteModuleDialog';
 import { motion } from 'motion/react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getCursoById } from '@/data/temporaryMocks/cursos';
 import { useAuthUser } from '@/providers/UserProvider';
 import { ResourceNotFound } from '@/components/ResourceNotFound';
-import { NewCourseDialog } from '@/pages/cursos/components/NewCourseDialog';
+import { useQuery } from '@tanstack/react-query';
+import { getCourse } from '@/services/cursos';
+import { courseKeys } from '@/lib/queryClientKeys';
+import { toCurso } from '@/pages/cursos/utils';
+import { HeaderListPageSkeleton } from '@/components/PageSkeleton';
+import type { ModuloType } from '@/data/types/api';
+import { useDeleteModule } from './hooks/useMutation';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -27,10 +33,32 @@ const itemVariants = {
 export const CoursePage = () => {
   const navigate = useNavigate();
   const { cursoId } = useParams();
-  const curso = cursoId ? getCursoById(cursoId) : undefined;
-  const { isAluno, isMonitor, isAdmin } = useAuthUser();
+  const { data, isPending, isError } = useQuery({
+    queryKey: courseKeys.detail(cursoId ?? ''),
+    queryFn: () => getCourse(cursoId!),
+    enabled: Boolean(cursoId),
+  });
+  const curso = data ? toCurso(data) : undefined;
+  const { isAluno, isMonitor } = useAuthUser();
+  const { mutate: removeModule, isPending: isDeleting } = useDeleteModule(
+    cursoId ?? ''
+  );
   const [openModuleDialog, setOpenModuleDialog] = useState(false);
-  const [openEditCourseDialog, setOpenEditCourseDialog] = useState(false);
+  const [editingModule, setEditingModule] = useState<ModuloType>();
+  const [moduleToDelete, setModuleToDelete] = useState<ModuloType>();
+
+  const handleModuleDialogChange = (open: boolean) => {
+    setOpenModuleDialog(open);
+    if (!open) setEditingModule(undefined);
+  };
+
+  if (!cursoId || isError) {
+    return <ResourceNotFound label="Curso não encontrado" />;
+  }
+
+  if (isPending) {
+    return <HeaderListPageSkeleton />;
+  }
 
   if (!curso) return <ResourceNotFound label="Curso não encontrado" />;
 
@@ -41,12 +69,10 @@ export const CoursePage = () => {
           curso={curso}
           isAluno={isAluno}
           isMonitor={isMonitor}
-          isAdmin={isAdmin}
-          handleNewModule={() => setOpenModuleDialog(true)}
-          handleEditCourse={() => setOpenEditCourseDialog(true)}
-          handleDeleteCourse={() =>
-            console.log({ action: 'delete-course', id: curso.id })
-          }
+          handleNewModule={() => {
+            setEditingModule(undefined);
+            setOpenModuleDialog(true);
+          }}
         />
         <motion.div
           initial="hidden"
@@ -60,8 +86,11 @@ export const CoursePage = () => {
                 <ModuleCard
                   modulo={modulo}
                   isMonitor={isMonitor}
-                  onEdit={() => {}}
-                  onDelete={() => {}}
+                  onEdit={() => {
+                    setEditingModule(modulo);
+                    setOpenModuleDialog(true);
+                  }}
+                  onDelete={() => setModuleToDelete(modulo)}
                   onClick={() =>
                     navigate(`/cursos/${curso.id}/modulos/${modulo.id}`)
                   }
@@ -74,12 +103,22 @@ export const CoursePage = () => {
 
       <NewModuleDialog
         open={openModuleDialog}
-        onOpenChange={setOpenModuleDialog}
+        onOpenChange={handleModuleDialogChange}
+        courseId={curso.id}
+        modulo={editingModule}
       />
-      <NewCourseDialog
-        open={openEditCourseDialog}
-        onOpenChange={setOpenEditCourseDialog}
-        curso={curso}
+      <DeleteModuleDialog
+        open={Boolean(moduleToDelete)}
+        onOpenChange={(open) => {
+          if (!open) setModuleToDelete(undefined);
+        }}
+        moduleName={moduleToDelete?.nome ?? ''}
+        isPending={isDeleting}
+        onConfirm={() => {
+          if (!moduleToDelete) return;
+          removeModule(moduleToDelete.id);
+          setModuleToDelete(undefined);
+        }}
       />
     </>
   );

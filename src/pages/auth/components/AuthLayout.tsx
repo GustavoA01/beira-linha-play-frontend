@@ -14,16 +14,20 @@ type AuthLayoutProps = {
   children: ReactNode;
   footer?: ReactNode;
   isAluno?: boolean;
+  isAdmin?: boolean;
   onEnterAsStudent?: () => void;
   onEnterAsMonitor?: () => void;
+  onEnterAsAdmin?: () => void;
 };
 
 export const AuthLayout = ({
   title,
   description,
   isAluno,
+  isAdmin,
   onEnterAsStudent,
   onEnterAsMonitor,
+  onEnterAsAdmin,
   children,
   footer,
 }: AuthLayoutProps) => (
@@ -54,8 +58,10 @@ export const AuthLayout = ({
         {onEnterAsStudent && onEnterAsMonitor && (
           <EnterAsButtons
             isAluno={Boolean(isAluno)}
+            isAdmin={Boolean(isAdmin)}
             onEnterAsStudent={onEnterAsStudent}
             onEnterAsMonitor={onEnterAsMonitor}
+            onEnterAsAdmin={onEnterAsAdmin}
           />
         )}
         {children}

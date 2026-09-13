@@ -4,7 +4,6 @@ import { ActivityCard } from './components/ActivityCard';
 import { useState } from 'react';
 import { NewActivityDialog } from './features/NewActivityDialog/container/NewActivityDialog';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getModuloById } from '@/data/temporaryMocks/cursos';
 import { temporaryTentativas } from '@/data/temporaryMocks/tentativas';
 import {
   contarTentativasDoAluno,
@@ -13,6 +12,11 @@ import {
 import { useAuthUser } from '@/providers/UserProvider';
 import { cn } from '@/lib/utils';
 import { ResourceNotFound } from '@/components/ResourceNotFound';
+import { useQuery } from '@tanstack/react-query';
+import { getModule } from '@/services/modulos';
+import { moduleKeys } from '@/lib/queryClientKeys';
+import { toModulo } from './utils';
+import { HeaderListPageSkeleton } from '@/components/PageSkeleton';
 
 export const ModulePage = () => {
   const navigate = useNavigate();
@@ -20,16 +24,31 @@ export const ModulePage = () => {
   const { isAluno, isMonitor, user } = useAuthUser();
   const { containerClassName } = useMediaDevice();
   const [openActivityDialog, setOpenActivityDialog] = useState(false);
-  const modulo =
-    cursoId && moduloId ? getModuloById(cursoId, moduloId) : undefined;
+  const { data, isPending, isError } = useQuery({
+    queryKey: moduleKeys.detail(moduloId ?? ''),
+    queryFn: async () => toModulo(await getModule(moduloId!)),
+    enabled: Boolean(moduloId),
+  });
+  const modulo = data;
 
-  const onClickActivity = (activityId: string) => {
+  const onClickActivity = (activityId?: string) => {
+    if (!activityId || !cursoId || !moduloId) return;
     const basePath = `/cursos/${cursoId}/modulos/${moduloId}`;
     if (isMonitor) navigate(`${basePath}/monitoramento/${activityId}`);
     else navigate(`${basePath}/atividade/${activityId}`);
   };
 
-  if (!modulo) return <ResourceNotFound label="Módulo não encontrado" />;
+  if (!moduloId) {
+    return <ResourceNotFound label="Módulo não encontrado" />;
+  }
+
+  if (isPending) {
+    return <HeaderListPageSkeleton />;
+  }
+
+  if (isError || !modulo) {
+    return <ResourceNotFound label="Não foi possível carregar o módulo" />;
+  }
 
   return (
     <>

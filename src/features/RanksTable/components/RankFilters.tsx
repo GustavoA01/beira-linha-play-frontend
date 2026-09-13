@@ -7,10 +7,15 @@ import {
 import { ChevronsUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+export type RankFilterItem = {
+  id: string;
+  nome: string;
+};
+
 type RankFiltersProps = {
   selected: string;
   setSelected: (value: string) => void;
-  items: string[];
+  items: RankFilterItem[];
   isDesktop?: boolean;
 };
 
@@ -20,7 +25,7 @@ export const RankFilters = ({
   items,
   isDesktop,
 }: RankFiltersProps) => (
-  <Select value={selected} onValueChange={setSelected} defaultValue="Geral">
+  <Select value={selected} onValueChange={setSelected}>
     <SelectTrigger
       showChevrDownIcon={false}
       className="hover:bg-primary-dark/10 transition-all ease-in shadow-none border-none flex w-10 items-end"
@@ -32,18 +37,18 @@ export const RankFilters = ({
       className="font-fredoka p-0"
       align={isDesktop ? 'center' : 'end'}
     >
-      {items.map((value) => (
+      {items.map((item) => (
         <SelectItem
-          key={value}
-          value={value}
+          key={item.id}
+          value={item.id}
           className={cn(
             'py-1 pl-2 border-l-4 border-transparent rounded-l-none [&>span:first-child]:hidden',
-            selected === value
+            selected === item.id
               ? 'font-semibold border-l-primary border-l-4'
               : 'hover:border-l-gray-300 hover:border-l-4'
           )}
         >
-          {value}
+          {item.nome}
         </SelectItem>
       ))}
     </SelectContent>

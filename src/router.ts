@@ -63,10 +63,6 @@ export const Router = createBrowserRouter([
                 path: 'medalhas',
                 Component: MedalsPage,
               },
-              {
-                path: '*',
-                Component: NotFoundPage,
-              },
             ],
           },
           {
@@ -82,6 +78,14 @@ export const Router = createBrowserRouter([
             Component: ModulePage,
           },
           {
+            path: '/cursos/:cursoId/modulos/:moduloId/atividade/:atividadeId',
+            Component: ActivityPage,
+          },
+          {
+            path: '/cursos/:cursoId/modulos/:moduloId/atividades/:atividadeId',
+            Component: ActivityPage,
+          },
+          {
             Component: RequireMonitor,
             children: [
               {
@@ -95,8 +99,8 @@ export const Router = createBrowserRouter([
             ],
           },
           {
-            path: '/cursos/:cursoId/modulos/:moduloId/atividade/:atividadeId',
-            Component: ActivityPage,
+            path: '*',
+            Component: NotFoundPage,
           },
         ],
       },

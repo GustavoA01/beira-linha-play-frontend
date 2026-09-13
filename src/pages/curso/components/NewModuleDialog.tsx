@@ -9,27 +9,43 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { LabelInput } from '@/components/LabelInput';
+import { Spinner } from '@/components/ui/spinner';
+import type { ModuloType } from '@/data/types/api';
 import { useNewModuleDialog } from '../hooks/useNewModuleDialog';
 
 type NewModuleDialogPropsType = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  courseId: string;
+  modulo?: ModuloType;
 };
 
 export const NewModuleDialog = ({
   open,
   onOpenChange,
+  courseId,
+  modulo,
 }: NewModuleDialogPropsType) => {
-  const { register, onSubmit, errors, handleOpenChange } =
-    useNewModuleDialog(onOpenChange);
+  const {
+    register,
+    onSubmit,
+    errors,
+    handleOpenChange,
+    isSubmitting,
+    isEditing,
+  } = useNewModuleDialog(onOpenChange, courseId, modulo);
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Novo módulo</DialogTitle>
+          <DialogTitle>
+            {isEditing ? 'Editar módulo' : 'Novo módulo'}
+          </DialogTitle>
           <DialogDescription>
-            Informe o nome do módulo para adicioná-lo ao curso.
+            {isEditing
+              ? 'Altere o nome do módulo.'
+              : 'Informe o nome do módulo para adicioná-lo ao curso.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -41,15 +57,18 @@ export const NewModuleDialog = ({
             placeholder="Ex.: Derivadas"
             error={errors.nome?.message}
             register={register}
+            disabled={isSubmitting}
           />
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" disabled={isSubmitting}>
                 Cancelar
               </Button>
             </DialogClose>
-            <Button type="submit">Adicionar</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? <Spinner /> : isEditing ? 'Salvar' : 'Adicionar'}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

@@ -4,10 +4,14 @@ import { WonMedal } from '../components/WonMedal';
 describe('WonMedal', () => {
   it('shows the earned medal', () => {
     render(
-      <WonMedal open={false} onOpenChange={jest.fn()} onDelete={jest.fn()} />
+      <WonMedal
+        nome="PUC Minas"
+        imagemUrl="https://example.com/puc.png"
+        pontosMin={20}
+      />
     );
 
-    expect(screen.getByAltText('Imagem medalha')).toBeInTheDocument();
+    expect(screen.getByAltText('PUC Minas')).toBeInTheDocument();
     expect(screen.getByText('PUC Minas')).toBeInTheDocument();
     expect(screen.getByText('20 xp')).toBeInTheDocument();
   });

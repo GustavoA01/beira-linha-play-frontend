@@ -5,15 +5,18 @@ type AuthFieldsValues = {
   apelido: string;
   email: string;
   senha: string;
+  nome?: string;
 };
 
 type AuthFieldError = { message?: string };
 
 type AuthFieldsPropsType<T extends FieldValues & AuthFieldsValues> = {
   isAluno: boolean;
+  isAdmin?: boolean;
   errors: {
     apelido?: AuthFieldError;
     email?: AuthFieldError;
+    nome?: AuthFieldError;
     senha?: AuthFieldError;
   };
   register: UseFormRegister<T>;
@@ -23,13 +26,24 @@ type AuthFieldsPropsType<T extends FieldValues & AuthFieldsValues> = {
 
 export const AuthFields = <T extends FieldValues & AuthFieldsValues>({
   isAluno,
+  isAdmin = false,
   errors,
   register,
   autoFocus = false,
   passwordAutoComplete = 'current-password',
 }: AuthFieldsPropsType<T>) => (
   <>
-    {isAluno ? (
+    {isAdmin ? (
+      <LabelInput
+        label="Nome"
+        id={'nome' as Path<T>}
+        autoFocus={autoFocus}
+        autoComplete="username"
+        placeholder="Ex.: Administrador"
+        error={errors.nome?.message}
+        register={register}
+      />
+    ) : isAluno ? (
       <LabelInput
         label="Apelido"
         id={'apelido' as Path<T>}

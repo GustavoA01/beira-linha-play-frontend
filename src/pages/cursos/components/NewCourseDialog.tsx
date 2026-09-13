@@ -19,6 +19,7 @@ import {
 import { ErrorFormMessage } from '@/components/ErrorFormMessage';
 import { LabelInput } from '@/components/LabelInput';
 import type { CursoType } from '@/data/types/api';
+import { Spinner } from '@/components/ui/spinner';
 import { Plus, X } from 'lucide-react';
 import { useNewCourseDialog } from '../hooks/useNewCourseDialog';
 
@@ -45,6 +46,7 @@ export const NewCourseDialog = ({
     monitoresDisponiveis,
     monitoresSelecionados,
     canSubmit,
+    isSubmitting,
     isEditing,
   } = useNewCourseDialog(onOpenChange, curso);
 
@@ -68,6 +70,7 @@ export const NewCourseDialog = ({
             placeholder="Ex.: Cálculo I"
             error={errors.nome?.message}
             register={register}
+            disabled={isSubmitting}
           />
 
           <div>
@@ -76,7 +79,7 @@ export const NewCourseDialog = ({
               <Select
                 value={pendingMonitorId || undefined}
                 onValueChange={setPendingMonitorId}
-                disabled={monitoresDisponiveis.length === 0}
+                disabled={isSubmitting || monitoresDisponiveis.length === 0}
               >
                 <SelectTrigger id="monitorId" className="w-full">
                   <SelectValue
@@ -135,12 +138,12 @@ export const NewCourseDialog = ({
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" disabled={isSubmitting}>
                 Cancelar
               </Button>
             </DialogClose>
             <Button type="submit" disabled={!canSubmit}>
-              {isEditing ? 'Salvar' : 'Adicionar'}
+              {isSubmitting ? <Spinner /> : isEditing ? 'Salvar' : 'Adicionar'}
             </Button>
           </DialogFooter>
         </form>

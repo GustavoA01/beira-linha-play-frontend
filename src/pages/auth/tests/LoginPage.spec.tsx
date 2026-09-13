@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { UserProvider } from '@/providers/UserProvider';
+import { mockLoggedAdmin } from '@/data/temporaryMocks/admins';
 import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
 import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
 import { login } from '@/services/auth';
@@ -45,6 +46,17 @@ describe('LoginPage', () => {
     expect(screen.getByLabelText('Apelido')).toBeInTheDocument();
     expect(screen.queryByLabelText('E-mail')).not.toBeInTheDocument();
     expect(screen.getByLabelText('Senha')).toBeInTheDocument();
+  });
+
+  it('swaps nickname for name when entering as admin', async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.click(screen.getByRole('button', { name: 'Entrar como admin' }));
+
+    expect(screen.getByLabelText('Nome')).toBeInTheDocument();
+    expect(screen.queryByLabelText('Apelido')).not.toBeInTheDocument();
+    expect(screen.queryByLabelText('E-mail')).not.toBeInTheDocument();
   });
 
   it('swaps nickname for email when entering as monitor', async () => {
@@ -129,6 +141,17 @@ describe('LoginPage', () => {
     expect(await screen.findByText('Mapa do aluno')).toBeInTheDocument();
   });
 
+  it('validates the admin name', async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.click(screen.getByRole('button', { name: 'Entrar como admin' }));
+    await user.type(screen.getByLabelText('Senha'), '123456');
+    await user.click(screen.getByRole('button', { name: 'Entrar' }));
+
+    expect(await screen.findByText('Informe o nome')).toBeInTheDocument();
+  });
+
   it('logs in the monitor and goes to courses', async () => {
     const user = userEvent.setup();
     mockedLogin.mockResolvedValue(mockLoggedMonitor);
@@ -144,6 +167,24 @@ describe('LoginPage', () => {
     expect(mockedLogin).toHaveBeenCalledWith({
       tipo: 'MONITOR',
       email: 'maria.souza@pucminas.br',
+      senha: '123456',
+    });
+    expect(await screen.findByText('Lista de cursos')).toBeInTheDocument();
+  });
+
+  it('logs in the admin and goes to courses', async () => {
+    const user = userEvent.setup();
+    mockedLogin.mockResolvedValue(mockLoggedAdmin);
+    renderPage();
+
+    await user.click(screen.getByRole('button', { name: 'Entrar como admin' }));
+    await user.type(screen.getByLabelText('Nome'), 'Administrador');
+    await user.type(screen.getByLabelText('Senha'), '123456');
+    await user.click(screen.getByRole('button', { name: 'Entrar' }));
+
+    expect(mockedLogin).toHaveBeenCalledWith({
+      tipo: 'ADMIN',
+      nome: 'Administrador',
       senha: '123456',
     });
     expect(await screen.findByText('Lista de cursos')).toBeInTheDocument();

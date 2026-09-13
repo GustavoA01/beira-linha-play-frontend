@@ -1,11 +1,11 @@
 import { ChevronDown, Trophy } from 'lucide-react';
-import { RankFilters } from './RankFilters';
+import { RankFilters, type RankFilterItem } from './RankFilters';
 import { AccordionTrigger } from '@/components/ui/accordion';
 
 type RankTableHeaderProps = {
   selected: string;
   setSelected: (value: string) => void;
-  items: string[];
+  items: RankFilterItem[];
   isDesktop?: boolean;
 };
 
@@ -23,7 +23,9 @@ export const RankTableHeader = ({
 
       <div>
         <h1 className="text-white font-bold font-montserrat">Ranking</h1>
-        <p className="text-blue-200 font-semibold text-sm">{selected}</p>
+        <p className="text-blue-200 font-semibold text-sm">
+          {items.find((item) => item.id === selected)?.nome}
+        </p>
       </div>
     </div>
 

@@ -11,20 +11,26 @@ export const LoginPage = () => {
     onSubmit,
     errors,
     isAluno,
+    isAdmin,
     enterAsStudent,
     enterAsMonitor,
+    enterAsAdmin,
   } = useLogin();
 
   return (
     <AuthLayout
       title="Entrar"
       isAluno={isAluno}
+      isAdmin={isAdmin}
       onEnterAsStudent={enterAsStudent}
       onEnterAsMonitor={enterAsMonitor}
+      onEnterAsAdmin={enterAsAdmin}
       description={
         isAluno
           ? 'Entre para continuar jogando.'
-          : 'Entre para gerenciar as turmas.'
+          : isAdmin
+            ? 'Entre para gerenciar os cursos.'
+            : 'Entre para gerenciar as turmas.'
       }
       footer={
         <AuthFooterLink
@@ -39,6 +45,7 @@ export const LoginPage = () => {
           autoFocus
           errors={errors}
           isAluno={isAluno}
+          isAdmin={isAdmin}
           register={register}
         />
         {errors.root?.message && (

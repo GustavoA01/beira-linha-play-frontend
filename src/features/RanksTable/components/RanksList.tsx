@@ -3,7 +3,7 @@ import { Crown, Medal } from 'lucide-react';
 import { ChessQueen } from './ChessQueen';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
-import type { AlunoType } from '@/data/types/api';
+import type { RankingResponseType } from '@/data/types/services';
 import { forwardRef } from 'react';
 
 const topRanksIcons = [
@@ -12,12 +12,8 @@ const topRanksIcons = [
   <Medal className="text-amber-700" />,
 ];
 
-type RankItemType = Omit<AlunoType, 'tipo' | 'cursoIds'> & {
-  position: number;
-};
-
 type RanksListProps = {
-  ranks: RankItemType[];
+  ranks: RankingResponseType[];
   loggedAlunoId?: string;
   showName: boolean;
 };
@@ -26,8 +22,8 @@ export const RanksList = forwardRef<HTMLTableRowElement, RanksListProps>(
   ({ ranks, loggedAlunoId, showName }, ref) => (
     <Table>
       <TableBody>
-        {ranks.map(({ id, nome, apelido, pontos, position, imagemPerfil }) => {
-          const isTopRanks = [1, 2, 3].includes(position);
+        {ranks.map(({ id, nome, apelido, pontos, posicao, imagemPerfil }) => {
+          const isTopRanks = [1, 2, 3].includes(posicao);
           const isLoggedAluno = id === loggedAlunoId;
           const initials = apelido.slice(0, 2).toUpperCase();
 
@@ -41,7 +37,7 @@ export const RanksList = forwardRef<HTMLTableRowElement, RanksListProps>(
               )}
             >
               <TableCell className="text-center w-10 font-bold text-gray-400">
-                {isTopRanks ? topRanksIcons[position - 1] : `${position}°`}
+                {isTopRanks ? topRanksIcons[posicao - 1] : `${posicao}°`}
               </TableCell>
 
               <TableCell>
@@ -71,7 +67,7 @@ export const RanksList = forwardRef<HTMLTableRowElement, RanksListProps>(
                 <span
                   className={cn(
                     'font-bold',
-                    position === 1 ? 'text-emerald-500' : 'text-blue-600'
+                    posicao === 1 ? 'text-emerald-500' : 'text-blue-600'
                   )}
                 >
                   {pontos}

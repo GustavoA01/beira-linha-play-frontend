@@ -1,12 +1,22 @@
+import type { ReactElement } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MedalsPage } from '../index';
 import { useAuthUser } from '@/providers/UserProvider';
 import { mockLoggedAdmin } from '@/data/temporaryMocks/admins';
 import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
+import { listMedals } from '@/services/medalhas';
 
 jest.mock('@/providers/UserProvider', () => ({
   useAuthUser: jest.fn(),
+}));
+
+jest.mock('@/services/medalhas', () => ({
+  listMedals: jest.fn(),
+  createMedal: jest.fn(),
+  deleteMedal: jest.fn(),
+  equipMedal: jest.fn(),
 }));
 
 jest.mock('@/services/cloudinary', () => ({
@@ -20,9 +30,36 @@ jest.mock('../components/UnknownMedal', () => ({
 const mockedUseAuthUser = useAuthUser as jest.MockedFunction<
   typeof useAuthUser
 >;
+const mockedListMedals = listMedals as jest.MockedFunction<typeof listMedals>;
+
+const renderPage = (ui: ReactElement) => {
+  const client = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+
+  return render(
+    <QueryClientProvider client={client}>{ui}</QueryClientProvider>
+  );
+};
 
 describe('MedalsPage', () => {
-  it('shows the gallery to the student without the add button', () => {
+  beforeEach(() => {
+    mockedListMedals.mockReset();
+    mockedListMedals.mockResolvedValue([
+      {
+        id: 'medal-1',
+        nome: 'PUC Minas',
+        imagemUrl: 'https://example.com/puc.png',
+        pontosMin: 20,
+        conquistada: true,
+      },
+    ]);
+  });
+
+  it('shows the gallery to the student without the add button', async () => {
     mockedUseAuthUser.mockReturnValue({
       user: mockLoggedAluno,
       setUser: jest.fn(),
@@ -32,12 +69,12 @@ describe('MedalsPage', () => {
       isAdmin: false,
     });
 
-    render(<MedalsPage />);
+    renderPage(<MedalsPage />);
 
     expect(
       screen.getByRole('heading', { name: 'Galeria de Medalhas' })
     ).toBeInTheDocument();
-    expect(screen.getByText('PUC Minas')).toBeInTheDocument();
+    expect(await screen.findByText('PUC Minas')).toBeInTheDocument();
     expect(screen.getByText('20 xp')).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Adicionar medalha' })
@@ -55,9 +92,11 @@ describe('MedalsPage', () => {
       isAdmin: true,
     });
 
-    render(<MedalsPage />);
+    renderPage(<MedalsPage />);
 
-    await user.click(screen.getByRole('button', { name: 'Adicionar medalha' }));
+    await user.click(
+      await screen.findByRole('button', { name: 'Adicionar medalha' })
+    );
 
     expect(
       screen.getByRole('heading', { name: 'Adicionar medalha' })

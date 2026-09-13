@@ -1,15 +1,20 @@
-import { temporaryRanks } from '@/data/temporaryMocks/ranks';
+import { useQuery } from '@tanstack/react-query';
 import { cn } from '@/lib/utils';
+import { courseKeys, rankingKeys } from '@/lib/queryClientKeys';
 import { useAuthUser } from '@/providers/UserProvider';
+import { listCourses } from '@/services/cursos';
+import { listRankings } from '@/services/rankings';
 import { useCallback, useState } from 'react';
 
 type UseRanksTableProps = {
   floating?: boolean;
 };
 
+const GERAL = { id: 'geral', nome: 'Geral' };
+
 export const useRanksTable = ({ floating }: UseRanksTableProps) => {
   const auth = useAuthUser();
-  const [selected, setSelected] = useState('Geral');
+  const [selected, setSelected] = useState(GERAL.id);
 
   const loggedAlunoId = auth.isAluno ? auth.user.id : undefined;
 
@@ -30,16 +35,31 @@ export const useRanksTable = ({ floating }: UseRanksTableProps) => {
     });
   }, []);
 
-  const ranks = [...temporaryRanks]
-    .sort((a, b) => b.pontos - a.pontos)
-    .map((rank, index) => ({
-      ...rank,
-      position: index + 1,
-    }));
+  const { data: courses = [] } = useQuery({
+    queryKey: courseKeys.all,
+    queryFn: listCourses,
+  });
+
+  const items = [
+    GERAL,
+    ...courses
+      .filter(
+        (course) => auth.isAdmin || auth.user.cursoIds.includes(course.id)
+      )
+      .map((course) => ({ id: course.id, nome: course.nome })),
+  ];
+
+  const courseId = selected === GERAL.id ? undefined : selected;
+
+  const { data: ranks = [] } = useQuery({
+    queryKey: rankingKeys.list(courseId),
+    queryFn: () => listRankings(courseId),
+  });
 
   return {
     selected,
     setSelected,
+    items,
     loggedAlunoId,
     scrollToLoggedRow,
     ranks,

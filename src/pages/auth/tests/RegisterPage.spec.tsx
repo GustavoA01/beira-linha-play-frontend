@@ -49,6 +49,9 @@ describe('RegisterPage', () => {
     expect(screen.queryByLabelText('E-mail')).not.toBeInTheDocument();
     expect(screen.getByLabelText('Senha')).toBeInTheDocument();
     expect(screen.getByLabelText('Confirmar senha')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Entrar como admin' })
+    ).not.toBeInTheDocument();
   });
 
   it('swaps nickname for email when entering as monitor', async () => {
