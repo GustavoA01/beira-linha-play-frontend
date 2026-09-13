@@ -1,17 +1,19 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { UserProvider, useUserProvider } from '@/providers/UserProvider';
 import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
-import { me, refresh } from '@/services/auth';
+import { currentUser, refresh } from '@/services/auth';
 
 jest.mock('@/services/auth', () => ({
-  me: jest.fn(),
+  currentUser: jest.fn(),
   refresh: jest.fn(),
   login: jest.fn(),
-  cadastro: jest.fn(),
+  register: jest.fn(),
   logout: jest.fn(),
 }));
 
-const mockedMe = me as jest.MockedFunction<typeof me>;
+const mockedCurrentUser = currentUser as jest.MockedFunction<
+  typeof currentUser
+>;
 const mockedRefresh = refresh as jest.MockedFunction<typeof refresh>;
 
 const Probe = () => {
@@ -25,7 +27,7 @@ const Probe = () => {
 
 describe('UserProvider', () => {
   beforeEach(() => {
-    mockedMe.mockReset();
+    mockedCurrentUser.mockReset();
     mockedRefresh.mockReset();
   });
 
@@ -37,12 +39,12 @@ describe('UserProvider', () => {
     );
 
     expect(screen.getByText('anonimo:none')).toBeInTheDocument();
-    expect(mockedMe).not.toHaveBeenCalled();
+    expect(mockedCurrentUser).not.toHaveBeenCalled();
     expect(mockedRefresh).not.toHaveBeenCalled();
   });
 
-  it('authenticates from GET /me', async () => {
-    mockedMe.mockResolvedValue(mockLoggedAluno);
+  it('authenticates from GET current user', async () => {
+    mockedCurrentUser.mockResolvedValue(mockLoggedAluno);
 
     render(
       <UserProvider>
@@ -59,8 +61,8 @@ describe('UserProvider', () => {
     expect(mockedRefresh).not.toHaveBeenCalled();
   });
 
-  it('restores the session from refresh when /me is unauthorized', async () => {
-    mockedMe.mockResolvedValue(null);
+  it('restores the session from refresh when current user is unauthorized', async () => {
+    mockedCurrentUser.mockResolvedValue(null);
     mockedRefresh.mockResolvedValue(mockLoggedAluno);
 
     render(
@@ -76,8 +78,8 @@ describe('UserProvider', () => {
     });
   });
 
-  it('stays anonymous when me and refresh fail', async () => {
-    mockedMe.mockResolvedValue(null);
+  it('stays anonymous when current user and refresh fail', async () => {
+    mockedCurrentUser.mockResolvedValue(null);
     mockedRefresh.mockResolvedValue(null);
 
     render(

@@ -1,9 +1,11 @@
 import { api } from './api';
-import type { RankingResponse } from './types';
+import { endpoints } from './endpoints';
+import type { RankingResponseType } from '@/data/types/services';
 
-export const listarRankings = async (cursoId?: string) => {
-  const { data } = await api.get<RankingResponse[]>('/api/rankings', {
-    params: cursoId ? { cursoId } : undefined,
-  });
+export const listRankings = async (courseId?: string) => {
+  const { data } = await api.get<RankingResponseType[]>(
+    endpoints.rankings.list,
+    { params: courseId ? { cursoId: courseId } : undefined }
+  );
   return data;
 };

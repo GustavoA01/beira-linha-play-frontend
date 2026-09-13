@@ -8,8 +8,8 @@ import { logout } from '@/services/auth';
 
 jest.mock('@/services/auth', () => ({
   login: jest.fn(),
-  cadastro: jest.fn(),
-  me: jest.fn(),
+  register: jest.fn(),
+  currentUser: jest.fn(),
   refresh: jest.fn(),
   logout: jest.fn(),
 }));

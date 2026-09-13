@@ -1,27 +1,29 @@
 import { api } from './api';
+import { endpoints } from './endpoints';
 import type {
-  MedalhaResponse,
-  SalvarMedalhaPayload,
-  UsuarioResponse,
-} from './types';
+  MedalResponseType,
+  SaveMedalPayloadType,
+  UserResponseType,
+} from '@/data/types/services';
 
-export const listarMedalhas = async () => {
-  const { data } = await api.get<MedalhaResponse[]>('/api/medalhas');
+export const listMedals = async () => {
+  const { data } = await api.get<MedalResponseType[]>(endpoints.medals.list);
   return data;
 };
 
-export const criarMedalha = async (payload: SalvarMedalhaPayload) => {
-  const { data } = await api.post<MedalhaResponse>('/api/medalhas', payload);
-  return data;
-};
-
-export const excluirMedalha = async (id: string) => {
-  await api.delete(`/api/medalhas/${id}`);
-};
-
-export const equiparMedalha = async (id: string) => {
-  const { data } = await api.post<UsuarioResponse>(
-    `/api/medalhas/${id}/equipar`
+export const createMedal = async (payload: SaveMedalPayloadType) => {
+  const { data } = await api.post<MedalResponseType>(
+    endpoints.medals.list,
+    payload
   );
+  return data;
+};
+
+export const deleteMedal = async (id: string) => {
+  await api.delete(endpoints.medals.byId(id));
+};
+
+export const equipMedal = async (id: string) => {
+  const { data } = await api.post<UserResponseType>(endpoints.medals.equip(id));
   return data;
 };

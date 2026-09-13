@@ -1,25 +1,29 @@
 import { api } from './api';
-import { toUsuario } from './auth';
+import { endpoints } from './endpoints';
+import { toUser } from './auth';
 import type {
-  AtualizarContaPayload,
-  CriarAdminPayload,
-  UsuarioResponse,
-} from './types';
+  CreateAdminPayloadType,
+  UpdateAccountPayloadType,
+  UserResponseType,
+} from '@/data/types/services';
 
-export const atualizarConta = async (payload: AtualizarContaPayload) => {
-  const { data } = await api.patch<UsuarioResponse>(
-    '/api/usuarios/me',
+export const updateAccount = async (payload: UpdateAccountPayloadType) => {
+  const { data } = await api.patch<UserResponseType>(
+    endpoints.users.me,
     payload
   );
-  return toUsuario(data);
+  return toUser(data);
 };
 
-export const criarAdmin = async (payload: CriarAdminPayload) => {
-  const { data } = await api.post<UsuarioResponse>('/api/admins', payload);
-  return toUsuario(data);
+export const createAdmin = async (payload: CreateAdminPayloadType) => {
+  const { data } = await api.post<UserResponseType>(
+    endpoints.users.admins,
+    payload
+  );
+  return toUser(data);
 };
 
-export const listarMonitores = async () => {
-  const { data } = await api.get<UsuarioResponse[]>('/api/monitores');
-  return data.map(toUsuario);
+export const listMonitors = async () => {
+  const { data } = await api.get<UserResponseType[]>(endpoints.users.monitors);
+  return data.map(toUser);
 };

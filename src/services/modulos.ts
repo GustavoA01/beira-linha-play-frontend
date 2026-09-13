@@ -1,33 +1,39 @@
 import { api } from './api';
-import type { ModuloResponse, SalvarModuloPayload } from './types';
+import { endpoints } from './endpoints';
+import type {
+  ModuleResponseType,
+  SaveModulePayloadType,
+} from '@/data/types/services';
 
-export const criarModulo = async (
-  cursoId: string,
-  payload: SalvarModuloPayload
+export const createModule = async (
+  courseId: string,
+  payload: SaveModulePayloadType
 ) => {
-  const { data } = await api.post<ModuloResponse>(
-    `/api/cursos/${cursoId}/modulos`,
+  const { data } = await api.post<ModuleResponseType>(
+    endpoints.courses.modules(courseId),
     payload
   );
   return data;
 };
 
-export const buscarModulo = async (id: string) => {
-  const { data } = await api.get<ModuloResponse>(`/api/modulos/${id}`);
+export const getModule = async (id: string) => {
+  const { data } = await api.get<ModuleResponseType>(
+    endpoints.modules.byId(id)
+  );
   return data;
 };
 
-export const atualizarModulo = async (
+export const updateModule = async (
   id: string,
-  payload: SalvarModuloPayload
+  payload: SaveModulePayloadType
 ) => {
-  const { data } = await api.patch<ModuloResponse>(
-    `/api/modulos/${id}`,
+  const { data } = await api.patch<ModuleResponseType>(
+    endpoints.modules.byId(id),
     payload
   );
   return data;
 };
 
-export const excluirModulo = async (id: string) => {
-  await api.delete(`/api/modulos/${id}`);
+export const deleteModule = async (id: string) => {
+  await api.delete(endpoints.modules.byId(id));
 };

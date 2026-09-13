@@ -1,6 +1,7 @@
 import type { ReactElement } from 'react';
 import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
+import { QueryProvider } from '@/providers/QueryProvider';
 import { UserProvider } from '@/providers/UserProvider';
 import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
 import type { UsuarioType } from '@/data/types/api';
@@ -13,7 +14,9 @@ export const renderWithProviders = (
   }: { route?: string; user?: UsuarioType | null } = {}
 ) =>
   render(
-    <MemoryRouter initialEntries={[route]}>
-      <UserProvider initialUser={user}>{ui}</UserProvider>
-    </MemoryRouter>
+    <QueryProvider>
+      <MemoryRouter initialEntries={[route]}>
+        <UserProvider initialUser={user}>{ui}</UserProvider>
+      </MemoryRouter>
+    </QueryProvider>
   );

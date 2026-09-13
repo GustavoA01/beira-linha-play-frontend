@@ -4,20 +4,20 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { UserProvider } from '@/providers/UserProvider';
 import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
 import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
-import { cadastro } from '@/services/auth';
+import { register } from '@/services/auth';
 import { RegisterPage } from '../register';
 
 jest.mock('@/assets/logo-beira-linha.png', () => 'logo.png');
 
 jest.mock('@/services/auth', () => ({
   login: jest.fn(),
-  cadastro: jest.fn(),
-  me: jest.fn(),
+  register: jest.fn(),
+  currentUser: jest.fn(),
   refresh: jest.fn(),
   logout: jest.fn(),
 }));
 
-const mockedCadastro = cadastro as jest.MockedFunction<typeof cadastro>;
+const mockedRegister = register as jest.MockedFunction<typeof register>;
 
 const renderPage = () =>
   render(
@@ -35,7 +35,7 @@ const renderPage = () =>
 
 describe('RegisterPage', () => {
   beforeEach(() => {
-    mockedCadastro.mockReset();
+    mockedRegister.mockReset();
   });
 
   it('shows the student form by default', () => {
@@ -124,7 +124,7 @@ describe('RegisterPage', () => {
 
   it('registers the student and goes to the map', async () => {
     const user = userEvent.setup();
-    mockedCadastro.mockResolvedValue(mockLoggedAluno);
+    mockedRegister.mockResolvedValue(mockLoggedAluno);
     renderPage();
 
     await user.type(screen.getByLabelText('Nome'), 'Gustavo Aguiar');
@@ -133,7 +133,7 @@ describe('RegisterPage', () => {
     await user.type(screen.getByLabelText('Confirmar senha'), '123456');
     await user.click(screen.getByRole('button', { name: 'Cadastrar' }));
 
-    expect(mockedCadastro).toHaveBeenCalledWith({
+    expect(mockedRegister).toHaveBeenCalledWith({
       tipo: 'ALUNO',
       nome: 'Gustavo Aguiar',
       apelido: 'Gu',
@@ -144,7 +144,7 @@ describe('RegisterPage', () => {
 
   it('registers the monitor and goes to courses', async () => {
     const user = userEvent.setup();
-    mockedCadastro.mockResolvedValue(mockLoggedMonitor);
+    mockedRegister.mockResolvedValue(mockLoggedMonitor);
     renderPage();
 
     await user.click(
@@ -156,7 +156,7 @@ describe('RegisterPage', () => {
     await user.type(screen.getByLabelText('Confirmar senha'), '123456');
     await user.click(screen.getByRole('button', { name: 'Cadastrar' }));
 
-    expect(mockedCadastro).toHaveBeenCalledWith({
+    expect(mockedRegister).toHaveBeenCalledWith({
       tipo: 'MONITOR',
       nome: 'Maria Souza',
       email: 'maria.souza@pucminas.br',

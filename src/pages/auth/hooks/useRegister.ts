@@ -4,7 +4,7 @@ import {
   type RegisterRoleType,
 } from '@/data/schemas/auth';
 import { useUserProvider } from '@/providers/UserProvider';
-import { cadastro } from '@/services/auth';
+import { register } from '@/services/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
@@ -34,7 +34,7 @@ export const useRegister = () => {
 
   const onSubmit = methods.handleSubmit(async (data: RegisterFormType) => {
     try {
-      const user = await cadastro({
+      const user = await register({
         tipo: data.tipo,
         nome: data.nome,
         senha: data.senha,

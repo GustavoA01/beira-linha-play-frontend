@@ -1,44 +1,47 @@
 import { api } from './api';
+import { endpoints } from './endpoints';
 import type {
-  AtividadeResponse,
-  MonitoramentoResponse,
-  SalvarAtividadePayload,
-} from './types';
+  ActivityResponseType,
+  MonitoringResponseType,
+  SaveActivityPayloadType,
+} from '@/data/types/services';
 
-export const criarAtividade = async (
-  moduloId: string,
-  payload: SalvarAtividadePayload
+export const createActivity = async (
+  moduleId: string,
+  payload: SaveActivityPayloadType
 ) => {
-  const { data } = await api.post<AtividadeResponse>(
-    `/api/modulos/${moduloId}/atividades`,
+  const { data } = await api.post<ActivityResponseType>(
+    endpoints.modules.activities(moduleId),
     payload
   );
   return data;
 };
 
-export const buscarAtividade = async (id: string) => {
-  const { data } = await api.get<AtividadeResponse>(`/api/atividades/${id}`);
+export const getActivity = async (id: string) => {
+  const { data } = await api.get<ActivityResponseType>(
+    endpoints.activities.byId(id)
+  );
   return data;
 };
 
-export const atualizarAtividade = async (
+export const updateActivity = async (
   id: string,
-  payload: SalvarAtividadePayload
+  payload: SaveActivityPayloadType
 ) => {
-  const { data } = await api.patch<AtividadeResponse>(
-    `/api/atividades/${id}`,
+  const { data } = await api.patch<ActivityResponseType>(
+    endpoints.activities.byId(id),
     payload
   );
   return data;
 };
 
-export const excluirAtividade = async (id: string) => {
-  await api.delete(`/api/atividades/${id}`);
+export const deleteActivity = async (id: string) => {
+  await api.delete(endpoints.activities.byId(id));
 };
 
-export const monitoramentoAtividade = async (id: string) => {
-  const { data } = await api.get<MonitoramentoResponse>(
-    `/api/atividades/${id}/monitoramento`
+export const getActivityMonitoring = async (id: string) => {
+  const { data } = await api.get<MonitoringResponseType>(
+    endpoints.activities.monitoring(id)
   );
   return data;
 };

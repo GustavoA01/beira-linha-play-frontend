@@ -1,10 +1,13 @@
 import type { UsuarioType } from '@/data/types/api';
 import { api, ApiError } from './api';
-import type { CadastroPayload, LoginPayload, UsuarioResponse } from './types';
+import { endpoints } from './endpoints';
+import type {
+  LoginPayloadType,
+  RegisterPayloadType,
+  UserResponseType,
+} from '@/data/types/services';
 
-export type { CadastroPayload, LoginPayload, UsuarioResponse } from './types';
-
-export const toUsuario = (data: UsuarioResponse): UsuarioType => {
+export const toUser = (data: UserResponseType): UsuarioType => {
   if (data.tipo === 'ALUNO') {
     return {
       id: data.id,
@@ -35,23 +38,28 @@ export const toUsuario = (data: UsuarioResponse): UsuarioType => {
   };
 };
 
-export const login = async (payload: LoginPayload) => {
-  const { data } = await api.post<UsuarioResponse>('/api/auth/login', payload);
-  return toUsuario(data);
-};
-
-export const cadastro = async (payload: CadastroPayload) => {
-  const { data } = await api.post<UsuarioResponse>(
-    '/api/auth/cadastro',
+export const login = async (payload: LoginPayloadType) => {
+  const { data } = await api.post<UserResponseType>(
+    endpoints.auth.login,
     payload
   );
-  return toUsuario(data);
+  return toUser(data);
 };
 
-export const me = async (): Promise<UsuarioType | null> => {
+export const register = async (payload: RegisterPayloadType) => {
+  const { data } = await api.post<UserResponseType>(
+    endpoints.auth.register,
+    payload
+  );
+  return toUser(data);
+};
+
+export const currentUser = async (): Promise<UsuarioType | null> => {
   try {
-    const { data } = await api.get<UsuarioResponse>('/api/auth/me');
-    return toUsuario(data);
+    const { data } = await api.get<UserResponseType>(
+      endpoints.auth.currentUser
+    );
+    return toUser(data);
   } catch (error) {
     if (error instanceof ApiError && error.status === 401) {
       return null;
@@ -62,13 +70,11 @@ export const me = async (): Promise<UsuarioType | null> => {
 
 export const refresh = async (): Promise<UsuarioType | null> => {
   try {
-    const { data } = await api.post<UsuarioResponse>('/api/auth/refresh');
-    return toUsuario(data);
+    const { data } = await api.post<UserResponseType>(endpoints.auth.refresh);
+    return toUser(data);
   } catch {
     return null;
   }
 };
 
-export const logout = async () => {
-  await api.post('/api/auth/logout');
-};
+export const logout = async () => await api.post(endpoints.auth.logout);

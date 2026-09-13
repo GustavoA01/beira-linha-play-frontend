@@ -1,43 +1,52 @@
 import { api } from './api';
+import { endpoints } from './endpoints';
 import type {
-  CursoResponse,
-  InscreverCursoPayload,
-  SalvarCursoPayload,
-} from './types';
+  CourseResponseType,
+  EnrollCoursePayloadType,
+  SaveCoursePayloadType,
+} from '@/data/types/services';
 
-export const listarCursos = async () => {
-  const { data } = await api.get<CursoResponse[]>('/api/cursos');
+export const listCourses = async () => {
+  const { data } = await api.get<CourseResponseType[]>(endpoints.courses.list);
   return data;
 };
 
-export const buscarCurso = async (id: string) => {
-  const { data } = await api.get<CursoResponse>(`/api/cursos/${id}`);
+export const getCourse = async (id: string) => {
+  const { data } = await api.get<CourseResponseType>(
+    endpoints.courses.byId(id)
+  );
   return data;
 };
 
-export const criarCurso = async (payload: SalvarCursoPayload) => {
-  const { data } = await api.post<CursoResponse>('/api/cursos', payload);
+export const createCourse = async (payload: SaveCoursePayloadType) => {
+  const { data } = await api.post<CourseResponseType>(
+    endpoints.courses.list,
+    payload
+  );
   return data;
 };
 
-export const atualizarCurso = async (
+export const updateCourse = async (
   id: string,
-  payload: SalvarCursoPayload
+  payload: SaveCoursePayloadType
 ) => {
-  const { data } = await api.patch<CursoResponse>(`/api/cursos/${id}`, payload);
+  const { data } = await api.patch<CourseResponseType>(
+    endpoints.courses.byId(id),
+    payload
+  );
   return data;
 };
 
-export const excluirCurso = async (id: string) => {
-  await api.delete(`/api/cursos/${id}`);
+export const deleteCourse = async (id: string) => {
+  await api.delete(endpoints.courses.byId(id));
 };
 
-export const inscreverCurso = async (
+export const enrollCourse = async (
   id: string,
-  payload: InscreverCursoPayload
+  payload: EnrollCoursePayloadType
 ) => {
-  const { data } = await api.post<CursoResponse>(
-    `/api/cursos/${id}/inscrever`,
+  const { data } = await api.post<CourseResponseType>(
+    endpoints.courses.enroll(id),
     payload
   );
   return data;

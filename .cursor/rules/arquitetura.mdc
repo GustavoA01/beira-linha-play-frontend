@@ -13,6 +13,7 @@ alwaysApply: true
 - `src/pages`: uma pasta por rota, nome em **português** (`cursos`, `curso`, `modulo`, `nova-atividade`).
 - `src/hooks`: hooks globais (`useMediaDevice`).
 - `src/data/types/api.ts`: modelo de domínio (diagrama de classes). Props de UI ficam **no componente que as usa**, sem pasta `types`.
+- `src/data/types/services.ts`: contrato da API (payload e response). Reusa `api.ts`; só declara o que a API achata, omite ou acrescenta.
 - `src/data/tentativas.ts`: derivações sobre `TentativaType` (contar, melhor pontuação). Recebem a lista; o mock só fornece os dados.
 - `src/data/temporaryMocks`: dados fake até existir API.
 - `src/providers`: estado global de sessão (`UserProvider` envolve o `App`, não o array do router).

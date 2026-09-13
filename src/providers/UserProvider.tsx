@@ -13,7 +13,7 @@ import type {
   MonitorType,
   UsuarioType,
 } from '@/data/types/api';
-import { me, refresh } from '@/services/auth';
+import { currentUser, refresh } from '@/services/auth';
 
 export type SessionStatus = 'loading' | 'anonimo' | 'autenticado';
 
@@ -79,18 +79,14 @@ export const UserProvider = ({
   }, []);
 
   useEffect(() => {
-    if (skipBoot) {
-      return;
-    }
+    if (skipBoot) return;
 
     let cancelled = false;
 
     const boot = async () => {
       try {
-        const current = await me();
-        if (cancelled) {
-          return;
-        }
+        const current = await currentUser();
+        if (cancelled) return;
 
         if (current) {
           setUser(current);
@@ -98,15 +94,11 @@ export const UserProvider = ({
         }
 
         const restored = await refresh();
-        if (cancelled) {
-          return;
-        }
+        if (cancelled) return;
 
         setUser(restored);
       } catch {
-        if (!cancelled) {
-          setUser(null);
-        }
+        if (!cancelled) setUser(null);
       }
     };
 

@@ -11,8 +11,8 @@ jest.mock('@/assets/logo-beira-linha.png', () => 'logo.png');
 
 jest.mock('@/services/auth', () => ({
   login: jest.fn(),
-  cadastro: jest.fn(),
-  me: jest.fn(),
+  register: jest.fn(),
+  currentUser: jest.fn(),
   refresh: jest.fn(),
   logout: jest.fn(),
 }));
