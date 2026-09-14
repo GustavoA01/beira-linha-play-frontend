@@ -13,7 +13,7 @@ import type {
   MonitorType,
   UsuarioType,
 } from '@/data/types/api';
-import { currentUser, refresh } from '@/services/auth';
+import { currentUser } from '@/services/auth';
 
 export type SessionStatus = 'loading' | 'anonimo' | 'autenticado';
 
@@ -87,16 +87,7 @@ export const UserProvider = ({
       try {
         const current = await currentUser();
         if (cancelled) return;
-
-        if (current) {
-          setUser(current);
-          return;
-        }
-
-        const restored = await refresh();
-        if (cancelled) return;
-
-        setUser(restored);
+        setUser(current);
       } catch {
         if (!cancelled) setUser(null);
       }
