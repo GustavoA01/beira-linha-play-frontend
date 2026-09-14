@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { UserProvider, useUserProvider } from '@/providers/UserProvider';
 import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
-import { currentUser, refresh } from '@/services/auth';
+import { currentUser } from '@/services/auth';
 
 jest.mock('@/services/auth', () => ({
   currentUser: jest.fn(),
@@ -14,7 +14,6 @@ jest.mock('@/services/auth', () => ({
 const mockedCurrentUser = currentUser as jest.MockedFunction<
   typeof currentUser
 >;
-const mockedRefresh = refresh as jest.MockedFunction<typeof refresh>;
 
 const Probe = () => {
   const { status, user } = useUserProvider();
@@ -28,7 +27,6 @@ const Probe = () => {
 describe('UserProvider', () => {
   beforeEach(() => {
     mockedCurrentUser.mockReset();
-    mockedRefresh.mockReset();
   });
 
   it('skips the network boot when initialUser is passed', () => {
@@ -40,7 +38,6 @@ describe('UserProvider', () => {
 
     expect(screen.getByText('anonimo:none')).toBeInTheDocument();
     expect(mockedCurrentUser).not.toHaveBeenCalled();
-    expect(mockedRefresh).not.toHaveBeenCalled();
   });
 
   it('authenticates from GET current user', async () => {
@@ -58,29 +55,10 @@ describe('UserProvider', () => {
         screen.getByText('autenticado:Gustavo Aguiar')
       ).toBeInTheDocument();
     });
-    expect(mockedRefresh).not.toHaveBeenCalled();
   });
 
-  it('restores the session from refresh when current user is unauthorized', async () => {
+  it('stays anonymous when current user is unauthorized', async () => {
     mockedCurrentUser.mockResolvedValue(null);
-    mockedRefresh.mockResolvedValue(mockLoggedAluno);
-
-    render(
-      <UserProvider>
-        <Probe />
-      </UserProvider>
-    );
-
-    await waitFor(() => {
-      expect(
-        screen.getByText('autenticado:Gustavo Aguiar')
-      ).toBeInTheDocument();
-    });
-  });
-
-  it('stays anonymous when current user and refresh fail', async () => {
-    mockedCurrentUser.mockResolvedValue(null);
-    mockedRefresh.mockResolvedValue(null);
 
     render(
       <UserProvider>
