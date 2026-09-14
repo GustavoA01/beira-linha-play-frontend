@@ -6,7 +6,8 @@ import { MedalsPage } from '../index';
 import { useAuthUser } from '@/providers/UserProvider';
 import { mockLoggedAdmin } from '@/data/temporaryMocks/admins';
 import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
-import { listMedals } from '@/services/medalhas';
+import { equipMedal, listMedals } from '@/services/medalhas';
+import { toast } from '@/components/ui/toast';
 
 jest.mock('@/providers/UserProvider', () => ({
   useAuthUser: jest.fn(),
@@ -23,6 +24,10 @@ jest.mock('@/services/cloudinary', () => ({
   uploadImage: jest.fn(),
 }));
 
+jest.mock('@/components/ui/toast', () => ({
+  toast: { add: jest.fn() },
+}));
+
 jest.mock('../components/UnknownMedal', () => ({
   UnknownMedal: () => null,
 }));
@@ -31,6 +36,7 @@ const mockedUseAuthUser = useAuthUser as jest.MockedFunction<
   typeof useAuthUser
 >;
 const mockedListMedals = listMedals as jest.MockedFunction<typeof listMedals>;
+const mockedEquipMedal = equipMedal as jest.MockedFunction<typeof equipMedal>;
 
 const renderPage = (ui: ReactElement) => {
   const client = new QueryClient({
@@ -48,6 +54,7 @@ const renderPage = (ui: ReactElement) => {
 describe('MedalsPage', () => {
   beforeEach(() => {
     mockedListMedals.mockReset();
+    mockedEquipMedal.mockReset();
     mockedListMedals.mockResolvedValue([
       {
         id: 'medal-1',
@@ -106,5 +113,57 @@ describe('MedalsPage', () => {
         'Cadastre uma medalha do catálogo com nome, pontos mínimos e imagem.'
       )
     ).toBeInTheDocument();
+  });
+
+  it('equips a medal and updates the student profile image', async () => {
+    const user = userEvent.setup();
+    const setUser = jest.fn();
+    let resolveEquip!: (value: Awaited<ReturnType<typeof equipMedal>>) => void;
+
+    mockedEquipMedal.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          resolveEquip = resolve;
+        })
+    );
+    mockedUseAuthUser.mockReturnValue({
+      user: mockLoggedAluno,
+      setUser,
+      status: 'autenticado',
+      isAluno: true,
+      isMonitor: false,
+      isAdmin: false,
+    });
+
+    renderPage(<MedalsPage />);
+
+    await user.click(await screen.findByText('PUC Minas'));
+
+    expect(
+      await screen.findByText('Atualizando foto de perfil...')
+    ).toBeInTheDocument();
+    expect(screen.getByRole('status', { name: 'Loading' })).toBeInTheDocument();
+
+    resolveEquip({
+      id: mockLoggedAluno.id,
+      nome: mockLoggedAluno.nome,
+      tipo: 'ALUNO',
+      cursoIds: mockLoggedAluno.cursoIds,
+      email: null,
+      apelido: mockLoggedAluno.apelido,
+      pontos: mockLoggedAluno.pontos,
+      imagemPerfil: 'https://example.com/puc.png',
+      cursoOrigem: null,
+    });
+
+    await screen.findByText('PUC Minas');
+    expect(setUser).toHaveBeenCalledWith({
+      ...mockLoggedAluno,
+      imagemPerfil: 'https://example.com/puc.png',
+    });
+    expect(toast.add).toHaveBeenCalledWith({
+      type: 'success',
+      title: 'Medalha selecionada',
+    });
   });
 });

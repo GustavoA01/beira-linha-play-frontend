@@ -1,5 +1,5 @@
 import { screen } from '@testing-library/react';
-import { Header } from '@/components/Header/Header';
+import { Header } from '@/components/Header';
 import { renderWithProviders } from './renderWithProviders';
 
 jest.mock('@/assets/logo-beira-linha.png', () => 'logo.png');

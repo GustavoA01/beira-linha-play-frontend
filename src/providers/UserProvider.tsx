@@ -7,51 +7,13 @@ import {
   useState,
   type ReactNode,
 } from 'react';
-import type {
-  AdminType,
-  AlunoType,
-  MonitorType,
-  UsuarioType,
-} from '@/data/types/api';
+import type { UsuarioType } from '@/data/types/api';
 import { currentUser } from '@/services/auth';
-
-export type SessionStatus = 'loading' | 'anonimo' | 'autenticado';
-
-type SetUserType = (user: UsuarioType | null) => void;
-
-type UserContextType =
-  | {
-      user: AlunoType;
-      setUser: SetUserType;
-      status: SessionStatus;
-      isAluno: true;
-      isMonitor: false;
-      isAdmin: false;
-    }
-  | {
-      user: MonitorType;
-      setUser: SetUserType;
-      status: SessionStatus;
-      isAluno: false;
-      isMonitor: true;
-      isAdmin: false;
-    }
-  | {
-      user: AdminType;
-      setUser: SetUserType;
-      status: SessionStatus;
-      isAluno: false;
-      isMonitor: false;
-      isAdmin: true;
-    }
-  | {
-      user: null;
-      setUser: SetUserType;
-      status: SessionStatus;
-      isAluno: false;
-      isMonitor: false;
-      isAdmin: false;
-    };
+import type {
+  SessionStatus,
+  SetUserType,
+  UserContextType,
+} from '@/data/types/providers';
 
 const UserContext = createContext<UserContextType | null>(null);
 
@@ -101,40 +63,37 @@ export const UserProvider = ({
   }, [setUser, skipBoot]);
 
   const value = useMemo((): UserContextType => {
+    const shared = { setUser, status };
+
     if (user?.tipo === 'ALUNO') {
       return {
+        ...shared,
         user,
-        setUser,
-        status,
         isAluno: true,
         isMonitor: false,
         isAdmin: false,
       };
-    }
-    if (user?.tipo === 'MONITOR') {
+    } else if (user?.tipo === 'MONITOR') {
       return {
+        ...shared,
         user,
-        setUser,
-        status,
         isAluno: false,
         isMonitor: true,
         isAdmin: false,
       };
-    }
-    if (user?.tipo === 'ADMIN') {
+    } else if (user?.tipo === 'ADMIN') {
       return {
+        ...shared,
         user,
-        setUser,
-        status,
         isAluno: false,
         isMonitor: false,
         isAdmin: true,
       };
     }
+
     return {
+      ...shared,
       user: null,
-      setUser,
-      status,
       isAluno: false,
       isMonitor: false,
       isAdmin: false,

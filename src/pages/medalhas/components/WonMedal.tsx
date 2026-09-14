@@ -6,6 +6,7 @@ import {
   ContextMenuTrigger,
 } from '@/components/ui/context-menu';
 import type { MedalhaType } from '@/data/types/api';
+import { cn } from '@/lib/utils';
 import { Trash2 } from 'lucide-react';
 
 type WonMedalPropsType = {
@@ -13,7 +14,9 @@ type WonMedalPropsType = {
   imagemUrl: MedalhaType['imagemUrl'];
   pontosMin: MedalhaType['pontosMin'];
   canDelete?: boolean;
+  disabled?: boolean;
   onDelete?: () => void;
+  selectImage?: () => void;
 };
 
 export const WonMedal = ({
@@ -21,10 +24,21 @@ export const WonMedal = ({
   imagemUrl,
   pontosMin,
   canDelete = false,
+  disabled = false,
   onDelete,
+  selectImage,
 }: WonMedalPropsType) => {
   const card = (
-    <Card className="group cursor-pointer hover:scale-105 hover:shadow-primary transition-all duration-300">
+    <Card
+      onClick={disabled ? undefined : selectImage}
+      aria-disabled={disabled || undefined}
+      className={cn(
+        'group transition-all duration-300',
+        disabled
+          ? 'pointer-events-none cursor-wait opacity-50 grayscale'
+          : 'cursor-pointer hover:scale-105 hover:shadow-primary'
+      )}
+    >
       <CardContent className="space-y-2 select-none flex flex-col items-center">
         <img
           src={imagemUrl}
@@ -43,9 +57,7 @@ export const WonMedal = ({
     </Card>
   );
 
-  if (!canDelete || !onDelete) {
-    return card;
-  }
+  if (!canDelete || !onDelete) return card;
 
   return (
     <ContextMenu>

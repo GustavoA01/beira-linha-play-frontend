@@ -1,18 +1,21 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { MedalsPageSkeleton } from '@/components/PageSkeleton';
+import { Spinner } from '@/components/ui/spinner';
 import { UnknownMedal } from './components/UnknownMedal';
 import { WonMedal } from './components/WonMedal';
 import { AddMedalDialog } from './components/AddMedalDialog';
 import { motion } from 'framer-motion';
 import { useAuthUser } from '@/providers/UserProvider';
-import { useDeleteMedal } from './hooks/useMutation';
+import { useDeleteMedal, useSelectMedal } from './hooks/useMutation';
 import { useQuery } from '@tanstack/react-query';
 import { listMedals } from '@/services/medalhas';
 import { medalKeys } from '@/lib/queryClientKeys';
+import { cn } from '@/lib/utils';
 
 export const MedalsPage = () => {
   const { isAdmin } = useAuthUser();
+  const { mutate: selectMedal, isPending: isSelectingMedal } = useSelectMedal();
   const {
     data: medals = [],
     isPending,
@@ -54,33 +57,52 @@ export const MedalsPage = () => {
         </p>
       )}
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 mt-4 pb-6 mx-auto">
-        {medals.map((medal, index) => {
-          const showAsWon = isAdmin || medal.conquistada;
+      <div className="relative w-full">
+        {isSelectingMedal && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded-lg bg-white/60 backdrop-blur-[1px]">
+            <Spinner className="size-6 text-primary" />
+            <p className="text-sm font-montserrat text-zinc-600">
+              Atualizando foto de perfil...
+            </p>
+          </div>
+        )}
 
-          return (
-            <motion.div
-              key={medal.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.08, duration: 0.3 }}
-            >
-              {showAsWon ? (
-                <WonMedal
-                  nome={medal.nome}
-                  imagemUrl={medal.imagemUrl}
-                  pontosMin={medal.pontosMin}
-                  canDelete={isAdmin}
-                  onDelete={() =>
-                    removeMedal({ id: medal.id, imagemUrl: medal.imagemUrl })
-                  }
-                />
-              ) : (
-                <UnknownMedal minPoints={medal.pontosMin} />
-              )}
-            </motion.div>
-          );
-        })}
+        <div
+          className={cn(
+            'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 mt-4 pb-6 mx-auto',
+            isSelectingMedal && 'pointer-events-none select-none'
+          )}
+          aria-busy={isSelectingMedal || undefined}
+        >
+          {medals.map((medal, index) => {
+            const showAsWon = isAdmin || medal.conquistada;
+
+            return (
+              <motion.div
+                key={medal.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.08, duration: 0.3 }}
+              >
+                {showAsWon ? (
+                  <WonMedal
+                    selectImage={() => selectMedal(medal.id)}
+                    disabled={isSelectingMedal}
+                    nome={medal.nome}
+                    imagemUrl={medal.imagemUrl}
+                    pontosMin={medal.pontosMin}
+                    canDelete={isAdmin}
+                    onDelete={() =>
+                      removeMedal({ id: medal.id, imagemUrl: medal.imagemUrl })
+                    }
+                  />
+                ) : (
+                  <UnknownMedal minPoints={medal.pontosMin} />
+                )}
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
 
       <AddMedalDialog open={openDialog} onOpenChange={setOpenDialog} />
