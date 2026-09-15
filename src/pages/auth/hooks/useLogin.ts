@@ -4,14 +4,40 @@ import {
   type LoginRoleType,
 } from '@/data/schemas/auth';
 import { useUserProvider } from '@/providers/UserProvider';
-import { login } from '@/services/auth';
+import { ApiError } from '@/services/api';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { useLoginMutation } from './useMutation';
+
+const credentialsMessage = (tipo: LoginRoleType) => {
+  if (tipo === 'ALUNO') {
+    return 'Apelido ou senha incorretos. Confira e tente de novo.';
+  }
+  if (tipo === 'MONITOR') {
+    return 'E-mail ou senha incorretos. Confira e tente de novo.';
+  }
+  return 'Nome ou senha incorretos. Confira e tente de novo.';
+};
+
+const loginErrorMessage = (tipo: LoginRoleType, error: unknown) => {
+  if (
+    error instanceof ApiError &&
+    (error.status === 401 || error.status === 403)
+  ) {
+    return credentialsMessage(tipo);
+  }
+
+  return error instanceof Error &&
+    error.message !== 'Não foi possível completar a operação'
+    ? error.message
+    : 'Não foi possível entrar. Tente de novo em instantes.';
+};
 
 export const useLogin = () => {
   const { setUser } = useUserProvider();
   const navigate = useNavigate();
+  const { mutateAsync: signIn, isPending } = useLoginMutation();
   const methods = useForm<LoginFormType>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -34,7 +60,7 @@ export const useLogin = () => {
 
   const onSubmit = methods.handleSubmit(async (data: LoginFormType) => {
     try {
-      const user = await login({
+      const user = await signIn({
         tipo: data.tipo,
         senha: data.senha,
         ...(data.tipo === 'ALUNO'
@@ -47,8 +73,7 @@ export const useLogin = () => {
       navigate(user.tipo === 'ALUNO' ? '/' : '/cursos', { replace: true });
     } catch (error) {
       methods.setError('root', {
-        message:
-          error instanceof Error ? error.message : 'Não foi possível entrar',
+        message: loginErrorMessage(data.tipo, error),
       });
     }
   });
@@ -57,6 +82,7 @@ export const useLogin = () => {
     onSubmit,
     register: methods.register,
     errors: methods.formState.errors,
+    isSubmitting: methods.formState.isSubmitting || isPending,
     isAluno,
     isAdmin,
     enterAsStudent: () => enterAs('ALUNO'),

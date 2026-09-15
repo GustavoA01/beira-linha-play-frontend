@@ -1,24 +1,35 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HeaderLayout } from '@/components/layouts/HeaderLayout';
 import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
 import { UserProvider } from '@/providers/UserProvider';
 
 jest.mock('@/assets/logo-beira-linha.png', () => 'logo.png');
 
-const renderLayout = (route: string) =>
-  render(
-    <MemoryRouter initialEntries={[route]}>
-      <UserProvider initialUser={mockLoggedAluno}>
-        <Routes>
-          <Route element={<HeaderLayout />}>
-            <Route path="/cursos" element={<p>Lista de cursos</p>} />
-            <Route path="/outra" element={<p>Outra página</p>} />
-          </Route>
-        </Routes>
-      </UserProvider>
-    </MemoryRouter>
+const renderLayout = (route: string) => {
+  const client = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+
+  return render(
+    <QueryClientProvider client={client}>
+      <MemoryRouter initialEntries={[route]}>
+        <UserProvider initialUser={mockLoggedAluno}>
+          <Routes>
+            <Route element={<HeaderLayout />}>
+              <Route path="/cursos" element={<p>Lista de cursos</p>} />
+              <Route path="/outra" element={<p>Outra página</p>} />
+            </Route>
+          </Routes>
+        </UserProvider>
+      </MemoryRouter>
+    </QueryClientProvider>
   );
+};
 
 describe('HeaderLayout', () => {
   it('shows the route content and bottom navigation on /cursos', () => {

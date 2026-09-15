@@ -1,9 +1,14 @@
-import type { CursoType, UsuarioType } from '@/data/types/api';
+import type { CursoType } from '@/data/types/api';
+import { useAuthUser } from '@/providers/UserProvider';
+import { ApiError } from '@/services/api';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useEnrollCourse } from './useMutation';
 
-export const useCursos = (user: UsuarioType) => {
+export const useCursos = () => {
+  const { user, setUser } = useAuthUser();
   const navigate = useNavigate();
+  const { mutateAsync: enroll } = useEnrollCourse();
   const [openCodeDialog, setOpenCodeDialog] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<CursoType | null>(null);
 
@@ -24,12 +29,31 @@ export const useCursos = (user: UsuarioType) => {
     setOpenCodeDialog(true);
   };
 
-  const handleCodeSubmit = (code: string) => {
+  const handleCodeSubmit = async (code: string) => {
     if (!selectedCourse) return 'Curso não encontrado';
-    if (code.toUpperCase() !== selectedCourse.codigoAcesso.toUpperCase()) {
-      return 'Código inválido';
+
+    try {
+      await enroll({
+        id: selectedCourse.id,
+        codigoAcesso: code,
+      });
+
+      if (user.tipo === 'ALUNO') {
+        setUser({
+          ...user,
+          cursoIds: user.cursoIds.includes(selectedCourse.id)
+            ? user.cursoIds
+            : [...user.cursoIds, selectedCourse.id],
+        });
+      }
+
+      openCourse(selectedCourse);
+    } catch (error) {
+      return error instanceof ApiError &&
+        error.message !== 'Não foi possível completar a operação'
+        ? error.message
+        : 'Código inválido. Confira e tente de novo.';
     }
-    openCourse(selectedCourse);
   };
 
   return {

@@ -1,6 +1,7 @@
 import { useMediaDevice } from '@/hooks/useMediaDevice';
 import { useState } from 'react';
 import type { AtividadeType } from '@/data/types/api';
+import type { MonitoringResponseType } from '@/data/types/services';
 import { MonitorHeader } from './MonitorHeader';
 import { SummaryCards } from './SummaryCards';
 import { QuestionsAccordion } from './QuestionsAccordion';
@@ -11,10 +12,12 @@ import { useActivityMonitor } from '../hooks/useActivityMonitor';
 
 type MonitoramentoContentPropsType = {
   activity: AtividadeType;
+  monitoring: MonitoringResponseType;
 };
 
 export const MonitoramentoContent = ({
   activity,
+  monitoring,
 }: MonitoramentoContentPropsType) => {
   const { containerClassName } = useMediaDevice();
   const [selectedStudent, setSelectedStudent] = useState<StudentRowType | null>(
@@ -28,7 +31,8 @@ export const MonitoramentoContent = ({
     averageAccuracy,
     questionStats,
     studentRows,
-  } = useActivityMonitor(activity);
+    activity: monitoredActivity,
+  } = useActivityMonitor(activity, monitoring);
 
   const hardestQuestion = [...questionStats].sort(
     (a, b) => a.accuracyPercent - b.accuracyPercent
@@ -36,7 +40,7 @@ export const MonitoramentoContent = ({
 
   return (
     <div className="flex flex-col h-dvh overflow-hidden">
-      <MonitorHeader activity={activity} totalXp={totalXp} />
+      <MonitorHeader activity={monitoredActivity} totalXp={totalXp} />
 
       <div
         className={`flex-1 min-h-0 overflow-y-auto custom-bar space-y-6 pb-20 ${containerClassName}`}
@@ -50,14 +54,14 @@ export const MonitoramentoContent = ({
         />
         <QuestionsAccordion questionStats={questionStats} />
         <StudentsTable
-          activity={activity}
+          activity={monitoredActivity}
           rows={studentRows}
           onSelectStudent={setSelectedStudent}
         />
       </div>
 
       <AttemptDialog
-        activity={activity}
+        activity={monitoredActivity}
         row={selectedStudent}
         onClose={() => setSelectedStudent(null)}
       />

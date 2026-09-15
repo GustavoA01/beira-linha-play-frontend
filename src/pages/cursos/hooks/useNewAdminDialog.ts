@@ -1,11 +1,7 @@
-import { toast } from '@/components/ui/toast';
 import { newAdminSchema, type NewAdminFormType } from '@/data/schemas/auth';
-import type { AdminType } from '@/data/types/api';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-
-const newAdminId = () =>
-  globalThis.crypto?.randomUUID?.() ?? `admin-${Date.now()}`;
+import { useCreateAdmin } from './useMutation';
 
 const emptyValues: NewAdminFormType = {
   nome: '',
@@ -14,6 +10,7 @@ const emptyValues: NewAdminFormType = {
 };
 
 export const useNewAdminDialog = (onOpenChange: (open: boolean) => void) => {
+  const { mutateAsync: addAdmin, isPending } = useCreateAdmin();
   const methods = useForm<NewAdminFormType>({
     resolver: zodResolver(newAdminSchema),
     defaultValues: emptyValues,
@@ -24,24 +21,16 @@ export const useNewAdminDialog = (onOpenChange: (open: boolean) => void) => {
     onOpenChange(nextOpen);
   };
 
-  const onSubmit = methods.handleSubmit((data: NewAdminFormType) => {
-    const admin: AdminType = {
-      id: newAdminId(),
-      nome: data.nome,
-      tipo: 'ADMIN',
-    };
-    console.log(admin);
+  const onSubmit = methods.handleSubmit(async (data: NewAdminFormType) => {
+    await addAdmin({ nome: data.nome, senha: data.senha });
     handleOpenChange(false);
-    toast.add({
-      type: 'success',
-      title: 'Administrador adicionado',
-    });
   });
 
   return {
     onSubmit,
     register: methods.register,
     errors: methods.formState.errors,
+    isSubmitting: methods.formState.isSubmitting || isPending,
     handleOpenChange,
   };
 };

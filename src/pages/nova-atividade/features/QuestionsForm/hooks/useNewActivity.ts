@@ -7,13 +7,63 @@ import {
   getNewActivityStorage,
   type NewActivityStorageType,
 } from '@/data/newActivityStorage';
+import type { SaveActivityPayloadType } from '@/data/types/services';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
+import { useNavigate, useParams } from 'react-router-dom';
+import { getActivity } from '@/services/atividades';
+import { activityKeys } from '@/lib/queryClientKeys';
+import { toQuestionForm } from '../../../utils';
+import {
+  useCreateActivity,
+  useUpdateActivity,
+} from '../../../hooks/useMutation';
+
+const toSaveActivityPayload = (
+  titulo: string,
+  questions: QuestionFormType['questions']
+): SaveActivityPayloadType => ({
+  titulo,
+  questoes: questions.map((question) => ({
+    enunciado: question.statement,
+    valor: question.xp,
+    alternativas: question.alternatives
+      .filter((alternative) => alternative.text !== 'ignore')
+      .map((alternative) => ({
+        descricao: alternative.text,
+        correta: alternative.isCorrect,
+      })),
+  })),
+});
+
+const emptyQuestion = () => ({
+  statement: '',
+  xp: 1,
+  alternatives: [
+    { text: '', isCorrect: false },
+    { text: '', isCorrect: false },
+    { text: '', isCorrect: false },
+    { text: '', isCorrect: false },
+  ],
+});
 
 export const useNewActivity = () => {
+  const navigate = useNavigate();
+  const { cursoId, moduloId = '', atividadeId } = useParams();
+  const { mutateAsync: addActivity, isPending: isCreating } =
+    useCreateActivity(moduloId);
+  const { mutateAsync: editActivity, isPending: isUpdating } =
+    useUpdateActivity(moduloId);
   const [localStorageActivityData, setLocalStorageActivityData] =
     useState<NewActivityStorageType | null>(null);
+
+  const { data: existing, isPending: isActivityPending } = useQuery({
+    queryKey: activityKeys.detail(atividadeId ?? ''),
+    queryFn: () => getActivity(atividadeId!),
+    enabled: Boolean(atividadeId),
+  });
 
   const methods = useForm<QuestionFormType>({
     resolver: zodResolver(questionFormSchema),
@@ -27,6 +77,8 @@ export const useNewActivity = () => {
   });
 
   useEffect(() => {
+    if (atividadeId) return;
+
     const newActivityData = getNewActivityStorage();
 
     if (!newActivityData) {
@@ -35,54 +87,54 @@ export const useNewActivity = () => {
     }
 
     setLocalStorageActivityData(newActivityData);
-
     reset({
       questions: Array.from({
         length: newActivityData.qtdQuestions ?? 0,
-      }).map(() => ({
-        statement: '',
-        xp: 1,
-        alternatives: [
-          { text: '', isCorrect: false },
-          { text: '', isCorrect: false },
-          { text: '', isCorrect: false },
-          { text: '', isCorrect: false },
-        ],
-      })),
+      }).map(emptyQuestion),
     });
-  }, [reset]);
+  }, [reset, atividadeId]);
 
-  const handleCreateActivity = (data: QuestionFormType) => {
-    const questionsFormatted = data.questions.map((question) => {
-      const filteredAlternatives = question.alternatives.filter(
-        (alt) => alt.text !== 'ignore'
-      );
-      return {
-        ...question,
-        alternatives: filteredAlternatives,
-      };
+  useEffect(() => {
+    if (!atividadeId || !existing) return;
+
+    const draft = getNewActivityStorage();
+    setLocalStorageActivityData({
+      activityName: draft?.activityName || existing.titulo,
+      qtdQuestions: existing.questoes?.length ?? existing.quantQuestoes,
+      messages: draft?.messages ?? [],
     });
+    reset(toQuestionForm(existing));
+  }, [atividadeId, existing, reset]);
 
-    const totalXp = questionsFormatted.reduce(
-      (acc, question) => question.xp + acc,
-      0
+  const handleCreateActivity = async (data: QuestionFormType) => {
+    if (!localStorageActivityData || !cursoId || !moduloId) return;
+
+    const payload = toSaveActivityPayload(
+      localStorageActivityData.activityName,
+      data.questions
     );
 
-    const activityData = {
-      ...localStorageActivityData,
-      totalXp,
-      questions: questionsFormatted,
-    };
+    if (atividadeId) await editActivity({ id: atividadeId, payload });
+    else await addActivity(payload);
 
     clearNewActivityStorage();
-
-    console.log(activityData);
+    navigate(`/cursos/${cursoId}/modulos/${moduloId}`, { replace: true });
   };
+
+  const isEditing = Boolean(atividadeId);
+  const isLoading = isEditing && isActivityPending;
+  const isReady = isEditing
+    ? Boolean(existing)
+    : Boolean(localStorageActivityData);
+  const isMissing = !isLoading && !isReady;
 
   return {
     localStorageActivityData,
     methods,
     fields,
+    isSubmitting: methods.formState.isSubmitting || isCreating || isUpdating,
+    isLoading,
+    isMissing,
     handleCreateActivity,
   };
 };

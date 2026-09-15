@@ -1,6 +1,8 @@
+import type { ReactElement } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { LogoutDialog } from '@/components/LogoutDialog';
 import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
 import { UserProvider } from '@/providers/UserProvider';
@@ -16,19 +18,32 @@ jest.mock('@/services/auth', () => ({
 
 const mockedLogout = logout as jest.MockedFunction<typeof logout>;
 
+const wrapClient = (ui: ReactElement) => {
+  const client = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+
+  return <QueryClientProvider client={client}>{ui}</QueryClientProvider>;
+};
+
 const renderDialog = () =>
   render(
-    <MemoryRouter initialEntries={['/cursos']}>
-      <UserProvider initialUser={mockLoggedAluno}>
-        <Routes>
-          <Route
-            path="/cursos"
-            element={<LogoutDialog openDialog setOpenDialog={jest.fn()} />}
-          />
-          <Route path="/login" element={<p>Login</p>} />
-        </Routes>
-      </UserProvider>
-    </MemoryRouter>
+    wrapClient(
+      <MemoryRouter initialEntries={['/cursos']}>
+        <UserProvider initialUser={mockLoggedAluno}>
+          <Routes>
+            <Route
+              path="/cursos"
+              element={<LogoutDialog openDialog setOpenDialog={jest.fn()} />}
+            />
+            <Route path="/login" element={<p>Login</p>} />
+          </Routes>
+        </UserProvider>
+      </MemoryRouter>
+    )
   );
 
 describe('LogoutDialog', () => {
@@ -53,11 +68,13 @@ describe('LogoutDialog', () => {
     const setOpenDialog = jest.fn();
 
     render(
-      <MemoryRouter>
-        <UserProvider initialUser={mockLoggedAluno}>
-          <LogoutDialog openDialog setOpenDialog={setOpenDialog} />
-        </UserProvider>
-      </MemoryRouter>
+      wrapClient(
+        <MemoryRouter>
+          <UserProvider initialUser={mockLoggedAluno}>
+            <LogoutDialog openDialog setOpenDialog={setOpenDialog} />
+          </UserProvider>
+        </MemoryRouter>
+      )
     );
 
     await user.click(screen.getByRole('button', { name: 'Cancelar' }));

@@ -42,4 +42,43 @@ describe('CourseCard', () => {
       screen.getByRole('button', { name: 'Ações do curso' })
     ).toBeInTheDocument();
   });
+
+  it('shows the number of activities in the course', () => {
+    render(
+      <CourseCard
+        curso={{
+          ...curso,
+          modulos: [
+            {
+              id: 'modulo-1',
+              nome: 'Limites',
+              cursoId: 'curso-1',
+              atividades: [
+                {
+                  id: 'atv-1',
+                  titulo: 'Noção de limite',
+                  quantQuestoes: 1,
+                  moduloId: 'modulo-1',
+                  questoes: [],
+                },
+                {
+                  id: 'atv-2',
+                  titulo: 'Continuidade',
+                  quantQuestoes: 1,
+                  moduloId: 'modulo-1',
+                  questoes: [],
+                },
+              ],
+            },
+          ],
+        }}
+        monitorNome="Maria Souza"
+        onClick={jest.fn()}
+        codCurso="ABC123"
+      />
+    );
+
+    expect(screen.getByText('1 módulo')).toBeInTheDocument();
+    expect(screen.getByText('2 Ativ.')).toBeInTheDocument();
+  });
 });

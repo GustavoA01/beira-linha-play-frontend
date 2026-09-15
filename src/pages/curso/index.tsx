@@ -3,32 +3,18 @@ import { CourseHeader } from './components/CourseHeader';
 import { ModuleCard } from './components/ModuleCard';
 import { NewModuleDialog } from './components/NewModuleDialog';
 import { DeleteModuleDialog } from './components/DeleteModuleDialog';
-import { motion } from 'motion/react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useAuthUser } from '@/providers/UserProvider';
 import { ResourceNotFound } from '@/components/ResourceNotFound';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueries } from '@tanstack/react-query';
 import { getCourse } from '@/services/cursos';
-import { courseKeys } from '@/lib/queryClientKeys';
-import { toCurso } from '@/pages/cursos/utils';
+import { getModule } from '@/services/modulos';
+import { courseKeys, moduleKeys } from '@/lib/queryClientKeys';
+import { toCourse } from '@/pages/cursos/utils';
+import { toModule } from '@/pages/modulo/utils';
 import { HeaderListPageSkeleton } from '@/components/PageSkeleton';
 import type { ModuloType } from '@/data/types/api';
 import { useDeleteModule } from './hooks/useMutation';
-
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.05,
-    },
-  },
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 15 },
-  show: { opacity: 1, y: 0 },
-};
 
 export const CoursePage = () => {
   const navigate = useNavigate();
@@ -38,7 +24,13 @@ export const CoursePage = () => {
     queryFn: () => getCourse(cursoId!),
     enabled: Boolean(cursoId),
   });
-  const curso = data ? toCurso(data) : undefined;
+  const moduleDetails = useQueries({
+    queries: (data?.modulos ?? []).map((modulo) => ({
+      queryKey: moduleKeys.detail(modulo.id),
+      queryFn: async () => toModule(await getModule(modulo.id)),
+    })),
+  });
+  const curso = data ? toCourse(data) : undefined;
   const { isAluno, isMonitor } = useAuthUser();
   const { mutate: removeModule, isPending: isDeleting } = useDeleteModule(
     cursoId ?? ''
@@ -62,6 +54,9 @@ export const CoursePage = () => {
 
   if (!curso) return <ResourceNotFound label="Curso não encontrado" />;
 
+  const moduloForCard = (modulo: ModuloType) =>
+    moduleDetails.find((item) => item.data?.id === modulo.id)?.data ?? modulo;
+
   return (
     <>
       <div className="flex flex-col h-dvh overflow-hidden">
@@ -74,37 +69,40 @@ export const CoursePage = () => {
             setOpenModuleDialog(true);
           }}
         />
-        <motion.div
-          initial="hidden"
-          animate="show"
-          variants={containerVariants}
-          className="flex-1 min-h-0 custom-bar sm:large-bar -mt-10 overflow-y-auto pb-4 container mx-auto px-4 sm:px-6 lg:px-8"
-        >
-          <div className="flex flex-col  pb-20">
-            {curso.modulos.map((modulo) => (
-              <motion.div key={modulo.id} variants={itemVariants}>
-                <ModuleCard
-                  modulo={modulo}
-                  isMonitor={isMonitor}
-                  onEdit={() => {
-                    setEditingModule(modulo);
-                    setOpenModuleDialog(true);
-                  }}
-                  onDelete={() => setModuleToDelete(modulo)}
-                  onClick={() =>
-                    navigate(`/cursos/${curso.id}/modulos/${modulo.id}`)
-                  }
-                />
-              </motion.div>
-            ))}
+        <div className="flex-1 min-h-0 custom-bar sm:large-bar -mt-10 overflow-y-auto pb-4 container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col pb-20">
+            {curso.modulos.length === 0 ? (
+              <p className="mt-14 text-sm text-muted-foreground font-montserrat">
+                Nenhum módulo cadastrado.
+              </p>
+            ) : (
+              curso.modulos.map((modulo) => {
+                const moduloCard = moduloForCard(modulo);
+                return (
+                  <ModuleCard
+                    key={modulo.id}
+                    modulo={moduloCard}
+                    isMonitor={isMonitor}
+                    onEdit={() => {
+                      setEditingModule(moduloCard);
+                      setOpenModuleDialog(true);
+                    }}
+                    onDelete={() => setModuleToDelete(moduloCard)}
+                    onClick={() =>
+                      navigate(`/cursos/${curso.id}/modulos/${modulo.id}`)
+                    }
+                  />
+                );
+              })
+            )}
           </div>
-        </motion.div>
+        </div>
       </div>
 
       <NewModuleDialog
         open={openModuleDialog}
         onOpenChange={handleModuleDialogChange}
-        courseId={curso.id}
+        courseId={cursoId}
         modulo={editingModule}
       />
       <DeleteModuleDialog
@@ -113,6 +111,7 @@ export const CoursePage = () => {
           if (!open) setModuleToDelete(undefined);
         }}
         moduleName={moduleToDelete?.nome ?? ''}
+        codigoAcesso={curso.codigoAcesso}
         isPending={isDeleting}
         onConfirm={() => {
           if (!moduleToDelete) return;

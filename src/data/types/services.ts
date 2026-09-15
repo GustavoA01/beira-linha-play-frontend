@@ -50,21 +50,37 @@ export type CreateAdminPayloadType = Pick<AdminType, 'nome'> & {
   senha: string;
 };
 
+export type ActivitySummaryResponseType = Pick<
+  AtividadeType,
+  'id' | 'titulo' | 'quantQuestoes' | 'moduloId'
+> & {
+  xpTotal?: number;
+  questoes?: QuestionResponseType[];
+};
+
+export type ModuleResponseType = Omit<ModuloType, 'atividades'> & {
+  atividades: ActivitySummaryResponseType[];
+  xpTotal?: number;
+};
+
+export type CourseModuleResponseType = Pick<
+  ModuloType,
+  'id' | 'nome' | 'cursoId'
+> & {
+  quantAtividades?: number;
+  quantidadeAtividades?: number;
+  xpTotal?: number;
+  atividades?: ActivitySummaryResponseType[];
+};
+
 export type CourseResponseType = Omit<CursoType, 'codigoAcesso' | 'modulos'> & {
   codigoAcesso: string | null;
-  modulos: Pick<ModuloType, 'id' | 'nome' | 'cursoId'>[];
+  modulos: CourseModuleResponseType[];
 };
 
 export type SaveCoursePayloadType = Pick<CursoType, 'nome' | 'monitorIds'>;
 
 export type EnrollCoursePayloadType = Pick<CursoType, 'codigoAcesso'>;
-
-export type ModuleResponseType = Omit<ModuloType, 'atividades'> & {
-  atividades: Pick<
-    AtividadeType,
-    'id' | 'titulo' | 'quantQuestoes' | 'moduloId'
-  >[];
-};
 
 export type SaveModulePayloadType = Pick<ModuloType, 'nome'>;
 

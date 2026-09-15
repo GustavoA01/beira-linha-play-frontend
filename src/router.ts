@@ -93,6 +93,10 @@ export const Router = createBrowserRouter([
                 Component: NewActivityPage,
               },
               {
+                path: '/cursos/:cursoId/modulos/:moduloId/nova-atividade/:atividadeId',
+                Component: NewActivityPage,
+              },
+              {
                 path: '/cursos/:cursoId/modulos/:moduloId/monitoramento/:atividadeId',
                 Component: ManagementPage,
               },

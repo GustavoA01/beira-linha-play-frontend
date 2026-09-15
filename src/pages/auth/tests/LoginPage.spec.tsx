@@ -1,10 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { UserProvider } from '@/providers/UserProvider';
 import { mockLoggedAdmin } from '@/data/temporaryMocks/admins';
 import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
 import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
+import { ApiError } from '@/services/api';
 import { login } from '@/services/auth';
 import { LoginPage } from '../login';
 
@@ -20,19 +22,29 @@ jest.mock('@/services/auth', () => ({
 
 const mockedLogin = login as jest.MockedFunction<typeof login>;
 
-const renderPage = () =>
-  render(
-    <MemoryRouter initialEntries={['/login']}>
-      <UserProvider initialUser={null}>
-        <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/" element={<p>Mapa do aluno</p>} />
-          <Route path="/cursos" element={<p>Lista de cursos</p>} />
-          <Route path="/cadastro" element={<p>Tela de cadastro</p>} />
-        </Routes>
-      </UserProvider>
-    </MemoryRouter>
+const renderPage = () => {
+  const client = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+
+  return render(
+    <QueryClientProvider client={client}>
+      <MemoryRouter initialEntries={['/login']}>
+        <UserProvider initialUser={null}>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/" element={<p>Mapa do aluno</p>} />
+            <Route path="/cursos" element={<p>Lista de cursos</p>} />
+            <Route path="/cadastro" element={<p>Tela de cadastro</p>} />
+          </Routes>
+        </UserProvider>
+      </MemoryRouter>
+    </QueryClientProvider>
   );
+};
 
 describe('LoginPage', () => {
   beforeEach(() => {
@@ -112,7 +124,9 @@ describe('LoginPage', () => {
 
   it('shows an error when student credentials are invalid', async () => {
     const user = userEvent.setup();
-    mockedLogin.mockRejectedValue(new Error('Apelido ou senha inválidos'));
+    mockedLogin.mockRejectedValue(
+      new ApiError('Não foi possível completar a operação', 401)
+    );
     renderPage();
 
     await user.type(screen.getByLabelText('Apelido'), 'Gu');
@@ -120,7 +134,9 @@ describe('LoginPage', () => {
     await user.click(screen.getByRole('button', { name: 'Entrar' }));
 
     expect(
-      await screen.findByText('Apelido ou senha inválidos')
+      await screen.findByText(
+        'Apelido ou senha incorretos. Confira e tente de novo.'
+      )
     ).toBeInTheDocument();
   });
 

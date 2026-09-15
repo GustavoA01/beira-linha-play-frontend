@@ -8,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import type { CursoType } from '@/data/types/api';
-import { contarAtividadesDoCurso } from '@/data/temporaryMocks/cursos';
+import { countCourseActivities } from '@/data/atividades';
 import { cn } from '@/lib/utils';
 import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
 import { DeleteCourseDialog } from './DeleteCourseDialog';
@@ -35,7 +35,7 @@ export const CourseCard = ({
   onDelete,
 }: CourseCardPropsType) => {
   const [confirmOpen, setConfirmOpen] = useState(false);
-  const atividadesCount = contarAtividadesDoCurso(curso);
+  const atividadesCount = countCourseActivities(curso);
   const modulosLabel = `${curso.modulos.length} ${curso.modulos.length === 1 ? 'módulo' : 'módulos'}`;
   const atividadesLabel = `${atividadesCount} Ativ.`;
   const stopCardClick = (event: SyntheticEvent) => {

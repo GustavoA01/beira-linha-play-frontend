@@ -1,15 +1,25 @@
 import type { AtividadeType } from '@/data/types/api';
-import type { ActivityResponseType } from '@/data/types/services';
+import type {
+  ActivitySummaryResponseType,
+  QuestionResponseType,
+} from '@/data/types/services';
 
-export const toAtividade = (
-  atividade: ActivityResponseType
-): AtividadeType => ({
-  ...atividade,
-  questoes: (atividade.questoes ?? []).map((questao) => ({
+const toQuestions = (
+  questoes: QuestionResponseType[] | undefined
+): AtividadeType['questoes'] =>
+  (questoes ?? []).map((questao) => ({
     ...questao,
     alternativas: (questao.alternativas ?? []).map((alternativa) => ({
       ...alternativa,
       correta: alternativa.correta ?? false,
     })),
-  })),
+  }));
+
+export const toActivitySummary = (
+  atividade: ActivitySummaryResponseType
+): AtividadeType => ({
+  ...atividade,
+  questoes: toQuestions(atividade.questoes),
 });
+
+export const toActivity = toActivitySummary;

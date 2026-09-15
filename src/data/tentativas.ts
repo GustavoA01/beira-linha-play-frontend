@@ -1,6 +1,6 @@
 import type { TentativaType } from './types/api';
 
-export const tentativasDoAlunoNaAtividade = (
+export const studentAttemptsOnActivity = (
   tentativas: TentativaType[],
   alunoId: string,
   atividadeId: string
@@ -9,18 +9,18 @@ export const tentativasDoAlunoNaAtividade = (
     (item) => item.alunoId === alunoId && item.atividadeId === atividadeId
   );
 
-export const contarTentativasDoAluno = (
+export const countStudentAttempts = (
   tentativas: TentativaType[],
   alunoId: string,
   atividadeId: string
-) => tentativasDoAlunoNaAtividade(tentativas, alunoId, atividadeId).length;
+) => studentAttemptsOnActivity(tentativas, alunoId, atividadeId).length;
 
-export const melhorPontuacaoDoAluno = (
+export const bestStudentScore = (
   tentativas: TentativaType[],
   alunoId: string,
   atividadeId: string
 ) => {
-  const pontuacoes = tentativasDoAlunoNaAtividade(
+  const pontuacoes = studentAttemptsOnActivity(
     tentativas,
     alunoId,
     atividadeId
@@ -29,18 +29,18 @@ export const melhorPontuacaoDoAluno = (
   return pontuacoes.length ? Math.max(...pontuacoes) : 0;
 };
 
-export const tentativasDaAtividade = (
+export const activityAttempts = (
   tentativas: TentativaType[],
   atividadeId: string
 ) => tentativas.filter((item) => item.atividadeId === atividadeId);
 
-export const ultimaTentativaPorAluno = (
+export const latestAttemptByStudent = (
   tentativas: TentativaType[],
   atividadeId: string
 ) => {
   const porAluno = new Map<string, TentativaType>();
 
-  tentativasDaAtividade(tentativas, atividadeId).forEach((item) => {
+  activityAttempts(tentativas, atividadeId).forEach((item) => {
     const atual = porAluno.get(item.alunoId);
     if (!atual || item.dataEnvio >= atual.dataEnvio) {
       porAluno.set(item.alunoId, item);

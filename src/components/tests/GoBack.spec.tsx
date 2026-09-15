@@ -17,4 +17,15 @@ describe('GoBack', () => {
     await user.click(screen.getByRole('button'));
     expect(mockNavigate).toHaveBeenCalledWith(-1);
   });
+
+  it('goes to the given path without keeping the current page', async () => {
+    const user = userEvent.setup();
+    render(<GoBack to="/cursos/curso-1/modulos/modulo-1" />);
+
+    await user.click(screen.getByRole('button'));
+    expect(mockNavigate).toHaveBeenCalledWith(
+      '/cursos/curso-1/modulos/modulo-1',
+      { replace: true }
+    );
+  });
 });

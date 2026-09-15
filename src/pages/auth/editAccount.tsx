@@ -1,11 +1,20 @@
 import { LabelInput } from '@/components/LabelInput';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { AuthLayout } from './components/AuthLayout';
 import { useEditAccount } from './hooks/useEditAccount';
 
 export const EditAccountPage = () => {
-  const { register, onSubmit, errors, isAluno, isMonitor, isAdmin, cancel } =
-    useEditAccount();
+  const {
+    register,
+    onSubmit,
+    errors,
+    isSubmitting,
+    isAluno,
+    isMonitor,
+    isAdmin,
+    cancel,
+  } = useEditAccount();
 
   return (
     <AuthLayout
@@ -25,6 +34,7 @@ export const EditAccountPage = () => {
           placeholder="Ex.: João da Silva"
           error={errors.nome?.message}
           register={register}
+          disabled={isSubmitting}
         />
         {isAluno && (
           <LabelInput
@@ -34,6 +44,7 @@ export const EditAccountPage = () => {
             placeholder="Ex.: Joãozinho"
             error={errors.apelido?.message}
             register={register}
+            disabled={isSubmitting}
           />
         )}
         {isMonitor && (
@@ -45,6 +56,7 @@ export const EditAccountPage = () => {
             placeholder="Ex.: joaosilva@gmail.com"
             error={errors.email?.message}
             register={register}
+            disabled={isSubmitting}
           />
         )}
         <LabelInput
@@ -54,6 +66,7 @@ export const EditAccountPage = () => {
           autoComplete="new-password"
           error={errors.senha?.message}
           register={register}
+          disabled={isSubmitting}
         />
         <LabelInput
           label="Confirmar senha"
@@ -62,15 +75,21 @@ export const EditAccountPage = () => {
           autoComplete="new-password"
           error={errors.confirmarSenha?.message}
           register={register}
+          disabled={isSubmitting}
         />
-        <Button type="submit" className="w-full font-montserrat">
-          Salvar
+        <Button
+          type="submit"
+          className="w-full font-montserrat"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? <Spinner /> : 'Salvar'}
         </Button>
         <Button
           type="button"
           variant="outline"
           className="w-full font-montserrat"
           onClick={cancel}
+          disabled={isSubmitting}
         >
           Cancelar
         </Button>

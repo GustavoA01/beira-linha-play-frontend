@@ -8,9 +8,10 @@ import { QuizSummary } from './QuizSummary';
 
 type QuizPlayPropsType = {
   activity: AtividadeType;
+  usedAttempts: number;
 };
 
-export const QuizPlay = ({ activity }: QuizPlayPropsType) => {
+export const QuizPlay = ({ activity, usedAttempts }: QuizPlayPropsType) => {
   const {
     phase,
     currentQuestion,
@@ -26,11 +27,12 @@ export const QuizPlay = ({ activity }: QuizPlayPropsType) => {
     progressPercent,
     attemptNumber,
     canRetry,
+    isSubmitting,
     selectAlternative,
     checkAnswer,
     goNext,
     retry,
-  } = useQuizPlay(activity);
+  } = useQuizPlay(activity, usedAttempts);
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-zinc-50">
@@ -85,6 +87,7 @@ export const QuizPlay = ({ activity }: QuizPlayPropsType) => {
             correctDescription={correctAlternative?.descricao}
             earnedXp={currentQuestion?.valor ?? 0}
             isLastQuestion={isLastQuestion}
+            isSubmitting={isSubmitting}
             onCheck={checkAnswer}
             onNext={goNext}
           />

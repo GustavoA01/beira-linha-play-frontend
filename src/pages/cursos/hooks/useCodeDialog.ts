@@ -7,7 +7,7 @@ import { useForm } from 'react-hook-form';
 
 export const useCodeDialog = (
   onOpenChange: (open: boolean) => void,
-  onSubmit: (code: string) => string | void
+  onSubmit: (code: string) => string | void | Promise<string | void>
 ) => {
   const methods = useForm<CourseCodeFormType>({
     resolver: zodResolver(courseCodeSchema),
@@ -19,19 +19,19 @@ export const useCodeDialog = (
     onOpenChange(nextOpen);
   };
 
-  const submitCode = ({ code }: CourseCodeFormType) => {
-    const submitError = onSubmit(code);
+  const submitCode = methods.handleSubmit(async ({ code }) => {
+    const submitError = await onSubmit(code);
     if (submitError) {
       methods.setError('code', { message: submitError });
       return;
     }
     handleOpenChange(false);
-  };
+  });
 
   return {
     register: methods.register,
-    handleSubmit: methods.handleSubmit,
     errors: methods.formState.errors,
+    isSubmitting: methods.formState.isSubmitting,
     submitCode,
     handleOpenChange,
   };

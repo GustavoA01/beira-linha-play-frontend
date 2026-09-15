@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useCreateCourse, useUpdateCourse } from './useMutation';
-import { valuesFromCurso } from '../utils';
+import { valuesFromCourse } from '../utils';
 
 export const useNewCourseDialog = (
   onOpenChange: (open: boolean) => void,
@@ -24,7 +24,7 @@ export const useNewCourseDialog = (
   const { mutateAsync: editCourse, isPending: isUpdating } = useUpdateCourse();
   const methods = useForm<NewCourseFormType>({
     resolver: zodResolver(newCourseSchema),
-    defaultValues: valuesFromCurso(curso),
+    defaultValues: valuesFromCourse(curso),
   });
   const [pendingMonitorId, setPendingMonitorId] = useState('');
   const isSubmitting =
@@ -39,13 +39,13 @@ export const useNewCourseDialog = (
   );
 
   useEffect(() => {
-    methods.reset(valuesFromCurso(curso));
+    methods.reset(valuesFromCourse(curso));
     setPendingMonitorId('');
   }, [curso, methods]);
 
   const handleOpenChange = (nextOpen: boolean) => {
     if (!nextOpen) {
-      methods.reset(valuesFromCurso(curso));
+      methods.reset(valuesFromCourse(curso));
       setPendingMonitorId('');
     }
     onOpenChange(nextOpen);

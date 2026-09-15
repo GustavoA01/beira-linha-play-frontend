@@ -1,8 +1,13 @@
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { Save } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-export const FormFooter = () => {
+type FormFooterProps = {
+  isSubmitting: boolean;
+};
+
+export const FormFooter = ({ isSubmitting }: FormFooterProps) => {
   const navigate = useNavigate();
   const goBack = () => navigate(-1);
 
@@ -13,13 +18,20 @@ export const FormFooter = () => {
         onClick={goBack}
         variant="outline"
         className="max-sm:hidden"
+        disabled={isSubmitting}
       >
         Cancelar
       </Button>
 
-      <Button type="submit">
-        <Save className="max-sm:hidden" />
-        Salvar
+      <Button type="submit" disabled={isSubmitting}>
+        {isSubmitting ? (
+          <Spinner />
+        ) : (
+          <>
+            <Save className="max-sm:hidden" />
+            Salvar
+          </>
+        )}
       </Button>
 
       <Button
@@ -27,6 +39,7 @@ export const FormFooter = () => {
         onClick={goBack}
         variant="outline"
         className="sm:hidden"
+        disabled={isSubmitting}
       >
         Cancelar
       </Button>

@@ -5,6 +5,9 @@ import type {
   ModuloType,
   QuestaoType,
 } from '@/data/types/api';
+import { countCourseActivities, activityXp, moduleXp } from '@/data/atividades';
+
+export { countCourseActivities, activityXp, moduleXp };
 
 const alternativa = (
   id: string,
@@ -31,15 +34,6 @@ const atividade = (
   quantQuestoes: questoes.length,
   questoes,
 });
-
-export const xpDaAtividade = (item: AtividadeType) =>
-  item.questoes.reduce((total, q) => total + q.valor, 0);
-
-export const xpDoModulo = (modulo: ModuloType) =>
-  modulo.atividades.reduce((total, item) => total + xpDaAtividade(item), 0);
-
-export const contarAtividadesDoCurso = (curso: CursoType) =>
-  curso.modulos.reduce((total, modulo) => total + modulo.atividades.length, 0);
 
 export const getCursoById = (id: string) =>
   temporaryCursos.find((curso) => curso.id === id);

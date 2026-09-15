@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { LabelInput } from '@/components/LabelInput';
+import { Spinner } from '@/components/ui/spinner';
 import { useNewAdminDialog } from '../hooks/useNewAdminDialog';
 
 type NewAdminDialogPropsType = {
@@ -20,7 +21,7 @@ export const NewAdminDialog = ({
   open,
   onOpenChange,
 }: NewAdminDialogPropsType) => {
-  const { register, onSubmit, errors, handleOpenChange } =
+  const { register, onSubmit, errors, isSubmitting, handleOpenChange } =
     useNewAdminDialog(onOpenChange);
 
   return (
@@ -42,6 +43,7 @@ export const NewAdminDialog = ({
             placeholder="Ex.: Ana Oliveira"
             error={errors.nome?.message}
             register={register}
+            disabled={isSubmitting}
           />
           <LabelInput
             id="senha"
@@ -50,6 +52,7 @@ export const NewAdminDialog = ({
             autoComplete="new-password"
             error={errors.senha?.message}
             register={register}
+            disabled={isSubmitting}
           />
           <LabelInput
             id="confirmarSenha"
@@ -58,15 +61,18 @@ export const NewAdminDialog = ({
             autoComplete="new-password"
             error={errors.confirmarSenha?.message}
             register={register}
+            disabled={isSubmitting}
           />
 
           <DialogFooter>
             <DialogClose asChild>
-              <Button type="button" variant="outline">
+              <Button type="button" variant="outline" disabled={isSubmitting}>
                 Cancelar
               </Button>
             </DialogClose>
-            <Button type="submit">Adicionar</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? <Spinner /> : 'Adicionar'}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

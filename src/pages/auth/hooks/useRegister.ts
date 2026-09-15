@@ -4,14 +4,21 @@ import {
   type RegisterRoleType,
 } from '@/data/schemas/auth';
 import { useUserProvider } from '@/providers/UserProvider';
-import { register } from '@/services/auth';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { useRegisterMutation } from './useMutation';
+
+const registerErrorMessage = (error: unknown) =>
+  error instanceof Error &&
+  error.message !== 'Não foi possível completar a operação'
+    ? error.message
+    : 'Não foi possível cadastrar';
 
 export const useRegister = () => {
   const { setUser } = useUserProvider();
   const navigate = useNavigate();
+  const { mutateAsync: signUp, isPending } = useRegisterMutation();
   const methods = useForm<RegisterFormType>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -34,7 +41,7 @@ export const useRegister = () => {
 
   const onSubmit = methods.handleSubmit(async (data: RegisterFormType) => {
     try {
-      const user = await register({
+      const user = await signUp({
         tipo: data.tipo,
         nome: data.nome,
         senha: data.senha,
@@ -46,8 +53,7 @@ export const useRegister = () => {
       navigate(user.tipo === 'ALUNO' ? '/' : '/cursos', { replace: true });
     } catch (error) {
       methods.setError('root', {
-        message:
-          error instanceof Error ? error.message : 'Não foi possível cadastrar',
+        message: registerErrorMessage(error),
       });
     }
   });
@@ -56,6 +62,7 @@ export const useRegister = () => {
     onSubmit,
     register: methods.register,
     errors: methods.formState.errors,
+    isSubmitting: methods.formState.isSubmitting || isPending,
     isAluno,
     enterAsStudent: () => enterAs('ALUNO'),
     enterAsMonitor: () => enterAs('MONITOR'),

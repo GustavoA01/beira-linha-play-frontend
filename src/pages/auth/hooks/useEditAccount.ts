@@ -2,15 +2,16 @@ import {
   editAccountSchema,
   type EditAccountFormType,
 } from '@/data/schemas/auth';
-import type { UsuarioType } from '@/data/types/api';
-import { toast } from '@/components/ui/toast';
+import type { UpdateAccountPayloadType } from '@/data/types/services';
 import { useAuthUser } from '@/providers/UserProvider';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { useUpdateAccount } from './useMutation';
 
 export const useEditAccount = () => {
   const { user, setUser, isAluno, isMonitor, isAdmin } = useAuthUser();
+  const { mutateAsync: saveAccount, isPending } = useUpdateAccount();
   const navigate = useNavigate();
   const homePath = isAluno ? '/' : '/cursos';
 
@@ -26,27 +27,18 @@ export const useEditAccount = () => {
     },
   });
 
-  const nextUser = (
-    user: UsuarioType,
+  const payloadFromForm = (
     data: EditAccountFormType
-  ): UsuarioType => {
-    if (user.tipo === 'ALUNO') {
-      return { ...user, nome: data.nome, apelido: data.apelido };
-    }
+  ): UpdateAccountPayloadType => ({
+    nome: data.nome,
+    ...(user.tipo === 'ALUNO' ? { apelido: data.apelido } : {}),
+    ...(user.tipo === 'MONITOR' ? { email: data.email } : {}),
+    ...(data.senha ? { senha: data.senha } : {}),
+  });
 
-    if (user.tipo === 'MONITOR') {
-      return { ...user, nome: data.nome, email: data.email };
-    }
-
-    return { ...user, nome: data.nome };
-  };
-
-  const onSubmit = methods.handleSubmit((data: EditAccountFormType) => {
-    setUser(nextUser(user, data));
-    toast.add({
-      type: 'success',
-      title: 'Conta atualizada',
-    });
+  const onSubmit = methods.handleSubmit(async (data: EditAccountFormType) => {
+    const updated = await saveAccount(payloadFromForm(data));
+    setUser(updated);
     navigate(homePath, { replace: true });
   });
 
@@ -54,6 +46,7 @@ export const useEditAccount = () => {
     onSubmit,
     register: methods.register,
     errors: methods.formState.errors,
+    isSubmitting: methods.formState.isSubmitting || isPending,
     isAluno,
     isMonitor,
     isAdmin,

@@ -15,6 +15,7 @@ export type QuizFooterPropsType = {
   correctDescription?: string;
   earnedXp: number;
   isLastQuestion: boolean;
+  isSubmitting: boolean;
   onCheck: () => void;
   onNext: () => void;
 };

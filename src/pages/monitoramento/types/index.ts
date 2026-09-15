@@ -1,6 +1,6 @@
-import type { RankAluno } from '@/data/temporaryMocks/ranks';
 import type {
   AlternativaType,
+  AlunoType,
   QuestaoType,
   TentativaType,
 } from '@/data/types/api';
@@ -21,7 +21,10 @@ export type QuestionStatType = {
 };
 
 export type StudentRowType = {
-  student: RankAluno;
+  student: Pick<
+    AlunoType,
+    'id' | 'nome' | 'apelido' | 'pontos' | 'imagemPerfil'
+  >;
   attempt?: TentativaType;
   answersByQuestion: (string | null)[];
 };

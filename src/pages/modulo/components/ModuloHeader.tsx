@@ -3,7 +3,7 @@ import { DescriptionCircle } from '@/components/DescriptionCircle';
 import { NewButtonFloat } from '@/components/NewButtonFloat';
 import { Progress } from '@/components/ui/progress';
 import type { ModuloType } from '@/data/types/api';
-import { xpDoModulo } from '@/data/temporaryMocks/cursos';
+import { countModuleActivities, moduleXp } from '@/data/atividades';
 
 type ModuloHeaderProps = {
   modulo: ModuloType;
@@ -18,7 +18,7 @@ export const ModuloHeader = ({
   isAluno,
   isMonitor,
 }: ModuloHeaderProps) => {
-  const atividadesCount = modulo.atividades.length;
+  const atividadesCount = countModuleActivities(modulo);
   const atividadesLabel = `${atividadesCount} ${atividadesCount === 1 ? 'atividade' : 'atividades'}`;
 
   return (
@@ -34,7 +34,7 @@ export const ModuloHeader = ({
           <DescriptionCircle
             className="text-blue-onSurface"
             left={atividadesLabel}
-            right={`${xpDoModulo(modulo)} XP`}
+            right={`${moduleXp(modulo)} XP`}
           />
 
           {isMonitor && (

@@ -6,9 +6,10 @@ import { type NewActivityFormType } from '@/data/schemas/activity';
 
 type FormProps = {
   onSubmit: () => void;
+  isEditing?: boolean;
 };
 
-export const Form = ({ onSubmit }: FormProps) => {
+export const Form = ({ onSubmit, isEditing }: FormProps) => {
   const {
     register,
     formState: { errors },
@@ -34,20 +35,22 @@ export const Form = ({ onSubmit }: FormProps) => {
           )}
         </div>
 
-        <div>
-          <Input
-            placeholder="Max: 10"
-            type="number"
-            className="placeholder:max-sm:text-sm"
-            {...register('qtdQuestions', {
-              setValueAs: (value) => Number(value),
-            })}
-          />
+        {!isEditing && (
+          <div>
+            <Input
+              placeholder="Max: 10"
+              type="number"
+              className="placeholder:max-sm:text-sm"
+              {...register('qtdQuestions', {
+                setValueAs: (value) => Number(value),
+              })}
+            />
 
-          {errors.qtdQuestions && errors.qtdQuestions.message && (
-            <ErrorFormMessage message={errors.qtdQuestions!.message!} />
-          )}
-        </div>
+            {errors.qtdQuestions && errors.qtdQuestions.message && (
+              <ErrorFormMessage message={errors.qtdQuestions!.message!} />
+            )}
+          </div>
+        )}
       </div>
 
       <Footer />

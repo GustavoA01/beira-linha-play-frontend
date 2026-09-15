@@ -1,5 +1,7 @@
 import { LabelInput } from '@/components/LabelInput';
+import { ErrorFormMessage } from '@/components/ErrorFormMessage';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { AuthFields } from './components/AuthFields';
 import { AuthLayout } from './components/AuthLayout';
 import { AuthFooterLink } from './components/AuthFooterLink';
@@ -10,6 +12,7 @@ export const RegisterPage = () => {
     register,
     onSubmit,
     errors,
+    isSubmitting,
     isAluno,
     enterAsStudent,
     enterAsMonitor,
@@ -54,8 +57,15 @@ export const RegisterPage = () => {
           error={errors.confirmarSenha?.message}
           register={register}
         />
-        <Button type="submit" className="w-full font-montserrat">
-          Cadastrar
+        {errors.root?.message && (
+          <ErrorFormMessage message={errors.root.message} />
+        )}
+        <Button
+          type="submit"
+          className="w-full font-montserrat"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? <Spinner /> : 'Cadastrar'}
         </Button>
       </form>
     </AuthLayout>

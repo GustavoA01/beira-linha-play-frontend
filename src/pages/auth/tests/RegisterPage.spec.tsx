@@ -1,9 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { UserProvider } from '@/providers/UserProvider';
 import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
 import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
+import { ApiError } from '@/services/api';
 import { register } from '@/services/auth';
 import { RegisterPage } from '../register';
 
@@ -19,19 +21,29 @@ jest.mock('@/services/auth', () => ({
 
 const mockedRegister = register as jest.MockedFunction<typeof register>;
 
-const renderPage = () =>
-  render(
-    <MemoryRouter initialEntries={['/cadastro']}>
-      <UserProvider initialUser={null}>
-        <Routes>
-          <Route path="/cadastro" element={<RegisterPage />} />
-          <Route path="/" element={<p>Mapa do aluno</p>} />
-          <Route path="/cursos" element={<p>Lista de cursos</p>} />
-          <Route path="/login" element={<p>Tela de login</p>} />
-        </Routes>
-      </UserProvider>
-    </MemoryRouter>
+const renderPage = () => {
+  const client = new QueryClient({
+    defaultOptions: {
+      queries: { retry: false },
+      mutations: { retry: false },
+    },
+  });
+
+  return render(
+    <QueryClientProvider client={client}>
+      <MemoryRouter initialEntries={['/cadastro']}>
+        <UserProvider initialUser={null}>
+          <Routes>
+            <Route path="/cadastro" element={<RegisterPage />} />
+            <Route path="/" element={<p>Mapa do aluno</p>} />
+            <Route path="/cursos" element={<p>Lista de cursos</p>} />
+            <Route path="/login" element={<p>Tela de login</p>} />
+          </Routes>
+        </UserProvider>
+      </MemoryRouter>
+    </QueryClientProvider>
   );
+};
 
 describe('RegisterPage', () => {
   beforeEach(() => {
@@ -166,6 +178,24 @@ describe('RegisterPage', () => {
       senha: '123456',
     });
     expect(await screen.findByText('Lista de cursos')).toBeInTheDocument();
+  });
+
+  it('shows an error when registration fails', async () => {
+    const user = userEvent.setup();
+    mockedRegister.mockRejectedValue(
+      new ApiError('Apelido já está em uso', 409)
+    );
+    renderPage();
+
+    await user.type(screen.getByLabelText('Nome'), 'Gustavo Aguiar');
+    await user.type(screen.getByLabelText('Apelido'), 'Gu');
+    await user.type(screen.getByLabelText('Senha'), '123456');
+    await user.type(screen.getByLabelText('Confirmar senha'), '123456');
+    await user.click(screen.getByRole('button', { name: 'Cadastrar' }));
+
+    expect(
+      await screen.findByText('Apelido já está em uso')
+    ).toBeInTheDocument();
   });
 
   it('navigates to login', async () => {

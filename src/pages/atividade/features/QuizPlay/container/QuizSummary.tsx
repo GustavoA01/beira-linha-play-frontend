@@ -27,6 +27,7 @@ export const QuizSummary = ({
   const { cursoId, moduloId } = useParams();
   const gabaritou = score >= totalXp;
   const correctCount = answers.filter((answer) => answer.correta).length;
+  const modulePath = `/cursos/${cursoId}/modulos/${moduloId}`;
 
   return (
     <div className="container mx-auto flex min-h-0 flex-1 flex-col overflow-y-auto custom-bar px-4 py-6 sm:px-8">
@@ -77,7 +78,7 @@ export const QuizSummary = ({
             size="lg"
             className="h-12 font-bold"
             variant={canRetry ? 'outline' : 'default'}
-            onClick={() => navigate(`/cursos/${cursoId}/modulos/${moduloId}`)}
+            onClick={() => navigate(modulePath, { replace: true })}
           >
             Voltar ao módulo
           </Button>

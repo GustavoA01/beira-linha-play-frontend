@@ -25,4 +25,11 @@ export const moduleKeys = {
 export const activityKeys = {
   all: ['activities'] as const,
   detail: (id: string) => [...activityKeys.all, id] as const,
+  monitoring: (id: string) => [...activityKeys.all, id, 'monitoring'] as const,
+};
+
+export const attemptKeys = {
+  all: ['attempts'] as const,
+  mine: (activityId?: string) =>
+    [...attemptKeys.all, 'mine', activityId ?? 'all'] as const,
 };

@@ -1,17 +1,10 @@
 import { useMemo, useState } from 'react';
-import type { AtividadeType, RespostaType } from '@/data/types/api';
-import {
-  registrarTentativa,
-  temporaryTentativas,
-} from '@/data/temporaryMocks/tentativas';
-import {
-  contarTentativasDoAluno,
-  melhorPontuacaoDoAluno,
-} from '@/data/tentativas';
-import { xpDaAtividade } from '@/data/temporaryMocks/cursos';
+import type { AtividadeType } from '@/data/types/api';
+import { activityXp } from '@/data/atividades';
 import { useAuthUser } from '@/providers/UserProvider';
 import { MAX_TENTATIVAS } from '@/data/constants';
 import type { QuizPhaseType } from '@/pages/atividade/features/QuizPlay/types';
+import { useSubmitAttempt } from '../../../hooks/useMutation';
 
 export type QuizAnswerType = {
   questaoId: string;
@@ -20,26 +13,24 @@ export type QuizAnswerType = {
   valor: number;
 };
 
-export const useQuizPlay = (activity: AtividadeType) => {
+export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
   const auth = useAuthUser();
-  const alunoId = auth.isAluno ? auth.user.id : '';
-  const countAttempts = () =>
-    contarTentativasDoAluno(temporaryTentativas, alunoId, activity.id);
+  const { mutateAsync: sendAttempt, isPending: isSubmitting } =
+    useSubmitAttempt(activity.id);
 
+  const [attemptsUsed, setAttemptsUsed] = useState(usedAttempts);
   const [phase, setPhase] = useState<QuizPhaseType>('answering');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [answers, setAnswers] = useState<QuizAnswerType[]>([]);
-  const [revealCorrect, setRevealCorrect] = useState(
-    () => countAttempts() >= 1
-  );
-  const [attemptNumber, setAttemptNumber] = useState(() => countAttempts() + 1);
+  const [revealCorrect, setRevealCorrect] = useState(usedAttempts >= 1);
+  const [attemptNumber, setAttemptNumber] = useState(usedAttempts + 1);
 
   const questions = activity.questoes;
   const currentQuestion = questions[currentIndex];
   const totalQuestions = questions.length;
   const isLastQuestion = currentIndex === totalQuestions - 1;
-  const totalXp = xpDaAtividade(activity);
+  const totalXp = activityXp(activity);
 
   const score = useMemo(
     () =>
@@ -67,31 +58,34 @@ export const useQuizPlay = (activity: AtividadeType) => {
             100
         );
 
-  const persistAttempt = (finalAnswers: QuizAnswerType[]) => {
+  const persistAttempt = async (finalAnswers: QuizAnswerType[]) => {
     if (!auth.isAluno) return;
 
-    const pontuacaoObtida = finalAnswers.reduce(
-      (sum, answer) => sum + (answer.correta ? answer.valor : 0),
-      0
-    );
-    const previousBest = melhorPontuacaoDoAluno(
-      temporaryTentativas,
-      auth.user.id,
-      activity.id
-    );
-    const respostas: RespostaType[] = finalAnswers.map((answer) => ({
-      id: crypto.randomUUID(),
-      questaoId: answer.questaoId,
-      alternativaId: answer.alternativaId,
-      correta: answer.correta,
-    }));
+    const result = await sendAttempt({
+      respostas: finalAnswers.map(({ questaoId, alternativaId }) => ({
+        questaoId,
+        alternativaId,
+      })),
+    });
 
-    registrarTentativa(auth.user.id, activity.id, pontuacaoObtida, respostas);
+    setAttemptsUsed(result.tentativasUsadas);
+    auth.setUser({ ...auth.user, pontos: result.pontosTotais });
 
-    const gained = Math.max(0, pontuacaoObtida - previousBest);
-    if (gained > 0) {
-      auth.setUser({ ...auth.user, pontos: auth.user.pontos + gained });
-    }
+    const corretoPorQuestao = new Map(
+      (result.tentativa.respostas ?? []).map((item) => [
+        item.questaoId,
+        item.correta,
+      ])
+    );
+
+    if (corretoPorQuestao.size === 0) return;
+
+    setAnswers((prev) =>
+      prev.map((answer) => ({
+        ...answer,
+        correta: corretoPorQuestao.get(answer.questaoId) ?? answer.correta,
+      }))
+    );
   };
 
   const selectAlternative = (id: string) => {
@@ -120,11 +114,11 @@ export const useQuizPlay = (activity: AtividadeType) => {
     setPhase('feedback');
   };
 
-  const goNext = () => {
-    if (phase !== 'feedback') return;
+  const goNext = async () => {
+    if (phase !== 'feedback' || isSubmitting) return;
 
     if (isLastQuestion) {
-      persistAttempt(answers);
+      await persistAttempt(answers);
       setPhase('summary');
       return;
     }
@@ -135,16 +129,16 @@ export const useQuizPlay = (activity: AtividadeType) => {
   };
 
   const canRetry =
-    phase === 'summary' && countAttempts() < MAX_TENTATIVAS && score < totalXp;
+    phase === 'summary' && attemptsUsed < MAX_TENTATIVAS && score < totalXp;
 
   const retry = () => {
     const hasBoasted = score >= totalXp;
-    const retryLimit = countAttempts() >= MAX_TENTATIVAS;
+    const retryLimit = attemptsUsed >= MAX_TENTATIVAS;
 
     if (retryLimit || hasBoasted) return;
 
-    setRevealCorrect(countAttempts() >= 1);
-    setAttemptNumber(countAttempts() + 1);
+    setRevealCorrect(attemptsUsed >= 1);
+    setAttemptNumber(attemptsUsed + 1);
     setPhase('answering');
     setCurrentIndex(0);
     setSelectedId(null);
@@ -167,6 +161,7 @@ export const useQuizPlay = (activity: AtividadeType) => {
     progressPercent,
     attemptNumber,
     canRetry,
+    isSubmitting,
     selectAlternative,
     checkAnswer,
     goNext,

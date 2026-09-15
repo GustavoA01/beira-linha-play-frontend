@@ -1,16 +1,54 @@
 import type { NewCourseFormType } from '@/data/schemas/course';
-import type { CursoType, UsuarioType } from '@/data/types/api';
-import type { CourseResponseType } from '@/data/types/services';
+import type {
+  AtividadeType,
+  CursoType,
+  ModuloType,
+  UsuarioType,
+} from '@/data/types/api';
+import type {
+  CourseModuleResponseType,
+  CourseResponseType,
+} from '@/data/types/services';
+import { toActivitySummary } from '@/pages/atividade/utils';
 
-export const toCurso = (course: CourseResponseType): CursoType => ({
+const toCourseActivities = (
+  modulo: CourseModuleResponseType
+): AtividadeType[] => {
+  const atividades = (modulo.atividades ?? []).map(toActivitySummary);
+
+  if (atividades.length > 0) return atividades;
+
+  const quantAtividades =
+    modulo.quantAtividades ?? modulo.quantidadeAtividades ?? 0;
+
+  return Array.from({ length: quantAtividades }, (_, index) => ({
+    id: `${modulo.id}-atividade-${index}`,
+    titulo: '',
+    quantQuestoes: 0,
+    moduloId: modulo.id,
+    questoes: [],
+  }));
+};
+
+export const toCourse = (course: CourseResponseType): CursoType => ({
   id: course.id,
   nome: course.nome,
   codigoAcesso: course.codigoAcesso ?? '',
   monitorIds: course.monitorIds,
   modulos: (course.modulos ?? []).map((modulo) => ({
-    ...modulo,
-    atividades: [],
+    id: modulo.id,
+    nome: modulo.nome,
+    cursoId: modulo.cursoId,
+    atividades: toCourseActivities(modulo),
   })),
+});
+
+export const withModuleDetails = (
+  curso: CursoType,
+  modulesById: Map<string, ModuloType>
+): CursoType => ({
+  ...curso,
+  modulos: curso.modulos.map((modulo) => modulesById.get(modulo.id) ?? modulo),
 });
 
 export const monitorNames = (
@@ -41,7 +79,7 @@ const emptyValues: NewCourseFormType = {
   monitorIds: [],
 };
 
-export const valuesFromCurso = (curso?: CursoType): NewCourseFormType => {
+export const valuesFromCourse = (curso?: CursoType): NewCourseFormType => {
   if (!curso) return emptyValues;
   return { nome: curso.nome, monitorIds: curso.monitorIds };
 };

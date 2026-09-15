@@ -1,5 +1,6 @@
 import { ErrorFormMessage } from '@/components/ErrorFormMessage';
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { AuthFields } from './components/AuthFields';
 import { AuthLayout } from './components/AuthLayout';
 import { AuthFooterLink } from './components/AuthFooterLink';
@@ -10,6 +11,7 @@ export const LoginPage = () => {
     register,
     onSubmit,
     errors,
+    isSubmitting,
     isAluno,
     isAdmin,
     enterAsStudent,
@@ -51,8 +53,12 @@ export const LoginPage = () => {
         {errors.root?.message && (
           <ErrorFormMessage message={errors.root.message} />
         )}
-        <Button type="submit" className="w-full font-montserrat">
-          Entrar
+        <Button
+          type="submit"
+          className="w-full font-montserrat"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? <Spinner /> : 'Entrar'}
         </Button>
       </form>
     </AuthLayout>

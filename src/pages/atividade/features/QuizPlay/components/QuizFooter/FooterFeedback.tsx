@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { Spinner } from '@/components/ui/spinner';
 import { Check, X } from 'lucide-react';
 import type { QuizFooterPropsType } from '../../types';
 import { cn } from '@/lib/utils';
@@ -9,6 +10,7 @@ export const FooterFeedback = ({
   correctDescription,
   earnedXp,
   isLastQuestion,
+  isSubmitting,
   onNext,
 }: QuizFooterPropsType) => (
   <div
@@ -59,6 +61,7 @@ export const FooterFeedback = ({
       <Button
         size="lg"
         onClick={onNext}
+        disabled={isSubmitting}
         className={cn(
           'h-12 w-full text-base font-bold sm:w-auto sm:min-w-40',
           selectedIsCorrect
@@ -66,7 +69,13 @@ export const FooterFeedback = ({
             : 'bg-red-600 hover:bg-red-700'
         )}
       >
-        {isLastQuestion ? 'Ver resultado' : 'Avançar'}
+        {isSubmitting ? (
+          <Spinner />
+        ) : isLastQuestion ? (
+          'Ver resultado'
+        ) : (
+          'Avançar'
+        )}
       </Button>
     </div>
   </div>

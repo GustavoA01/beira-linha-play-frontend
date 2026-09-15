@@ -2,42 +2,63 @@ import { useParams } from 'react-router-dom';
 import { MonitoramentoContent } from './components/MonitoramentoContent';
 import { ResourceNotFound } from '@/components/ResourceNotFound';
 import { useQuery } from '@tanstack/react-query';
-import { getActivity } from '@/services/atividades';
+import { getActivity, getActivityMonitoring } from '@/services/atividades';
 import { activityKeys } from '@/lib/queryClientKeys';
-import { toAtividade } from '@/pages/atividade/utils';
+import { toActivity } from '@/pages/atividade/utils';
 import { HeaderListPageSkeleton } from '@/components/PageSkeleton';
 import { ApiError } from '@/services/api';
 
 export const ManagementPage = () => {
   const { atividadeId } = useParams();
-  const { data, isPending, isError, error } = useQuery({
+  const enabled = Boolean(atividadeId);
+  const {
+    data: activity,
+    isPending: isActivityPending,
+    isError: isActivityError,
+    error: activityError,
+  } = useQuery({
     queryKey: activityKeys.detail(atividadeId ?? ''),
-    queryFn: async () => toAtividade(await getActivity(atividadeId!)),
-    enabled: Boolean(atividadeId),
+    queryFn: async () => toActivity(await getActivity(atividadeId!)),
+    enabled,
+  });
+  const {
+    data: monitoring,
+    isPending: isMonitoringPending,
+    isError: isMonitoringError,
+  } = useQuery({
+    queryKey: activityKeys.monitoring(atividadeId ?? ''),
+    queryFn: () => getActivityMonitoring(atividadeId!),
+    enabled,
   });
 
   if (!atividadeId) {
     return <ResourceNotFound label="Atividade não encontrada" />;
   }
 
-  if (isPending) return <HeaderListPageSkeleton />;
+  if (isActivityPending) return <HeaderListPageSkeleton />;
 
-  if (isError || !data) {
+  if (isActivityError || !activity) {
     const isMissing =
-      error instanceof ApiError &&
-      (error.status === 404 || error.status === 400);
+      activityError instanceof ApiError &&
+      (activityError.status === 404 || activityError.status === 400);
     return (
       <ResourceNotFound
         label={
           isMissing
             ? 'Atividade não encontrada'
-            : error instanceof ApiError
-              ? error.message
-              : 'Não foi possível carregar a atividade'
+            : 'Não foi possível carregar a atividade'
         }
       />
     );
   }
 
-  return <MonitoramentoContent activity={data} />;
+  if (isMonitoringPending) return <HeaderListPageSkeleton />;
+
+  if (isMonitoringError || !monitoring) {
+    return (
+      <ResourceNotFound label="Não foi possível carregar o monitoramento" />
+    );
+  }
+
+  return <MonitoramentoContent activity={activity} monitoring={monitoring} />;
 };

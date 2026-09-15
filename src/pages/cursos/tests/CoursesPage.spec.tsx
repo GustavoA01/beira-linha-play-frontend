@@ -8,6 +8,7 @@ import { useAuthUser } from '@/providers/UserProvider';
 import { mockLoggedAdmin } from '@/data/temporaryMocks/admins';
 import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
 import { listCourses } from '@/services/cursos';
+import { getModule } from '@/services/modulos';
 import { listMonitors } from '@/services/usuarios';
 
 jest.mock('@/providers/UserProvider', () => ({
@@ -19,6 +20,14 @@ jest.mock('@/services/cursos', () => ({
   createCourse: jest.fn(),
   updateCourse: jest.fn(),
   deleteCourse: jest.fn(),
+  enrollCourse: jest.fn(),
+}));
+
+jest.mock('@/services/modulos', () => ({
+  getModule: jest.fn(),
+  createModule: jest.fn(),
+  updateModule: jest.fn(),
+  deleteModule: jest.fn(),
 }));
 
 jest.mock('@/services/usuarios', () => ({
@@ -36,6 +45,7 @@ const mockedListCourses = listCourses as jest.MockedFunction<
 const mockedListMonitors = listMonitors as jest.MockedFunction<
   typeof listMonitors
 >;
+const mockedGetModule = getModule as jest.MockedFunction<typeof getModule>;
 const renderPage = (ui: ReactElement) => {
   const client = new QueryClient({
     defaultOptions: {
@@ -55,8 +65,15 @@ describe('CoursesPage', () => {
   beforeEach(() => {
     mockedListCourses.mockReset();
     mockedListMonitors.mockReset();
+    mockedGetModule.mockReset();
     mockedListCourses.mockResolvedValue([]);
     mockedListMonitors.mockResolvedValue([]);
+    mockedGetModule.mockResolvedValue({
+      id: 'modulo-1',
+      nome: 'Limites',
+      cursoId: 'curso-1',
+      atividades: [],
+    });
   });
 
   it('hides admin actions from the monitor', async () => {
@@ -143,6 +160,57 @@ describe('CoursesPage', () => {
     expect(
       screen.getByRole('button', { name: 'Ações do curso' })
     ).toBeInTheDocument();
+  });
+
+  it('shows the activity count from the module details', async () => {
+    mockedUseAuthUser.mockReturnValue({
+      user: mockLoggedAdmin,
+      setUser: jest.fn(),
+      status: 'autenticado',
+      isAluno: false,
+      isMonitor: false,
+      isAdmin: true,
+    });
+    mockedListCourses.mockResolvedValue([
+      {
+        id: 'curso-1',
+        nome: 'Cálculo I',
+        codigoAcesso: 'ABC123',
+        monitorIds: ['monitor-1'],
+        modulos: [
+          {
+            id: 'modulo-1',
+            nome: 'Limites',
+            cursoId: 'curso-1',
+          },
+        ],
+      },
+    ]);
+    mockedGetModule.mockResolvedValue({
+      id: 'modulo-1',
+      nome: 'Limites',
+      cursoId: 'curso-1',
+      atividades: [
+        {
+          id: 'atv-1',
+          titulo: 'Noção de limite',
+          quantQuestoes: 2,
+          moduloId: 'modulo-1',
+        },
+        {
+          id: 'atv-2',
+          titulo: 'Continuidade',
+          quantQuestoes: 1,
+          moduloId: 'modulo-1',
+        },
+      ],
+    });
+
+    renderPage(<CoursesPage />);
+
+    expect(await screen.findByText('Cálculo I')).toBeInTheDocument();
+    expect(screen.getByText('1 módulo')).toBeInTheDocument();
+    expect(await screen.findByText('2 Ativ.')).toBeInTheDocument();
   });
 
   it('locks courses the monitor does not teach and shows her name on her course', async () => {

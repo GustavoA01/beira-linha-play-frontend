@@ -16,12 +16,13 @@ export const ActivityConcluded = ({
 }: ActivityConcludedPropsType) => {
   const navigate = useNavigate();
   const { cursoId, moduloId } = useParams();
+  const modulePath = `/cursos/${cursoId}/modulos/${moduloId}`;
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-zinc-50">
       <header className="bg-blue-puc px-4 pt-4 pb-8 text-blue-onSurface sm:px-8 sm:pt-8">
         <div className="container mx-auto flex items-center justify-between">
-          <GoBack />
+          <GoBack to={modulePath} />
           <h1 className="truncate font-semibold">{activity.titulo}</h1>
           <span className="w-16" />
         </div>
@@ -37,7 +38,7 @@ export const ActivityConcluded = ({
         <Button
           size="lg"
           className="mt-2 h-12 font-bold"
-          onClick={() => navigate(`/cursos/${cursoId}/modulos/${moduloId}`)}
+          onClick={() => navigate(modulePath, { replace: true })}
         >
           Voltar ao módulo
         </Button>

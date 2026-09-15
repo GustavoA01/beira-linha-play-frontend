@@ -9,7 +9,7 @@ const emptyValues: NewModuleFormType = {
   nome: '',
 };
 
-const valuesFromModulo = (modulo?: ModuloType): NewModuleFormType => {
+const valuesFromModule = (modulo?: ModuloType): NewModuleFormType => {
   if (!modulo) return emptyValues;
   return { nome: modulo.nome };
 };
@@ -25,17 +25,17 @@ export const useNewModuleDialog = (
     useUpdateModule(courseId);
   const methods = useForm<NewModuleFormType>({
     resolver: zodResolver(newModuleSchema),
-    defaultValues: valuesFromModulo(modulo),
+    defaultValues: valuesFromModule(modulo),
   });
   const isSubmitting =
     methods.formState.isSubmitting || isCreating || isUpdating;
 
   useEffect(() => {
-    methods.reset(valuesFromModulo(modulo));
+    methods.reset(valuesFromModule(modulo));
   }, [modulo, methods]);
 
   const handleOpenChange = (nextOpen: boolean) => {
-    if (!nextOpen) methods.reset(valuesFromModulo(modulo));
+    if (!nextOpen) methods.reset(valuesFromModule(modulo));
     onOpenChange(nextOpen);
   };
 
