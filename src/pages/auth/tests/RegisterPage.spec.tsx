@@ -114,9 +114,6 @@ describe('RegisterPage', () => {
     await user.click(
       screen.getByRole('button', { name: 'Entrar como monitor' })
     );
-    await user.type(screen.getByLabelText('Nome completo'), 'Maria Souza');
-    await user.type(screen.getByLabelText('Senha'), '123456');
-    await user.type(screen.getByLabelText('Confirmar senha'), '123456');
     await user.click(screen.getByRole('button', { name: 'Cadastrar' }));
 
     expect(

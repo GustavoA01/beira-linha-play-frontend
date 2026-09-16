@@ -8,188 +8,62 @@ export const nodeTypes: NodeTypes = {
   background: BackgroundNode,
 };
 
-export const nodesPhases: PhaseNodeType[] = [
-  {
-    id: '1',
-    type: 'phase',
-    position: { x: 0, y: 0 },
-    data: { id: '1', minPoints: 3 },
-  },
-  {
-    id: '2',
-    type: 'phase',
-    position: { x: 80, y: -150 },
-    data: { id: '2', minPoints: 6 },
-  },
-  {
-    id: '3',
-    type: 'phase',
-    position: { x: -80, y: -300 },
-    data: { id: '3', minPoints: 9 },
-  },
-  {
-    id: '4',
-    type: 'phase',
-    position: { x: 160, y: -500 },
-    data: { id: '4', minPoints: 12 },
-  },
-  {
-    id: '5',
-    type: 'phase',
-    position: { x: 80, y: -750 },
-    data: { id: '5', minPoints: 15 },
-  },
-  {
-    id: '6',
-    type: 'phase',
-    position: { x: -80, y: -1000 },
-    data: { id: '6', minPoints: 18 },
-  },
-  {
-    id: '7',
-    type: 'phase',
-    position: { x: 90, y: -1250 },
-    data: { id: '7', minPoints: 21 },
-  },
-  {
-    id: '8',
-    type: 'phase',
-    position: { x: 0, y: -1500 },
-    data: { id: '8', minPoints: 24 },
-  },
-  {
-    id: '9',
-    type: 'phase',
-    position: { x: 80, y: -1750 },
-    data: { id: '9', minPoints: 27 },
-  },
-  {
-    id: '10',
-    type: 'phase',
-    position: { x: -80, y: -2000 },
-    data: { id: '10', minPoints: 30 },
-  },
-  {
-    id: '11',
-    type: 'phase',
-    position: { x: 150, y: -2250 },
-    data: { id: '11', minPoints: 33 },
-  },
-  {
-    id: '12',
-    type: 'phase',
-    position: { x: 0, y: -2500 },
-    data: { id: '12', minPoints: 36 },
-  },
-  {
-    id: '13',
-    type: 'phase',
-    position: { x: -140, y: -2750 },
-    data: { id: '13', minPoints: 39 },
-  },
-  {
-    id: '14',
-    type: 'phase',
-    position: { x: -60, y: -3000 },
-    data: { id: '14', minPoints: 42 },
-  },
-  {
-    id: '15',
-    type: 'phase',
-    position: { x: 90, y: -3250 },
-    data: { id: '15', minPoints: 45 },
-  },
-  {
-    id: '16',
-    type: 'phase',
-    position: { x: 160, y: -3500 },
-    data: { id: '16', minPoints: 48 },
-  },
-  {
-    id: '17',
-    type: 'phase',
-    position: { x: 50, y: -3750 },
-    data: { id: '17', minPoints: 51 },
-  },
-  {
-    id: '18',
-    type: 'phase',
-    position: { x: -100, y: -4000 },
-    data: { id: '18', minPoints: 54 },
-  },
-  {
-    id: '19',
-    type: 'phase',
-    position: { x: -160, y: -4250 },
-    data: { id: '19', minPoints: 57 },
-  },
-  {
-    id: '20',
-    type: 'phase',
-    position: { x: 20, y: -4500 },
-    data: { id: '20', minPoints: 60 },
-  },
-  {
-    id: '21',
-    type: 'phase',
-    position: { x: -180, y: -4750 },
-    data: { id: '21', minPoints: 63 },
-  },
-  {
-    id: '22',
-    type: 'phase',
-    position: { x: -280, y: -5000 },
-    data: { id: '22', minPoints: 66 },
-  },
-  {
-    id: '23',
-    type: 'phase',
-    position: { x: -40, y: -5250 },
-    data: { id: '23', minPoints: 69 },
-  },
-  {
-    id: '24',
-    type: 'phase',
-    position: { x: 220, y: -5500 },
-    data: { id: '24', minPoints: 72 },
-  },
-  {
-    id: '25',
-    type: 'phase',
-    position: { x: 300, y: -5750 },
-    data: { id: '25', minPoints: 75 },
-  },
-  {
-    id: '26',
-    type: 'phase',
-    position: { x: 90, y: -6000 },
-    data: { id: '26', minPoints: 78 },
-  },
-  {
-    id: '27',
-    type: 'phase',
-    position: { x: -50, y: -6250 },
-    data: { id: '27', minPoints: 81 },
-  },
-  {
-    id: '28',
-    type: 'phase',
-    position: { x: -220, y: -6500 },
-    data: { id: '28', minPoints: 84 },
-  },
-  {
-    id: '29',
-    type: 'phase',
-    position: { x: -300, y: -6750 },
-    data: { id: '29', minPoints: 87 },
-  },
-  {
-    id: '30',
-    type: 'phase',
-    position: { x: -90, y: -7000 },
-    data: { id: '30', minPoints: 90 },
-  },
+const FIRST_REGION_PHASES = 9;
+const FIRST_REGION_XP = 20;
+const XP_PER_PHASE_AFTER = 2;
+
+const minPointsOf = (phase: number) => {
+  if (phase <= FIRST_REGION_PHASES) {
+    return Math.round((phase / FIRST_REGION_PHASES) * FIRST_REGION_XP) || 1;
+  }
+
+  return FIRST_REGION_XP + (phase - FIRST_REGION_PHASES) * XP_PER_PHASE_AFTER;
+};
+
+const phaseLayouts: Array<Pick<PhaseNodeType, 'id' | 'position'>> = [
+  { id: '1', position: { x: 0, y: 0 } },
+  { id: '2', position: { x: 80, y: -150 } },
+  { id: '3', position: { x: -80, y: -300 } },
+  { id: '4', position: { x: 160, y: -500 } },
+  { id: '5', position: { x: 80, y: -750 } },
+  { id: '6', position: { x: -80, y: -1000 } },
+  { id: '7', position: { x: 90, y: -1250 } },
+  { id: '8', position: { x: 0, y: -1500 } },
+  { id: '9', position: { x: 80, y: -1750 } },
+  { id: '10', position: { x: -80, y: -2000 } },
+  { id: '11', position: { x: 150, y: -2250 } },
+  { id: '12', position: { x: 0, y: -2500 } },
+  { id: '13', position: { x: -140, y: -2750 } },
+  { id: '14', position: { x: -60, y: -3000 } },
+  { id: '15', position: { x: 90, y: -3250 } },
+  { id: '16', position: { x: 160, y: -3500 } },
+  { id: '17', position: { x: 50, y: -3750 } },
+  { id: '18', position: { x: -100, y: -4000 } },
+  { id: '19', position: { x: -160, y: -4250 } },
+  { id: '20', position: { x: 20, y: -4500 } },
+  { id: '21', position: { x: -180, y: -4750 } },
+  { id: '22', position: { x: -280, y: -5000 } },
+  { id: '23', position: { x: -40, y: -5250 } },
+  { id: '24', position: { x: 220, y: -5500 } },
+  { id: '25', position: { x: 300, y: -5750 } },
+  { id: '26', position: { x: 90, y: -6000 } },
+  { id: '27', position: { x: -50, y: -6250 } },
+  { id: '28', position: { x: -220, y: -6500 } },
+  { id: '29', position: { x: -300, y: -6750 } },
+  { id: '30', position: { x: -90, y: -7000 } },
 ];
+
+export const nodesPhases: PhaseNodeType[] = phaseLayouts.map(
+  (phase, index) => ({
+    id: phase.id,
+    type: 'phase',
+    position: phase.position,
+    data: {
+      id: phase.id,
+      minPoints: minPointsOf(index + 1),
+    },
+  })
+);
 
 const nodeLastIndex = nodesPhases[nodesPhases.length - 1];
 export const nodesLastPosition = nodeLastIndex.position.y - 200;

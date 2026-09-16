@@ -16,7 +16,7 @@ import type {
 import { useAuthUser } from '@/providers/UserProvider';
 
 export const useMap = () => {
-  const { user, isAluno, isMonitor } = useAuthUser();
+  const { user, isAluno } = useAuthUser();
   const initialNodes = [...backgroundNodes, ...nodesPhases];
   const [nodes, setNodes] = useState(initialNodes);
   const [edges, setEdges] = useState(edgesPhases);
@@ -41,9 +41,9 @@ export const useMap = () => {
     (node) => node.data.minPoints <= points
   );
 
-  const currentNode = isMonitor
-    ? phaseNodes[0]
-    : (unlockedPhases.at(-1) ?? phaseNodes[0]);
+  const currentNode = isAluno
+    ? (unlockedPhases.at(-1) ?? phaseNodes[0])
+    : phaseNodes[0];
 
   return {
     nodes,
@@ -51,6 +51,6 @@ export const useMap = () => {
     onNodesChange,
     onEdgesChange,
     currentNode,
-    isMonitor,
+    isAluno,
   };
 };

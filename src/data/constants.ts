@@ -2,16 +2,16 @@ import { Map as MapIcon, NotebookPen, Trophy } from 'lucide-react';
 
 export const MAX_TENTATIVAS = 2;
 
-export const mapPath = (isMonitor: boolean) => (isMonitor ? '/mapa' : '/');
+export const mapPath = (isAluno: boolean) => (isAluno ? '/' : '/mapa');
 
-export const getHeaderItems = (isMonitor: boolean) =>
+export const getHeaderItems = (isAluno: boolean) =>
   [
     { name: 'Cursos', path: '/cursos' },
-    { name: 'Mapa', path: mapPath(isMonitor) },
+    { name: 'Mapa', path: mapPath(isAluno) },
     { name: 'Medalhas', path: '/medalhas' },
   ] as const;
 
-export const getBottomNavigateButtons = (isMonitor: boolean) =>
+export const getBottomNavigateButtons = (isAluno: boolean) =>
   [
     {
       icon: NotebookPen,
@@ -19,7 +19,7 @@ export const getBottomNavigateButtons = (isMonitor: boolean) =>
     },
     {
       icon: MapIcon,
-      to: mapPath(isMonitor),
+      to: mapPath(isAluno),
     },
     {
       icon: Trophy,

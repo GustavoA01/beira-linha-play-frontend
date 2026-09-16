@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { queryClientKeys } from '@/lib/queryClientKeys';
-import { toModule } from '../utils';
+import { fillActivityXp, toModule } from '../utils';
 import { getCourse } from '@/services/cursos';
 import { getModule } from '@/services/modulos';
+import { getActivity } from '@/services/atividades';
 import { listMyAttempts } from '@/services/tentativas';
 import type { AtividadeType } from '@/data/types/api';
 import { useNavigate } from 'react-router-dom';
@@ -21,7 +22,13 @@ export const useModulo = (
 
   const { data, isPending, isError } = useQuery({
     queryKey: queryClientKeys.moduleKeys.detail(moduloId ?? ''),
-    queryFn: async () => toModule(await getModule(moduloId!)),
+    queryFn: async () => {
+      const modulo = toModule(await getModule(moduloId!));
+      return {
+        ...modulo,
+        atividades: await fillActivityXp(modulo.atividades, getActivity),
+      };
+    },
     enabled: Boolean(moduloId),
   });
 

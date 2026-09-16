@@ -6,8 +6,8 @@ import { useAuthUser } from '@/providers/UserProvider';
 
 export const HeaderLayout = () => {
   const { pathname } = useLocation();
-  const { isMonitor } = useAuthUser();
-  const bottomNavigateButtons = getBottomNavigateButtons(isMonitor);
+  const { isAluno } = useAuthUser();
+  const bottomNavigateButtons = getBottomNavigateButtons(isAluno);
 
   const shouldShowBottomNav = bottomNavigateButtons.some(
     ({ to }) => to === pathname

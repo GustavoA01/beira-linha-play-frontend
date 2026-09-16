@@ -6,7 +6,7 @@ import { cn } from '@/lib/utils';
 
 export const BottomNavigation = () => {
   const { pathname } = useLocation();
-  const { isMonitor } = useAuthUser();
+  const { isAluno } = useAuthUser();
 
   return (
     <LayoutGroup>
@@ -15,7 +15,7 @@ export const BottomNavigation = () => {
         animate={{ opacity: 1, y: 0 }}
         className="fixed bottom-6 z-40 flex items-center justify-center gap-6 w-50 left-1/2 -translate-x-1/2 rounded-full bg-white shadow-md py-2 sm:hidden"
       >
-        {getBottomNavigateButtons(isMonitor).map((button) => {
+        {getBottomNavigateButtons(isAluno).map((button) => {
           const selected = pathname === button.to;
 
           return (

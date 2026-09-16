@@ -55,6 +55,8 @@ export type ActivitySummaryResponseType = Pick<
   'id' | 'titulo' | 'quantQuestoes' | 'moduloId'
 > & {
   xpTotal?: number;
+  xp?: number;
+  valorTotal?: number;
   questoes?: QuestionResponseType[];
 };
 

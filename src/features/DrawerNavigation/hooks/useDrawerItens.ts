@@ -14,7 +14,7 @@ export const useDrawerItens = ({
   setOpenDrawer,
   setOpenDialog,
 }: useDrawerItensProps) => {
-  const { isMonitor } = useAuthUser();
+  const { isAluno } = useAuthUser();
 
   const headerAcademicItems = [
     {
@@ -28,7 +28,7 @@ export const useDrawerItens = ({
   const headerConquestItems = [
     {
       label: 'Mapa',
-      path: mapPath(isMonitor),
+      path: mapPath(isAluno),
       icon: MapIcon,
       onClick: () => setOpenDrawer(false),
     },

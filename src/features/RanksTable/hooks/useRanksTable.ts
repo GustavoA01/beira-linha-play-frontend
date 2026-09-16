@@ -65,6 +65,6 @@ export const useRanksTable = ({ floating }: UseRanksTableProps) => {
     ranks,
     shellClassName,
     maxHeight,
-    isMonitor: auth.isMonitor,
+    showName: !auth.isAluno,
   };
 };

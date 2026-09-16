@@ -15,7 +15,7 @@ type RankTableProps = {
 export const RankTable = ({ floating = true }: RankTableProps) => {
   const { isDesktop } = useMediaDevice();
   const {
-    isMonitor,
+    showName,
     selected,
     setSelected,
     items,
@@ -39,7 +39,7 @@ export const RankTable = ({ floating = true }: RankTableProps) => {
             ranks={ranks}
             ref={scrollToLoggedRow}
             loggedAlunoId={loggedAlunoId}
-            showName={isMonitor}
+            showName={showName}
           />
         </div>
       </div>
@@ -62,7 +62,7 @@ export const RankTable = ({ floating = true }: RankTableProps) => {
                 ranks={ranks}
                 ref={scrollToLoggedRow}
                 loggedAlunoId={loggedAlunoId}
-                showName={isMonitor}
+                showName={showName}
               />
             </div>
           </AccordionContent>

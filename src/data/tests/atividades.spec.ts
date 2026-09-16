@@ -3,8 +3,16 @@ import type { AtividadeType, ModuloType } from '@/data/types/api';
 
 describe('activityXp', () => {
   const activity = (
-    overrides: Partial<AtividadeType> & { xpTotal?: number } = {}
-  ): AtividadeType & { xpTotal?: number } => ({
+    overrides: Partial<AtividadeType> & {
+      xpTotal?: number;
+      xp?: number;
+      valorTotal?: number;
+    } = {}
+  ): AtividadeType & {
+    xpTotal?: number;
+    xp?: number;
+    valorTotal?: number;
+  } => ({
     id: 'atv-1',
     titulo: 'Limites',
     quantQuestoes: 0,
@@ -38,6 +46,8 @@ describe('activityXp', () => {
 
   it('uses the flattened xp when there are no questions', () => {
     expect(activityXp(activity({ xpTotal: 8 }))).toBe(8);
+    expect(activityXp(activity({ xp: 6 }))).toBe(6);
+    expect(activityXp(activity({ valorTotal: 4 }))).toBe(4);
   });
 });
 

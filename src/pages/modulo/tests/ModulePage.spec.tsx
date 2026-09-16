@@ -8,6 +8,7 @@ import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
 import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
 import { getCourse } from '@/services/cursos';
 import { getModule } from '@/services/modulos';
+import { getActivity } from '@/services/atividades';
 import { listMyAttempts } from '@/services/tentativas';
 import type { ModuleResponseType } from '@/data/types/services';
 import type { TentativaType } from '@/data/types/api';
@@ -40,6 +41,9 @@ jest.mock('@/services/atividades', () => ({
 
 const mockedGetCourse = getCourse as jest.MockedFunction<typeof getCourse>;
 const mockedGetModule = getModule as jest.MockedFunction<typeof getModule>;
+const mockedGetActivity = getActivity as jest.MockedFunction<
+  typeof getActivity
+>;
 const mockedListMyAttempts = listMyAttempts as jest.MockedFunction<
   typeof listMyAttempts
 >;
@@ -98,6 +102,7 @@ describe('ModulePage', () => {
   beforeEach(() => {
     mockedGetCourse.mockReset();
     mockedGetModule.mockReset();
+    mockedGetActivity.mockReset();
     mockedListMyAttempts.mockReset();
     mockedGetCourse.mockResolvedValue({
       id: 'curso-1',
@@ -134,6 +139,35 @@ describe('ModulePage', () => {
     await waitFor(() => {
       expect(mockedGetCourse).toHaveBeenCalledWith('curso-1');
     });
+  });
+
+  it('shows activity points from the detail when the module omits questions', async () => {
+    mockedGetModule.mockResolvedValue({
+      ...modulo,
+      atividades: [
+        {
+          id: 'atv-1',
+          titulo: 'Cálculo de limites simples',
+          quantQuestoes: 1,
+          moduloId: 'modulo-1',
+        },
+      ],
+    });
+    mockedGetActivity.mockResolvedValue({
+      id: 'atv-1',
+      titulo: 'Cálculo de limites simples',
+      quantQuestoes: 1,
+      moduloId: 'modulo-1',
+      questoes: [
+        { id: 'q1', enunciado: 'Quanto vale?', valor: 3, alternativas: [] },
+      ],
+    });
+
+    renderPage(mockLoggedMonitor);
+
+    expect(await screen.findByText('+ 3 pts')).toBeInTheDocument();
+    expect(screen.getByText('3 XP')).toBeInTheDocument();
+    expect(mockedGetActivity).toHaveBeenCalledWith('atv-1');
   });
 
   it('shows an empty state when there are no activities', async () => {

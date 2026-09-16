@@ -18,11 +18,11 @@ const navLinkClass = (isActive?: boolean) =>
 
 export const HeaderDesktopNav = ({ onLogout }: HeaderDesktopNavPropsType) => {
   const { pathname } = useLocation();
-  const { isMonitor } = useAuthUser();
+  const { isAluno } = useAuthUser();
 
   return (
     <div className="hidden sm:flex items-center gap-2">
-      {getHeaderItems(isMonitor).map(({ name, path }) => (
+      {getHeaderItems(isAluno).map(({ name, path }) => (
         <Link
           to={path}
           key={name + path}

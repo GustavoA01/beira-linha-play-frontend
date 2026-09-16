@@ -7,14 +7,18 @@ import type {
 } from '@/data/types/api';
 import { bestStudentScore, countStudentAttempts } from '@/data/tentativas';
 
-type WithFlattenedXp = { xpTotal?: number };
+type WithFlattenedXp = {
+  xpTotal?: number;
+  xp?: number;
+  valorTotal?: number;
+};
 
 export const activityXp = (item: AtividadeType & WithFlattenedXp) => {
   const fromQuestions = (item.questoes ?? []).reduce(
     (total, questao) => total + (questao.valor ?? 0),
     0
   );
-  return fromQuestions || item.xpTotal || 0;
+  return fromQuestions || item.xpTotal || item.xp || item.valorTotal || 0;
 };
 
 export const isActivityConcluded = (
