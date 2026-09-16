@@ -3,54 +3,44 @@ import { PhaseNode } from '@/pages/mapa/components/trail/PhaseNode';
 import type { PhaseNodeType } from '@/data/types/reactFlow';
 import type { NodeTypes } from '@xyflow/react';
 
+const FIRST_PHASE_XP = 1;
+const EASY_STEP = 3;
+const HARD_STEP = 4;
+const EASY_UNTIL_PHASE = 9;
+
 export const nodeTypes: NodeTypes = {
   phase: PhaseNode,
   background: BackgroundNode,
 };
 
-const FIRST_REGION_PHASES = 9;
-const FIRST_REGION_XP = 20;
-const XP_PER_PHASE_AFTER = 2;
-
 const minPointsOf = (phase: number) => {
-  if (phase <= FIRST_REGION_PHASES) {
-    return Math.round((phase / FIRST_REGION_PHASES) * FIRST_REGION_XP) || 1;
+  if (phase === 1) return FIRST_PHASE_XP;
+
+  if (phase <= EASY_UNTIL_PHASE) {
+    return FIRST_PHASE_XP + (phase - 1) * EASY_STEP;
   }
 
-  return FIRST_REGION_XP + (phase - FIRST_REGION_PHASES) * XP_PER_PHASE_AFTER;
+  const easyEndXp = FIRST_PHASE_XP + (EASY_UNTIL_PHASE - 1) * EASY_STEP;
+  return easyEndXp + (phase - EASY_UNTIL_PHASE) * HARD_STEP;
 };
 
 const phaseLayouts: Array<Pick<PhaseNodeType, 'id' | 'position'>> = [
   { id: '1', position: { x: 0, y: 0 } },
-  { id: '2', position: { x: 80, y: -150 } },
-  { id: '3', position: { x: -80, y: -300 } },
-  { id: '4', position: { x: 160, y: -500 } },
-  { id: '5', position: { x: 80, y: -750 } },
-  { id: '6', position: { x: -80, y: -1000 } },
-  { id: '7', position: { x: 90, y: -1250 } },
-  { id: '8', position: { x: 0, y: -1500 } },
-  { id: '9', position: { x: 80, y: -1750 } },
-  { id: '10', position: { x: -80, y: -2000 } },
-  { id: '11', position: { x: 150, y: -2250 } },
-  { id: '12', position: { x: 0, y: -2500 } },
-  { id: '13', position: { x: -140, y: -2750 } },
-  { id: '14', position: { x: -60, y: -3000 } },
-  { id: '15', position: { x: 90, y: -3250 } },
-  { id: '16', position: { x: 160, y: -3500 } },
-  { id: '17', position: { x: 50, y: -3750 } },
-  { id: '18', position: { x: -100, y: -4000 } },
-  { id: '19', position: { x: -160, y: -4250 } },
-  { id: '20', position: { x: 20, y: -4500 } },
-  { id: '21', position: { x: -180, y: -4750 } },
-  { id: '22', position: { x: -280, y: -5000 } },
-  { id: '23', position: { x: -40, y: -5250 } },
-  { id: '24', position: { x: 220, y: -5500 } },
-  { id: '25', position: { x: 300, y: -5750 } },
-  { id: '26', position: { x: 90, y: -6000 } },
-  { id: '27', position: { x: -50, y: -6250 } },
-  { id: '28', position: { x: -220, y: -6500 } },
-  { id: '29', position: { x: -300, y: -6750 } },
-  { id: '30', position: { x: -90, y: -7000 } },
+  { id: '2', position: { x: 210, y: -580 } },
+  { id: '3', position: { x: -190, y: -1160 } },
+  { id: '4', position: { x: 130, y: -1750 } },
+  { id: '5', position: { x: -240, y: -2300 } },
+  { id: '6', position: { x: 340, y: -2625 } },
+  { id: '7', position: { x: 200, y: -3250 } },
+  { id: '8', position: { x: 360, y: -3875 } },
+  { id: '9', position: { x: 250, y: -4500 } },
+  { id: '10', position: { x: -40, y: -4750 } },
+  { id: '11', position: { x: -250, y: -5125 } },
+  { id: '12', position: { x: -200, y: -5500 } },
+  { id: '13', position: { x: 270, y: -5875 } },
+  { id: '14', position: { x: 320, y: -6250 } },
+  { id: '15', position: { x: 200, y: -6625 } },
+  { id: '16', position: { x: 250, y: -7000 } },
 ];
 
 export const nodesPhases: PhaseNodeType[] = phaseLayouts.map(

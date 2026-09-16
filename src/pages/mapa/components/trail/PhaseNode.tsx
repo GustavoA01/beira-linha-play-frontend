@@ -14,30 +14,47 @@ export const PhaseNode = ({ id, data: { minPoints } }: PhaseNodeProps) => {
     isInteractive,
     points,
     glowColors,
+    glowShadows,
+    glowOpacities,
+    glowScales,
     iconClassName,
   } = usePhaseNode(minPoints);
 
   const pulseDelay = ((Number(id) || 1) % 5) * 0.6;
+  const colorTransition = {
+    duration: 6,
+    delay: pulseDelay,
+    repeat: Infinity,
+    ease: 'easeInOut' as const,
+  };
 
   return (
     <>
       <div
         onClick={isInteractive ? () => setOpenDialog(true) : undefined}
         className={cn(
-          'relative w-20 h-20 rounded-full select-none drop-shadow-lg',
+          'relative w-20 h-20 rounded-full select-none',
           isInteractive &&
             'transition-all ease-in hover:scale-105 cursor-pointer'
         )}
       >
         <motion.div
-          className="absolute inset-0 rounded-full ring-1 ring-inset ring-black/10"
-          animate={{ backgroundColor: glowColors }}
-          transition={{
-            duration: 6,
-            delay: pulseDelay,
-            repeat: Infinity,
-            ease: 'easeInOut',
+          aria-hidden
+          className="pointer-events-none absolute -inset-2 rounded-full blur-xl"
+          animate={{
+            backgroundColor: glowColors,
+            opacity: glowOpacities,
+            scale: glowScales,
           }}
+          transition={colorTransition}
+        />
+        <motion.div
+          className="absolute inset-0 rounded-full ring-1 ring-inset ring-black/10"
+          animate={{
+            backgroundColor: glowColors,
+            boxShadow: glowShadows,
+          }}
+          transition={colorTransition}
         />
 
         <div className="pointer-events-none absolute inset-0 bottom-[3px] rounded-full bg-linear-to-b from-white/25 to-transparent" />
