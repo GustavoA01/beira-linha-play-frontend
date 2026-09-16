@@ -8,70 +8,29 @@ import { motion } from 'framer-motion';
 import { useCursos } from './hooks/useCursos';
 import { useAuthUser } from '@/providers/UserProvider';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
-import type { CursoType } from '@/data/types/api';
-import { useQuery, useQueries } from '@tanstack/react-query';
-import { listCourses } from '@/services/cursos';
-import { getModule } from '@/services/modulos';
-import { listMonitors } from '@/services/usuarios';
-import { courseKeys, moduleKeys, monitorKeys } from '@/lib/queryClientKeys';
 import { CoursesPageSkeleton } from '@/components/PageSkeleton';
-import { useDeleteCourse } from './hooks/useMutation';
-import { monitorNames, toCourse, withModuleDetails } from './utils';
-import { toModule } from '@/pages/modulo/utils';
+import { monitorNames } from './utils';
+import { useCursosMutation } from './hooks/useCursosMutation';
 
 export const CoursesPage = () => {
   const { containerClassName } = useMediaDevice();
   const { user, isAdmin, isAluno } = useAuthUser();
-  const {
-    data: courses = [],
-    isPending,
-    isError,
-  } = useQuery({
-    queryKey: courseKeys.all,
-    queryFn: listCourses,
-  });
-  const { data: monitors = [] } = useQuery({
-    queryKey: monitorKeys.all,
-    queryFn: listMonitors,
-  });
-  const { mutate: removeCourse } = useDeleteCourse();
-  const moduleIds = [
-    ...new Set(
-      courses.flatMap((course) =>
-        (course.modulos ?? []).map((modulo) => modulo.id)
-      )
-    ),
-  ];
-  const moduleQueries = useQueries({
-    queries: moduleIds.map((id) => ({
-      queryKey: moduleKeys.detail(id),
-      queryFn: async () => toModule(await getModule(id)),
-    })),
-  });
-  const modulesById = new Map(
-    moduleQueries.flatMap((query) =>
-      query.data ? [[query.data.id, query.data] as const] : []
-    )
-  );
-  const cursos = courses.map((course) =>
-    withModuleDetails(toCourse(course), modulesById)
-  );
+  const { cursos, isPending, isError, removeCourse, monitors } =
+    useCursosMutation();
   const {
     openCodeDialog,
     setOpenCodeDialog,
     isLocked,
     handleCourseClick,
     handleCodeSubmit,
+    openCourseDialog,
+    setOpenCourseDialog,
+    editingCourse,
+    setEditingCourse,
+    openAdminDialog,
+    setOpenAdminDialog,
+    handleCourseDialogChange,
   } = useCursos();
-  const [openCourseDialog, setOpenCourseDialog] = useState(false);
-  const [editingCourse, setEditingCourse] = useState<CursoType>();
-  const [openAdminDialog, setOpenAdminDialog] = useState(false);
-
-  const handleCourseDialogChange = (open: boolean) => {
-    setOpenCourseDialog(open);
-    if (!open) setEditingCourse(undefined);
-  };
 
   return (
     <div

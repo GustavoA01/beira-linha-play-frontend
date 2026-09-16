@@ -1,39 +1,23 @@
-import { useParams } from 'react-router-dom';
 import { MonitoramentoContent } from './components/MonitoramentoContent';
 import { ResourceNotFound } from '@/components/ResourceNotFound';
-import { useQuery } from '@tanstack/react-query';
-import { getActivity, getActivityMonitoring } from '@/services/atividades';
-import { activityKeys } from '@/lib/queryClientKeys';
-import { toActivity } from '@/pages/atividade/utils';
 import { HeaderListPageSkeleton } from '@/components/PageSkeleton';
 import { ApiError } from '@/services/api';
+import { useMonitoramento } from './hooks/useMonitoramento';
 
 export const ManagementPage = () => {
-  const { atividadeId } = useParams();
-  const enabled = Boolean(atividadeId);
   const {
-    data: activity,
-    isPending: isActivityPending,
-    isError: isActivityError,
-    error: activityError,
-  } = useQuery({
-    queryKey: activityKeys.detail(atividadeId ?? ''),
-    queryFn: async () => toActivity(await getActivity(atividadeId!)),
-    enabled,
-  });
-  const {
-    data: monitoring,
-    isPending: isMonitoringPending,
-    isError: isMonitoringError,
-  } = useQuery({
-    queryKey: activityKeys.monitoring(atividadeId ?? ''),
-    queryFn: () => getActivityMonitoring(atividadeId!),
-    enabled,
-  });
+    atividadeId,
+    activity,
+    isActivityPending,
+    isActivityError,
+    activityError,
+    monitoring,
+    isMonitoringPending,
+    isMonitoringError,
+  } = useMonitoramento();
 
-  if (!atividadeId) {
+  if (!atividadeId)
     return <ResourceNotFound label="Atividade não encontrada" />;
-  }
 
   if (isActivityPending) return <HeaderListPageSkeleton />;
 

@@ -1,67 +1,41 @@
 import { ModuloHeader } from './components/ModuloHeader';
 import { useMediaDevice } from '@/hooks/useMediaDevice';
 import { ActivityCard } from './components/ActivityCard';
-import { useState } from 'react';
 import { NewActivityDialog } from './features/NewActivityDialog/container/NewActivityDialog';
 import { DeleteActivityDialog } from './components/DeleteActivityDialog';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { countStudentAttempts, bestStudentScore } from '@/data/tentativas';
 import { useAuthUser } from '@/providers/UserProvider';
 import { cn } from '@/lib/utils';
 import { ResourceNotFound } from '@/components/ResourceNotFound';
-import { useQuery } from '@tanstack/react-query';
-import { getCourse } from '@/services/cursos';
-import { getModule } from '@/services/modulos';
-import { listMyAttempts } from '@/services/tentativas';
-import { attemptKeys, courseKeys, moduleKeys } from '@/lib/queryClientKeys';
-import { toModule } from './utils';
 import { HeaderListPageSkeleton } from '@/components/PageSkeleton';
-import type { AtividadeType } from '@/data/types/api';
 import { useDeleteActivity } from './hooks/useMutation';
+import { useModulo } from './hooks/useModulo';
 
 export const ModulePage = () => {
-  const navigate = useNavigate();
   const { cursoId, moduloId } = useParams();
   const { isAluno, isMonitor, user } = useAuthUser();
   const { containerClassName } = useMediaDevice();
-  const [openActivityDialog, setOpenActivityDialog] = useState(false);
-  const [editingActivity, setEditingActivity] = useState<AtividadeType>();
-  const [activityToDelete, setActivityToDelete] = useState<AtividadeType>();
   const { mutate: removeActivity, isPending: isDeleting } = useDeleteActivity(
     moduloId ?? ''
   );
-  const { data, isPending, isError } = useQuery({
-    queryKey: moduleKeys.detail(moduloId ?? ''),
-    queryFn: async () => toModule(await getModule(moduloId!)),
-    enabled: Boolean(moduloId),
-  });
-  const { data: course } = useQuery({
-    queryKey: courseKeys.detail(cursoId ?? ''),
-    queryFn: () => getCourse(cursoId!),
-    enabled: Boolean(cursoId) && isMonitor,
-  });
   const {
-    data: attempts = [],
-    isPending: isAttemptsPending,
-    isError: isAttemptsError,
-  } = useQuery({
-    queryKey: attemptKeys.mine(),
-    queryFn: () => listMyAttempts(),
-    enabled: isAluno,
-  });
-  const modulo = data;
-
-  const onClickActivity = (activityId?: string) => {
-    if (!activityId || !cursoId || !moduloId) return;
-    const basePath = `/cursos/${cursoId}/modulos/${moduloId}`;
-    if (isMonitor) navigate(`${basePath}/monitoramento/${activityId}`);
-    else navigate(`${basePath}/atividade/${activityId}`);
-  };
-
-  const handleActivityDialogChange = (open: boolean) => {
-    setOpenActivityDialog(open);
-    if (!open) setEditingActivity(undefined);
-  };
+    modulo,
+    isPending,
+    isError,
+    course,
+    attempts,
+    isAttemptsPending,
+    isAttemptsError,
+    onClickActivity,
+    handleActivityDialogChange,
+    openActivityDialog,
+    setOpenActivityDialog,
+    editingActivity,
+    setEditingActivity,
+    activityToDelete,
+    setActivityToDelete,
+  } = useModulo(moduloId ?? '', isAluno, isMonitor, cursoId ?? '');
 
   if (!moduloId) return <ResourceNotFound label="Módulo não encontrado" />;
 

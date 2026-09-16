@@ -1,56 +1,42 @@
-import { useState } from 'react';
 import { CourseHeader } from './components/CourseHeader';
 import { ModuleCard } from './components/ModuleCard';
 import { NewModuleDialog } from './components/NewModuleDialog';
 import { DeleteModuleDialog } from './components/DeleteModuleDialog';
-import { useNavigate, useParams } from 'react-router-dom';
-import { useAuthUser } from '@/providers/UserProvider';
+import { useNavigate } from 'react-router-dom';
 import { ResourceNotFound } from '@/components/ResourceNotFound';
-import { useQuery, useQueries } from '@tanstack/react-query';
-import { getCourse } from '@/services/cursos';
-import { getModule } from '@/services/modulos';
-import { courseKeys, moduleKeys } from '@/lib/queryClientKeys';
-import { toCourse } from '@/pages/cursos/utils';
-import { toModule } from '@/pages/modulo/utils';
 import { HeaderListPageSkeleton } from '@/components/PageSkeleton';
 import type { ModuloType } from '@/data/types/api';
 import { useDeleteModule } from './hooks/useMutation';
+import { useCurso } from './hooks/useCurso';
 
 export const CoursePage = () => {
   const navigate = useNavigate();
-  const { cursoId } = useParams();
-  const { data, isPending, isError } = useQuery({
-    queryKey: courseKeys.detail(cursoId ?? ''),
-    queryFn: () => getCourse(cursoId!),
-    enabled: Boolean(cursoId),
-  });
-  const moduleDetails = useQueries({
-    queries: (data?.modulos ?? []).map((modulo) => ({
-      queryKey: moduleKeys.detail(modulo.id),
-      queryFn: async () => toModule(await getModule(modulo.id)),
-    })),
-  });
-  const curso = data ? toCourse(data) : undefined;
-  const { isAluno, isMonitor } = useAuthUser();
+  const {
+    curso,
+    cursoId,
+    isPending,
+    isError,
+    moduleDetails,
+    isAluno,
+    isMonitor,
+    editingModule,
+    setEditingModule,
+    moduleToDelete,
+    setModuleToDelete,
+    handleModuleDialogChange,
+    openModuleDialog,
+    setOpenModuleDialog,
+  } = useCurso();
+
   const { mutate: removeModule, isPending: isDeleting } = useDeleteModule(
     cursoId ?? ''
   );
-  const [openModuleDialog, setOpenModuleDialog] = useState(false);
-  const [editingModule, setEditingModule] = useState<ModuloType>();
-  const [moduleToDelete, setModuleToDelete] = useState<ModuloType>();
-
-  const handleModuleDialogChange = (open: boolean) => {
-    setOpenModuleDialog(open);
-    if (!open) setEditingModule(undefined);
-  };
 
   if (!cursoId || isError) {
     return <ResourceNotFound label="Curso não encontrado" />;
   }
 
-  if (isPending) {
-    return <HeaderListPageSkeleton />;
-  }
+  if (isPending) return <HeaderListPageSkeleton />;
 
   if (!curso) return <ResourceNotFound label="Curso não encontrado" />;
 

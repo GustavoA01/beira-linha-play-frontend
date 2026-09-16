@@ -6,7 +6,7 @@ class ResizeObserverMock {
   disconnect() {}
 }
 
-global.ResizeObserver = ResizeObserverMock;
+globalThis.ResizeObserver = ResizeObserverMock;
 
 Object.defineProperty(window, 'matchMedia', {
   writable: true,

@@ -1,14 +1,17 @@
+import type { ReactNode } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ChatHeader } from '../components/ChatHeader';
 
 jest.mock('@/components/ui/drawer', () => ({
-  DrawerHeader: ({ children }: { children: unknown }) => (
+  DrawerHeader: ({ children }: { children: ReactNode }) => (
     <header>{children}</header>
   ),
-  DrawerTitle: ({ children }: { children: unknown }) => <h2>{children}</h2>,
-  DrawerDescription: ({ children }: { children: unknown }) => <p>{children}</p>,
-  DrawerClose: ({ children }: { children: unknown }) => children,
+  DrawerTitle: ({ children }: { children: ReactNode }) => <h2>{children}</h2>,
+  DrawerDescription: ({ children }: { children: ReactNode }) => (
+    <p>{children}</p>
+  ),
+  DrawerClose: ({ children }: { children: ReactNode }) => children,
 }));
 
 describe('ChatHeader', () => {

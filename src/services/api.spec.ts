@@ -1,23 +1,41 @@
-import { AxiosError, type AxiosRequestConfig } from 'axios';
+import {
+  AxiosError,
+  AxiosHeaders,
+  type AxiosResponse,
+  type InternalAxiosRequestConfig,
+} from 'axios';
 import { api, ApiError } from './api';
 import { endpoints } from './endpoints';
 
-const ok = (config: AxiosRequestConfig, data: unknown, status = 200) => ({
+const withHeaders = (
+  config: InternalAxiosRequestConfig
+): InternalAxiosRequestConfig => ({
+  ...config,
+  headers: config.headers ?? new AxiosHeaders(),
+});
+
+const ok = <T,>(
+  config: InternalAxiosRequestConfig,
+  data: T,
+  status = 200
+): AxiosResponse<T> => ({
   data,
   status,
   statusText: 'OK',
   headers: {},
-  config,
+  config: withHeaders(config),
 });
 
-const unauthorized = (config: AxiosRequestConfig) =>
-  new AxiosError('Não autenticado', 'ERR_BAD_REQUEST', config, null, {
+const unauthorized = (config: InternalAxiosRequestConfig) => {
+  const fullConfig = withHeaders(config);
+  return new AxiosError('Não autenticado', 'ERR_BAD_REQUEST', fullConfig, null, {
     data: { mensagem: 'Não autenticado', status: 401 },
     status: 401,
     statusText: 'Unauthorized',
     headers: {},
-    config,
+    config: fullConfig,
   });
+};
 
 describe('api refresh interceptor', () => {
   const originalAdapter = api.defaults.adapter;

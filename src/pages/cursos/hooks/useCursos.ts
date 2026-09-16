@@ -11,6 +11,9 @@ export const useCursos = () => {
   const { mutateAsync: enroll } = useEnrollCourse();
   const [openCodeDialog, setOpenCodeDialog] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<CursoType | null>(null);
+  const [openCourseDialog, setOpenCourseDialog] = useState(false);
+  const [editingCourse, setEditingCourse] = useState<CursoType>();
+  const [openAdminDialog, setOpenAdminDialog] = useState(false);
 
   const isLocked = (cursoId: string) =>
     user.tipo !== 'ADMIN' && !user.cursoIds.includes(cursoId);
@@ -56,11 +59,25 @@ export const useCursos = () => {
     }
   };
 
+  
+
+  const handleCourseDialogChange = (open: boolean) => {
+    setOpenCourseDialog(open);
+    if (!open) setEditingCourse(undefined);
+  };
+
   return {
     openCodeDialog,
     setOpenCodeDialog,
     isLocked,
     handleCourseClick,
     handleCodeSubmit,
+    openCourseDialog,
+    setOpenCourseDialog,
+    editingCourse,
+    setEditingCourse,
+    openAdminDialog,
+    setOpenAdminDialog,
+    handleCourseDialogChange,
   };
 };

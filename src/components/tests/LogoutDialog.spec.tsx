@@ -49,7 +49,13 @@ const renderDialog = () =>
 describe('LogoutDialog', () => {
   beforeEach(() => {
     mockedLogout.mockReset();
-    mockedLogout.mockResolvedValue(undefined);
+    mockedLogout.mockResolvedValue({
+      data: undefined,
+      status: 204,
+      statusText: 'No Content',
+      headers: {},
+      config: { headers: {} },
+    } as Awaited<ReturnType<typeof logout>>);
   });
 
   it('shows the dialog when open', () => {

@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { MedalsPageSkeleton } from '@/components/PageSkeleton';
 import { Spinner } from '@/components/ui/spinner';
@@ -6,26 +5,21 @@ import { UnknownMedal } from './components/UnknownMedal';
 import { WonMedal } from './components/WonMedal';
 import { AddMedalDialog } from './components/AddMedalDialog';
 import { motion } from 'framer-motion';
-import { useAuthUser } from '@/providers/UserProvider';
-import { useDeleteMedal, useSelectMedal } from './hooks/useMutation';
-import { useQuery } from '@tanstack/react-query';
-import { listMedals } from '@/services/medalhas';
-import { medalKeys } from '@/lib/queryClientKeys';
 import { cn } from '@/lib/utils';
+import { useMedalhas } from './hooks/useMedalhas';
 
 export const MedalsPage = () => {
-  const { isAdmin } = useAuthUser();
-  const { mutate: selectMedal, isPending: isSelectingMedal } = useSelectMedal();
   const {
-    data: medals = [],
+    isAdmin,
+    selectMedal,
+    isSelectingMedal,
+    medals,
     isPending,
     isError,
-  } = useQuery({
-    queryKey: medalKeys.all,
-    queryFn: listMedals,
-  });
-  const { mutate: removeMedal } = useDeleteMedal();
-  const [openDialog, setOpenDialog] = useState(false);
+    removeMedal,
+    openDialog,
+    setOpenDialog,
+  } = useMedalhas();
 
   return (
     <div className="container mx-auto mt-8 px-4 sm:px-8 flex flex-col items-center overflow-y-auto custom-bar">
