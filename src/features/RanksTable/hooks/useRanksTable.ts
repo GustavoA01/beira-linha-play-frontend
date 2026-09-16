@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
+import { queryClientKeys } from '@/lib/queryClientKeys';
 import { cn } from '@/lib/utils';
-import { courseKeys, rankingKeys } from '@/lib/queryClientKeys';
 import { useAuthUser } from '@/providers/UserProvider';
 import { listCourses } from '@/services/cursos';
 import { listRankings } from '@/services/rankings';
@@ -36,7 +36,7 @@ export const useRanksTable = ({ floating }: UseRanksTableProps) => {
   }, []);
 
   const { data: courses = [] } = useQuery({
-    queryKey: courseKeys.all,
+    queryKey: queryClientKeys.courseKeys.all,
     queryFn: listCourses,
   });
 
@@ -52,7 +52,7 @@ export const useRanksTable = ({ floating }: UseRanksTableProps) => {
   const courseId = selected === GERAL.id ? undefined : selected;
 
   const { data: ranks = [] } = useQuery({
-    queryKey: rankingKeys.list(courseId),
+    queryKey: queryClientKeys.rankingKeys.list(courseId),
     queryFn: () => listRankings(courseId),
   });
 

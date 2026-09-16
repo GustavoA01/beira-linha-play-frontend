@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const registerSchema = z
   .object({
     tipo: z.enum(['ALUNO', 'MONITOR']),
-    nome: z.string().trim().min(1, 'Informe o nome'),
+    nome: z.string().trim().min(1, 'Informe o nome completo'),
     apelido: z.string().trim(),
     email: z.string().trim(),
     senha: z.string().min(6, 'A senha deve ter pelo menos 6 caracteres'),

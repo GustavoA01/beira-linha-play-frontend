@@ -1,8 +1,8 @@
-import { courseKeys, moduleKeys, monitorKeys } from '@/lib/queryClientKeys';
 import { toCourse, withModuleDetails } from '../utils';
 import { listCourses } from '@/services/cursos';
 import { listMonitors } from '@/services/usuarios';
 import { useQueries, useQuery } from '@tanstack/react-query';
+import { queryClientKeys } from '@/lib/queryClientKeys';
 import { toModule } from '@/pages/modulo/utils';
 import { getModule } from '@/services/modulos';
 import { useDeleteCourse } from './useMutation';
@@ -15,12 +15,12 @@ export const useCursosMutation = () => {
     isPending,
     isError,
   } = useQuery({
-    queryKey: courseKeys.all,
+    queryKey: queryClientKeys.courseKeys.all,
     queryFn: listCourses,
   });
 
   const { data: monitors = [] } = useQuery({
-    queryKey: monitorKeys.all,
+    queryKey: queryClientKeys.monitorKeys.all,
     queryFn: listMonitors,
   });
 
@@ -34,7 +34,7 @@ export const useCursosMutation = () => {
 
   const moduleQueries = useQueries({
     queries: moduleIds.map((id) => ({
-      queryKey: moduleKeys.detail(id),
+      queryKey: queryClientKeys.moduleKeys.detail(id),
       queryFn: async () => toModule(await getModule(id)),
     })),
   });

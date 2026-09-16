@@ -1,9 +1,9 @@
 import { newCourseSchema, type NewCourseFormType } from '@/data/schemas/course';
 import type { CursoType, MonitorType } from '@/data/types/api';
-import { monitorKeys } from '@/lib/queryClientKeys';
 import { listMonitors } from '@/services/usuarios';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
+import { queryClientKeys } from '@/lib/queryClientKeys';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useCreateCourse, useUpdateCourse } from './useMutation';
@@ -14,7 +14,7 @@ export const useNewCourseDialog = (
   curso?: CursoType
 ) => {
   const { data: users = [] } = useQuery({
-    queryKey: monitorKeys.all,
+    queryKey: queryClientKeys.monitorKeys.all,
     queryFn: listMonitors,
   });
   const monitores = users.filter(

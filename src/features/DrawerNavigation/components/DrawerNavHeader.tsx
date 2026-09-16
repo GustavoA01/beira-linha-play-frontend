@@ -5,6 +5,7 @@ import {
   DrawerTitle,
 } from '@/components/ui/drawer';
 import { useAnimateBg } from '@/hooks/useAnimateBg';
+import { getInitials } from '@/lib/utils';
 import { useAuthUser } from '@/providers/UserProvider';
 
 export const DrawerNavHeader = () => {
@@ -13,14 +14,7 @@ export const DrawerNavHeader = () => {
   const title = isAluno ? user.apelido : user.nome;
   const subtitle = user.nome;
   const points = isAluno ? user.pontos : null;
-  const initials = subtitle
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
+  const initials = getInitials(subtitle);
 
   return (
     <DrawerHeader ref={scope} className="flex flex-col bg-primary gap-4 p-4">

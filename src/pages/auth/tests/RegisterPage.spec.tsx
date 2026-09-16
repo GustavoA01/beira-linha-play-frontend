@@ -56,7 +56,7 @@ describe('RegisterPage', () => {
     expect(
       screen.getByRole('heading', { name: 'Cadastre-se' })
     ).toBeInTheDocument();
-    expect(screen.getByLabelText('Nome')).toBeInTheDocument();
+    expect(screen.getByLabelText('Nome completo')).toBeInTheDocument();
     expect(screen.getByLabelText('Apelido')).toBeInTheDocument();
     expect(screen.queryByLabelText('E-mail')).not.toBeInTheDocument();
     expect(screen.getByLabelText('Senha')).toBeInTheDocument();
@@ -98,7 +98,9 @@ describe('RegisterPage', () => {
 
     await user.click(screen.getByRole('button', { name: 'Cadastrar' }));
 
-    expect(await screen.findByText('Informe o nome')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Informe o nome completo')
+    ).toBeInTheDocument();
     expect(screen.getByText('Informe o apelido')).toBeInTheDocument();
     expect(
       screen.getByText('A senha deve ter pelo menos 6 caracteres')
@@ -112,7 +114,7 @@ describe('RegisterPage', () => {
     await user.click(
       screen.getByRole('button', { name: 'Entrar como monitor' })
     );
-    await user.type(screen.getByLabelText('Nome'), 'Maria Souza');
+    await user.type(screen.getByLabelText('Nome completo'), 'Maria Souza');
     await user.type(screen.getByLabelText('Senha'), '123456');
     await user.type(screen.getByLabelText('Confirmar senha'), '123456');
     await user.click(screen.getByRole('button', { name: 'Cadastrar' }));
@@ -126,7 +128,7 @@ describe('RegisterPage', () => {
     const user = userEvent.setup();
     renderPage();
 
-    await user.type(screen.getByLabelText('Nome'), 'Gustavo Aguiar');
+    await user.type(screen.getByLabelText('Nome completo'), 'Gustavo Aguiar');
     await user.type(screen.getByLabelText('Apelido'), 'Gu');
     await user.type(screen.getByLabelText('Senha'), '123456');
     await user.type(screen.getByLabelText('Confirmar senha'), 'abcdef');
@@ -142,7 +144,7 @@ describe('RegisterPage', () => {
     mockedRegister.mockResolvedValue(mockLoggedAluno);
     renderPage();
 
-    await user.type(screen.getByLabelText('Nome'), 'Gustavo Aguiar');
+    await user.type(screen.getByLabelText('Nome completo'), 'Gustavo Aguiar');
     await user.type(screen.getByLabelText('Apelido'), 'Gu');
     await user.type(screen.getByLabelText('Senha'), '123456');
     await user.type(screen.getByLabelText('Confirmar senha'), '123456');
@@ -165,7 +167,7 @@ describe('RegisterPage', () => {
     await user.click(
       screen.getByRole('button', { name: 'Entrar como monitor' })
     );
-    await user.type(screen.getByLabelText('Nome'), 'Maria Souza');
+    await user.type(screen.getByLabelText('Nome completo'), 'Maria Souza');
     await user.type(screen.getByLabelText('E-mail'), 'maria.souza@pucminas.br');
     await user.type(screen.getByLabelText('Senha'), '123456');
     await user.type(screen.getByLabelText('Confirmar senha'), '123456');
@@ -187,7 +189,7 @@ describe('RegisterPage', () => {
     );
     renderPage();
 
-    await user.type(screen.getByLabelText('Nome'), 'Gustavo Aguiar');
+    await user.type(screen.getByLabelText('Nome completo'), 'Gustavo Aguiar');
     await user.type(screen.getByLabelText('Apelido'), 'Gu');
     await user.type(screen.getByLabelText('Senha'), '123456');
     await user.type(screen.getByLabelText('Confirmar senha'), '123456');

@@ -1,20 +1,12 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/components/ui/toast';
-import { ApiError } from '@/services/api';
+import { toastError } from '@/lib/utils';
 import { login, logout, register } from '@/services/auth';
 import { updateAccount } from '@/services/usuarios';
 import type {
   LoginPayloadType,
   RegisterPayloadType,
 } from '@/data/types/services';
-
-const toastError = (error: unknown, fallback: string) => {
-  console.error(error);
-  toast.add({
-    type: 'error',
-    title: error instanceof ApiError ? error.message : fallback,
-  });
-};
 
 const resetSessionQueries = (
   queryClient: ReturnType<typeof useQueryClient>

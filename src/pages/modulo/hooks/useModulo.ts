@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { attemptKeys, courseKeys, moduleKeys } from '@/lib/queryClientKeys';
+import { queryClientKeys } from '@/lib/queryClientKeys';
 import { toModule } from '../utils';
 import { getCourse } from '@/services/cursos';
 import { getModule } from '@/services/modulos';
@@ -20,13 +20,13 @@ export const useModulo = (
   const [activityToDelete, setActivityToDelete] = useState<AtividadeType>();
 
   const { data, isPending, isError } = useQuery({
-    queryKey: moduleKeys.detail(moduloId ?? ''),
+    queryKey: queryClientKeys.moduleKeys.detail(moduloId ?? ''),
     queryFn: async () => toModule(await getModule(moduloId!)),
     enabled: Boolean(moduloId),
   });
 
   const { data: course } = useQuery({
-    queryKey: courseKeys.detail(cursoId ?? ''),
+    queryKey: queryClientKeys.courseKeys.detail(cursoId ?? ''),
     queryFn: () => getCourse(cursoId!),
     enabled: Boolean(cursoId) && isMonitor,
   });
@@ -36,7 +36,7 @@ export const useModulo = (
     isPending: isAttemptsPending,
     isError: isAttemptsError,
   } = useQuery({
-    queryKey: attemptKeys.mine(),
+    queryKey: queryClientKeys.attemptKeys.mine(),
     queryFn: () => listMyAttempts(),
     enabled: isAluno,
   });

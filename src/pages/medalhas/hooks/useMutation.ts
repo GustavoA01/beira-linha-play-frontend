@@ -1,18 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { queryClientKeys } from '@/lib/queryClientKeys';
 import { toast } from '@/components/ui/toast';
-import { ApiError } from '@/services/api';
+import { toastError } from '@/lib/utils';
 import { createMedal, deleteMedal, equipMedal } from '@/services/medalhas';
-import { medalKeys, rankingKeys } from '@/lib/queryClientKeys';
 import { useAuthUser } from '@/providers/UserProvider';
 import { toUser } from '@/services/auth';
-
-const toastError = (error: unknown, fallback: string) => {
-  console.error(error);
-  toast.add({
-    type: 'error',
-    title: error instanceof ApiError ? error.message : fallback,
-  });
-};
 
 export const useCreateMedal = () => {
   const queryClient = useQueryClient();
@@ -20,7 +12,9 @@ export const useCreateMedal = () => {
   return useMutation({
     mutationFn: createMedal,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: medalKeys.all });
+      void queryClient.invalidateQueries({
+        queryKey: queryClientKeys.medalKeys.all,
+      });
       toast.add({
         type: 'success',
         title: 'Medalha adicionada',
@@ -39,7 +33,9 @@ export const useSelectMedal = () => {
     mutationFn: equipMedal,
     onSuccess: (user) => {
       setUser(toUser(user));
-      void queryClient.invalidateQueries({ queryKey: rankingKeys.all });
+      void queryClient.invalidateQueries({
+        queryKey: queryClientKeys.rankingKeys.all,
+      });
       toast.add({ type: 'success', title: 'Medalha selecionada' });
     },
     onError: (error) => {
@@ -55,7 +51,9 @@ export const useDeleteMedal = () => {
   return useMutation({
     mutationFn: deleteMedal,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: medalKeys.all });
+      void queryClient.invalidateQueries({
+        queryKey: queryClientKeys.medalKeys.all,
+      });
       toast.add({
         type: 'success',
         title: 'Medalha excluída',

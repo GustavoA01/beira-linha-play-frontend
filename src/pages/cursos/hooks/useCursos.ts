@@ -59,8 +59,6 @@ export const useCursos = () => {
     }
   };
 
-  
-
   const handleCourseDialogChange = (open: boolean) => {
     setOpenCourseDialog(open);
     if (!open) setEditingCourse(undefined);

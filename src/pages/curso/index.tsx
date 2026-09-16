@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { ResourceNotFound } from '@/components/ResourceNotFound';
 import { HeaderListPageSkeleton } from '@/components/PageSkeleton';
 import type { ModuloType } from '@/data/types/api';
+import { isModuleConcluded } from '@/data/atividades';
 import { useDeleteModule } from './hooks/useMutation';
 import { useCurso } from './hooks/useCurso';
 
@@ -17,6 +18,8 @@ export const CoursePage = () => {
     isPending,
     isError,
     moduleDetails,
+    attempts,
+    alunoId,
     isAluno,
     isMonitor,
     editingModule,
@@ -69,6 +72,10 @@ export const CoursePage = () => {
                     key={modulo.id}
                     modulo={moduloCard}
                     isMonitor={isMonitor}
+                    concluded={
+                      isAluno &&
+                      isModuleConcluded(moduloCard, attempts, alunoId)
+                    }
                     onEdit={() => {
                       setEditingModule(moduloCard);
                       setOpenModuleDialog(true);

@@ -8,6 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
+import { getInitials } from '@/lib/utils';
 import { useUserProvider } from '@/providers/UserProvider';
 
 type HeaderUserMenuPropsType = {
@@ -19,14 +20,7 @@ export const HeaderUserMenu = ({ onLogout }: HeaderUserMenuPropsType) => {
   if (!auth.user) return null;
 
   const greetingName = auth.isAluno ? auth.user.apelido : auth.user.nome;
-  const initials = auth.user.nome
-    .trim()
-    .split(/\s+/)
-    .filter(Boolean)
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join('')
-    .toUpperCase();
+  const initials = getInitials(auth.user.nome) || '?';
 
   const src =
     auth.isAluno && auth.user.imagemPerfil ? auth.user.imagemPerfil : '';

@@ -1,14 +1,16 @@
 import { DescriptionCircle } from '@/components/DescriptionCircle';
 import { EditDeleteActions } from '@/components/EditDeleteActions';
 import { Card } from '@/components/ui/card';
-import { Check, ChevronRight, Notebook } from 'lucide-react';
+import { Check, ChevronRight, Layers, Notebook } from 'lucide-react';
 import { motion } from 'motion/react';
 import type { ModuloType } from '@/data/types/api';
 import { countModuleActivities, moduleXp } from '@/data/atividades';
+import { cn } from '@/lib/utils';
 
 type ModuleCardProps = {
   modulo: ModuloType;
   isMonitor: boolean;
+  concluded?: boolean;
   onClick: () => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -17,14 +19,14 @@ type ModuleCardProps = {
 export const ModuleCard = ({
   modulo,
   isMonitor,
+  concluded = false,
   onClick,
   onEdit,
   onDelete,
 }: ModuleCardProps) => {
   const atividadesCount = countModuleActivities(modulo);
   const atividadesLabel = `${atividadesCount} ${atividadesCount === 1 ? 'atividade' : 'atividades'}`;
-  const iconClassName =
-    'group-hover:text-white text-green-400 transition-colors ease-in';
+  const StudentIcon = concluded ? Check : Layers;
 
   return (
     <motion.div
@@ -35,11 +37,23 @@ export const ModuleCard = ({
     >
       <Card className="group flex flex-row justify-between items-center py-4 pl-2 pr-4 cursor-pointer mt-4 shadow-sm hover:shadow-md transition-all ease-in">
         <div className="flex items-center gap-4 pl-2 min-w-0">
-          <div className="p-2 bg-green-100 group-hover:bg-green-400 rounded-full transition-colors ease-in shrink-0">
+          <div
+            className={cn(
+              'p-2 rounded-full transition-colors ease-in shrink-0',
+              isMonitor || concluded
+                ? 'bg-green-100 group-hover:bg-green-400'
+                : 'bg-zinc-100 group-hover:bg-zinc-300'
+            )}
+          >
             {isMonitor ? (
-              <Notebook className={iconClassName} />
+              <Notebook className="group-hover:text-white text-green-400 transition-colors ease-in" />
             ) : (
-              <Check className={iconClassName} />
+              <StudentIcon
+                className={cn(
+                  'transition-colors ease-in group-hover:text-white',
+                  concluded ? 'text-green-400' : 'text-zinc-400'
+                )}
+              />
             )}
           </div>
           <div className="min-w-0">

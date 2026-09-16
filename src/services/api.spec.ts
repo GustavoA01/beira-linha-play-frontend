@@ -14,7 +14,7 @@ const withHeaders = (
   headers: config.headers ?? new AxiosHeaders(),
 });
 
-const ok = <T,>(
+const ok = <T>(
   config: InternalAxiosRequestConfig,
   data: T,
   status = 200
@@ -28,13 +28,19 @@ const ok = <T,>(
 
 const unauthorized = (config: InternalAxiosRequestConfig) => {
   const fullConfig = withHeaders(config);
-  return new AxiosError('Não autenticado', 'ERR_BAD_REQUEST', fullConfig, null, {
-    data: { mensagem: 'Não autenticado', status: 401 },
-    status: 401,
-    statusText: 'Unauthorized',
-    headers: {},
-    config: fullConfig,
-  });
+  return new AxiosError(
+    'Não autenticado',
+    'ERR_BAD_REQUEST',
+    fullConfig,
+    null,
+    {
+      data: { mensagem: 'Não autenticado', status: 401 },
+      status: 401,
+      statusText: 'Unauthorized',
+      headers: {},
+      config: fullConfig,
+    }
+  );
 };
 
 describe('api refresh interceptor', () => {

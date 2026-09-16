@@ -10,11 +10,11 @@ import {
 import type { SaveActivityPayloadType } from '@/data/types/services';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
+import { queryClientKeys } from '@/lib/queryClientKeys';
 import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getActivity } from '@/services/atividades';
-import { activityKeys } from '@/lib/queryClientKeys';
 import { toQuestionForm } from '../../../utils';
 import {
   useCreateActivity,
@@ -60,7 +60,7 @@ export const useNewActivity = () => {
     useState<NewActivityStorageType | null>(null);
 
   const { data: existing, isPending: isActivityPending } = useQuery({
-    queryKey: activityKeys.detail(atividadeId ?? ''),
+    queryKey: queryClientKeys.activityKeys.detail(atividadeId ?? ''),
     queryFn: () => getActivity(atividadeId!),
     enabled: Boolean(atividadeId),
   });

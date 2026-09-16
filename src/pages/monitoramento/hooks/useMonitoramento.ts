@@ -1,6 +1,6 @@
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { activityKeys } from '@/lib/queryClientKeys';
+import { queryClientKeys } from '@/lib/queryClientKeys';
 import { toActivity } from '@/pages/atividade/utils';
 import { getActivity, getActivityMonitoring } from '@/services/atividades';
 
@@ -14,7 +14,7 @@ export const useMonitoramento = () => {
     isError: isActivityError,
     error: activityError,
   } = useQuery({
-    queryKey: activityKeys.detail(atividadeId ?? ''),
+    queryKey: queryClientKeys.activityKeys.detail(atividadeId ?? ''),
     queryFn: async () => toActivity(await getActivity(atividadeId!)),
     enabled,
   });
@@ -24,7 +24,7 @@ export const useMonitoramento = () => {
     isPending: isMonitoringPending,
     isError: isMonitoringError,
   } = useQuery({
-    queryKey: activityKeys.monitoring(atividadeId ?? ''),
+    queryKey: queryClientKeys.activityKeys.monitoring(atividadeId ?? ''),
     queryFn: () => getActivityMonitoring(atividadeId!),
     enabled,
   });

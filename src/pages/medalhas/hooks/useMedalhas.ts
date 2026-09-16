@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { medalKeys } from '@/lib/queryClientKeys';
+import { queryClientKeys } from '@/lib/queryClientKeys';
 import { useAuthUser } from '@/providers/UserProvider';
 import { listMedals } from '@/services/medalhas';
 import { useDeleteMedal, useSelectMedal } from './useMutation';
@@ -13,7 +13,7 @@ export const useMedalhas = () => {
     isPending,
     isError,
   } = useQuery({
-    queryKey: medalKeys.all,
+    queryKey: queryClientKeys.medalKeys.all,
     queryFn: listMedals,
   });
   const { mutate: removeMedal } = useDeleteMedal();

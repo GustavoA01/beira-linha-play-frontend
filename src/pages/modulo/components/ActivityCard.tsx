@@ -8,9 +8,9 @@ import {
 } from '@/components/ui/item';
 import { Badge } from '@/components/ui/badge';
 import { EditDeleteActions } from '@/components/EditDeleteActions';
-import { Check, Notebook } from 'lucide-react';
+import { Check, CircleDashed, Notebook } from 'lucide-react';
 import type { AtividadeType } from '@/data/types/api';
-import { activityXp } from '@/data/atividades';
+import { activityXp, isActivityConcluded } from '@/data/atividades';
 import { cn } from '@/lib/utils';
 import { MAX_TENTATIVAS } from '@/data/constants';
 
@@ -36,8 +36,9 @@ export const ActivityCard = ({
   const xpTotal = activityXp(activity);
   const questionsLabel = `${activity.quantQuestoes} ${activity.quantQuestoes === 1 ? 'PERGUNTA' : 'PERGUNTAS'}`;
   const attemptsLabel = `${usedAttempts}/${MAX_TENTATIVAS} tentativas`;
-  const hasBoasted = usedAttempts > 0 && bestScore >= xpTotal;
-  const concluded = usedAttempts === MAX_TENTATIVAS || hasBoasted;
+  const concluded = isActivityConcluded(usedAttempts, bestScore, xpTotal);
+
+  const StudentIcon = concluded ? Check : CircleDashed;
 
   return (
     <Item
@@ -55,7 +56,7 @@ export const ActivityCard = ({
             : 'bg-zinc-100 text-zinc-400'
         )}
       >
-        {isMonitor ? <Notebook /> : <Check />}
+        {isMonitor ? <Notebook /> : <StudentIcon />}
       </ItemMedia>
 
       <ItemContent className="min-w-0">

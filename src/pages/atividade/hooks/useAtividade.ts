@@ -1,10 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { activityXp } from '@/data/atividades';
-import { MAX_TENTATIVAS } from '@/data/constants';
+import { queryClientKeys } from '@/lib/queryClientKeys';
+import { activityXp, isActivityConcluded } from '@/data/atividades';
 import { countStudentAttempts, bestStudentScore } from '@/data/tentativas';
-import { activityKeys, attemptKeys } from '@/lib/queryClientKeys';
 import { useAuthUser } from '@/providers/UserProvider';
 import { getActivity } from '@/services/atividades';
 import { listMyAttempts } from '@/services/tentativas';
@@ -16,7 +15,7 @@ export const useAtividade = () => {
   const validIds = Boolean(cursoId && moduloId && atividadeId);
 
   const { data, isPending, isError, error } = useQuery({
-    queryKey: activityKeys.detail(atividadeId ?? ''),
+    queryKey: queryClientKeys.activityKeys.detail(atividadeId ?? ''),
     queryFn: async () => toActivity(await getActivity(atividadeId!)),
     enabled: validIds && !auth.isMonitor,
   });
@@ -27,7 +26,7 @@ export const useAtividade = () => {
     isPending: isAttemptsPending,
     isError: isAttemptsError,
   } = useQuery({
-    queryKey: attemptKeys.mine(atividadeId),
+    queryKey: queryClientKeys.attemptKeys.mine(atividadeId),
     queryFn: () => listMyAttempts(atividadeId),
     enabled: attemptsEnabled,
   });
@@ -40,9 +39,8 @@ export const useAtividade = () => {
     : 0;
   const bestScore = data ? bestStudentScore(attempts, studentId, data.id) : 0;
   const totalXp = data ? activityXp(data) : 0;
-  const hasBoasted = usedAttempts > 0 && bestScore >= totalXp;
   const hasConcluded =
-    Boolean(data) && (usedAttempts === MAX_TENTATIVAS || hasBoasted);
+    Boolean(data) && isActivityConcluded(usedAttempts, bestScore, totalXp);
 
   useEffect(() => {
     if (data && !hasConcluded) setStayOnQuiz(true);

@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { queryClientKeys } from '@/lib/queryClientKeys';
 import { toast } from '@/components/ui/toast';
-import { ApiError } from '@/services/api';
+import { toastError } from '@/lib/utils';
 import {
   createCourse,
   deleteCourse,
@@ -8,16 +9,7 @@ import {
   updateCourse,
 } from '@/services/cursos';
 import { createAdmin } from '@/services/usuarios';
-import { courseKeys } from '@/lib/queryClientKeys';
 import type { SaveCoursePayloadType } from '@/data/types/services';
-
-const toastError = (error: unknown, fallback: string) => {
-  console.error(error);
-  toast.add({
-    type: 'error',
-    title: error instanceof ApiError ? error.message : fallback,
-  });
-};
 
 export const useCreateCourse = () => {
   const queryClient = useQueryClient();
@@ -25,7 +17,9 @@ export const useCreateCourse = () => {
   return useMutation({
     mutationFn: createCourse,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: courseKeys.all });
+      void queryClient.invalidateQueries({
+        queryKey: queryClientKeys.courseKeys.all,
+      });
       toast.add({
         type: 'success',
         title: 'Curso adicionado',
@@ -49,7 +43,9 @@ export const useUpdateCourse = () => {
       payload: SaveCoursePayloadType;
     }) => updateCourse(id, payload),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: courseKeys.all });
+      void queryClient.invalidateQueries({
+        queryKey: queryClientKeys.courseKeys.all,
+      });
       toast.add({
         type: 'success',
         title: 'Curso atualizado',
@@ -67,7 +63,9 @@ export const useDeleteCourse = () => {
   return useMutation({
     mutationFn: deleteCourse,
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: courseKeys.all });
+      void queryClient.invalidateQueries({
+        queryKey: queryClientKeys.courseKeys.all,
+      });
       toast.add({
         type: 'success',
         title: 'Curso excluído',
@@ -100,7 +98,9 @@ export const useEnrollCourse = () => {
     mutationFn: ({ id, codigoAcesso }: { id: string; codigoAcesso: string }) =>
       enrollCourse(id, { codigoAcesso }),
     onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: courseKeys.all });
+      void queryClient.invalidateQueries({
+        queryKey: queryClientKeys.courseKeys.all,
+      });
       toast.add({
         type: 'success',
         title: 'Você entrou na turma',

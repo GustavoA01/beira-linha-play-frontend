@@ -1,16 +1,8 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { queryClientKeys } from '@/lib/queryClientKeys';
 import { toast } from '@/components/ui/toast';
-import { ApiError } from '@/services/api';
+import { toastError } from '@/lib/utils';
 import { deleteActivity } from '@/services/atividades';
-import { activityKeys, courseKeys, moduleKeys } from '@/lib/queryClientKeys';
-
-const toastError = (error: unknown, fallback: string) => {
-  console.error(error);
-  toast.add({
-    type: 'error',
-    title: error instanceof ApiError ? error.message : fallback,
-  });
-};
 
 export const useDeleteActivity = (moduleId: string) => {
   const queryClient = useQueryClient();
@@ -19,11 +11,17 @@ export const useDeleteActivity = (moduleId: string) => {
     mutationFn: deleteActivity,
     onSuccess: () => {
       void queryClient.invalidateQueries({
-        queryKey: moduleKeys.detail(moduleId),
+        queryKey: queryClientKeys.moduleKeys.detail(moduleId),
       });
-      void queryClient.invalidateQueries({ queryKey: moduleKeys.all });
-      void queryClient.invalidateQueries({ queryKey: activityKeys.all });
-      void queryClient.invalidateQueries({ queryKey: courseKeys.all });
+      void queryClient.invalidateQueries({
+        queryKey: queryClientKeys.moduleKeys.all,
+      });
+      void queryClient.invalidateQueries({
+        queryKey: queryClientKeys.activityKeys.all,
+      });
+      void queryClient.invalidateQueries({
+        queryKey: queryClientKeys.courseKeys.all,
+      });
       toast.add({
         type: 'success',
         title: 'Atividade excluída',

@@ -1,4 +1,11 @@
-import type { AtividadeType, CursoType, ModuloType } from '@/data/types/api';
+import { MAX_TENTATIVAS } from '@/data/constants';
+import type {
+  AtividadeType,
+  CursoType,
+  ModuloType,
+  TentativaType,
+} from '@/data/types/api';
+import { bestStudentScore, countStudentAttempts } from '@/data/tentativas';
 
 type WithFlattenedXp = { xpTotal?: number };
 
@@ -8,6 +15,29 @@ export const activityXp = (item: AtividadeType & WithFlattenedXp) => {
     0
   );
   return fromQuestions || item.xpTotal || 0;
+};
+
+export const isActivityConcluded = (
+  usedAttempts: number,
+  bestScore: number,
+  xpTotal: number
+) =>
+  usedAttempts === MAX_TENTATIVAS || (usedAttempts > 0 && bestScore >= xpTotal);
+
+export const isModuleConcluded = (
+  modulo: ModuloType,
+  tentativas: TentativaType[],
+  alunoId: string
+) => {
+  if (modulo.atividades.length === 0) return false;
+
+  return modulo.atividades.every((atividade) =>
+    isActivityConcluded(
+      countStudentAttempts(tentativas, alunoId, atividade.id),
+      bestStudentScore(tentativas, alunoId, atividade.id),
+      activityXp(atividade)
+    )
+  );
 };
 
 export const moduleXp = (modulo: ModuloType & WithFlattenedXp) => {

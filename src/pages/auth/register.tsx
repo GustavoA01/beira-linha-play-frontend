@@ -37,7 +37,7 @@ export const RegisterPage = () => {
         <LabelInput
           id="nome"
           autoFocus
-          label="Nome"
+          label="Nome completo"
           autoComplete="name"
           placeholder="Ex.: João da Silva"
           error={errors.nome?.message}

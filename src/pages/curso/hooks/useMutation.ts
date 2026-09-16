@@ -1,21 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { queryClientKeys } from '@/lib/queryClientKeys';
 import { toast } from '@/components/ui/toast';
-import { ApiError } from '@/services/api';
+import { toastError } from '@/lib/utils';
 import { createModule, deleteModule, updateModule } from '@/services/modulos';
-import { courseKeys, moduleKeys } from '@/lib/queryClientKeys';
 import type {
   CourseResponseType,
   ModuleResponseType,
   SaveModulePayloadType,
 } from '@/data/types/services';
-
-const toastError = (error: unknown, fallback: string) => {
-  console.error(error);
-  toast.add({
-    type: 'error',
-    title: error instanceof ApiError ? error.message : fallback,
-  });
-};
 
 const addCreatedModuleToCourse = (
   queryClient: ReturnType<typeof useQueryClient>,
@@ -23,7 +15,7 @@ const addCreatedModuleToCourse = (
   created: ModuleResponseType
 ) => {
   queryClient.setQueryData<CourseResponseType>(
-    courseKeys.detail(courseId),
+    queryClientKeys.courseKeys.detail(courseId),
     (current) => {
       if (!current) return current;
 
@@ -45,16 +37,25 @@ const addCreatedModuleToCourse = (
       };
     }
   );
-  queryClient.setQueryData(moduleKeys.detail(created.id), created);
+  queryClient.setQueryData(
+    queryClientKeys.moduleKeys.detail(created.id),
+    created
+  );
 };
 
 const invalidateModuleQueries = (
   queryClient: ReturnType<typeof useQueryClient>,
   courseId: string
 ) => {
-  void queryClient.invalidateQueries({ queryKey: courseKeys.detail(courseId) });
-  void queryClient.invalidateQueries({ queryKey: courseKeys.all });
-  void queryClient.invalidateQueries({ queryKey: moduleKeys.all });
+  void queryClient.invalidateQueries({
+    queryKey: queryClientKeys.courseKeys.detail(courseId),
+  });
+  void queryClient.invalidateQueries({
+    queryKey: queryClientKeys.courseKeys.all,
+  });
+  void queryClient.invalidateQueries({
+    queryKey: queryClientKeys.moduleKeys.all,
+  });
 };
 
 export const useCreateModule = (courseId: string) => {
@@ -66,7 +67,7 @@ export const useCreateModule = (courseId: string) => {
     onSuccess: (created) => {
       addCreatedModuleToCourse(queryClient, courseId, created);
       void queryClient.invalidateQueries({
-        queryKey: courseKeys.all,
+        queryKey: queryClientKeys.courseKeys.all,
         exact: true,
       });
       toast.add({

@@ -19,13 +19,13 @@ export const ConfirmCourseCodeInput = ({
     <Label htmlFor="codigo-curso">Código do curso</Label>
     <Input
       id="codigo-curso"
+      autoFocus
       value={value}
-      onChange={(event) => onChange(event.target.value)}
+      autoComplete="off"
+      disabled={disabled}
       placeholder="Digite o código do curso"
       className="mt-1.5 placeholder:max-sm:text-sm"
-      autoComplete="off"
-      autoFocus
-      disabled={disabled}
+      onChange={(event) => onChange(event.target.value)}
     />
     {error && <ErrorFormMessage message={error} />}
   </div>
