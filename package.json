@@ -14,7 +14,6 @@
   "dependencies": {
     "@base-ui/react": "^1.7.0",
     "@custom-react-hooks/use-media-query": "^1.5.1",
-    "@google/genai": "^1.28.0",
     "@hookform/resolvers": "^5.2.2",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-avatar": "^1.1.10",
@@ -60,6 +59,7 @@
     "@types/react": "^19.1.16",
     "@types/react-dom": "^19.1.9",
     "@vitejs/plugin-react": "^5.0.4",
+    "baseline-browser-mapping": "^2.11.24",
     "eslint": "^9.36.0",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.22",

@@ -105,6 +105,15 @@ export type SaveActivityPayloadType = {
   }[];
 };
 
+export type GenerateQuestionsPayloadType = {
+  mensagem: string;
+  quantidadeQuestoes?: number;
+};
+
+export type GenerateQuestionsResponseType = {
+  questoes: SaveActivityPayloadType['questoes'];
+};
+
 export type AttemptResultResponseType = {
   tentativa: TentativaType;
   tentativasUsadas: number;

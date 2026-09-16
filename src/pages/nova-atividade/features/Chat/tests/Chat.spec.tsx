@@ -1,8 +1,10 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FormProvider, useForm } from 'react-hook-form';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { Chat } from '../container/Chat';
-import { generateContent } from '@/services/googleConfig';
+import { ApiError } from '@/services/api';
+import { generateQuestions } from '@/services/ia';
 import type { QuestionFormType } from '@/data/schemas/activity';
 import type { ReactNode } from 'react';
 import {
@@ -26,12 +28,12 @@ jest.mock('@/components/ui/drawer', () => ({
   DrawerClose: ({ children }: { children: ReactNode }) => children,
 }));
 
-jest.mock('@/services/googleConfig', () => ({
-  generateContent: jest.fn(),
+jest.mock('@/services/ia', () => ({
+  generateQuestions: jest.fn(),
 }));
 
-const mockedGenerateContent = generateContent as jest.MockedFunction<
-  typeof generateContent
+const mockedGenerateQuestions = generateQuestions as jest.MockedFunction<
+  typeof generateQuestions
 >;
 
 const emptyQuestion = (): QuestionFormType['questions'][number] => ({
@@ -45,18 +47,18 @@ const emptyQuestion = (): QuestionFormType['questions'][number] => ({
   ],
 });
 
-const generatedJson = JSON.stringify({
-  questions: [
-    {
-      statement: 'O que é uma lista?',
-      xp: 1,
-      alternatives: [
-        { text: 'Uma coleção', isCorrect: true },
-        { text: 'Um número', isCorrect: false },
-      ],
-    },
-  ],
-});
+const generatedQuestions: QuestionFormType['questions'] = [
+  {
+    statement: 'O que é uma lista?',
+    xp: 1,
+    alternatives: [
+      { text: 'Uma coleção', isCorrect: true },
+      { text: 'Um número', isCorrect: false },
+      { text: 'ignore', isCorrect: false },
+      { text: 'ignore', isCorrect: false },
+    ],
+  },
+];
 
 const ChatHarness = ({
   questions = [emptyQuestion(), emptyQuestion()],
@@ -76,6 +78,20 @@ const ChatHarness = ({
   );
 };
 
+const renderChat = (ui: ReactNode = <ChatHarness />) =>
+  render(
+    <MemoryRouter
+      initialEntries={['/cursos/curso-1/modulos/modulo-1/nova-atividade']}
+    >
+      <Routes>
+        <Route
+          path="/cursos/:cursoId/modulos/:moduloId/nova-atividade"
+          element={ui}
+        />
+      </Routes>
+    </MemoryRouter>
+  );
+
 const typeAndSend = async (text: string) => {
   const user = userEvent.setup();
   await user.type(
@@ -93,7 +109,7 @@ const typeAndSend = async (text: string) => {
 
 describe('Chat', () => {
   beforeEach(() => {
-    mockedGenerateContent.mockReset();
+    mockedGenerateQuestions.mockReset();
     localStorage.clear();
     jest.spyOn(console, 'error').mockImplementation(() => {});
   });
@@ -109,13 +125,13 @@ describe('Chat', () => {
       messages: [{ role: 'user', content: 'Crie perguntas sobre listas' }],
     });
 
-    render(<ChatHarness />);
+    renderChat();
 
     expect(screen.getByText('Crie perguntas sobre listas')).toBeInTheDocument();
   });
 
   it('shows the empty state', () => {
-    render(<ChatHarness />);
+    renderChat();
 
     expect(
       screen.getByText('Peça perguntas para o gerador de atividades')
@@ -124,13 +140,13 @@ describe('Chat', () => {
   });
 
   it('sends a prompt and shows the generated question', async () => {
-    mockedGenerateContent.mockResolvedValue(generatedJson);
+    mockedGenerateQuestions.mockResolvedValue(generatedQuestions);
     setNewActivityStorage({
       activityName: 'Listas',
       qtdQuestions: 2,
       messages: [],
     });
-    render(<ChatHarness />);
+    renderChat();
 
     await typeAndSend('Crie 1 pergunta sobre listas');
 
@@ -139,6 +155,10 @@ describe('Chat', () => {
     ).toBeInTheDocument();
     expect(await screen.findByText(/O que é uma lista/)).toBeInTheDocument();
     expect(screen.getByTitle('Limpar conversa')).toBeInTheDocument();
+    expect(mockedGenerateQuestions).toHaveBeenCalledWith('modulo-1', {
+      mensagem: 'Crie 1 pergunta sobre listas',
+      quantidadeQuestoes: 2,
+    });
 
     const stored = JSON.parse(
       localStorage.getItem(NEW_ACTIVITY_STORAGE_KEY) ?? '{}'
@@ -154,8 +174,8 @@ describe('Chat', () => {
   });
 
   it('applies a generated question to the activity form', async () => {
-    mockedGenerateContent.mockResolvedValue(generatedJson);
-    render(<ChatHarness />);
+    mockedGenerateQuestions.mockResolvedValue(generatedQuestions);
+    renderChat();
 
     await typeAndSend('Crie 1 pergunta sobre listas');
     await userEvent
@@ -168,8 +188,8 @@ describe('Chat', () => {
   });
 
   it('clears the conversation', async () => {
-    mockedGenerateContent.mockResolvedValue(generatedJson);
-    render(<ChatHarness />);
+    mockedGenerateQuestions.mockResolvedValue(generatedQuestions);
+    renderChat();
 
     const user = await typeAndSend('Crie 1 pergunta sobre listas');
     await screen.findByText(/O que é uma lista/);
@@ -182,8 +202,8 @@ describe('Chat', () => {
   });
 
   it('keeps the user message when generation fails', async () => {
-    mockedGenerateContent.mockRejectedValue(new Error('falha'));
-    render(<ChatHarness />);
+    mockedGenerateQuestions.mockRejectedValue(new Error('falha'));
+    renderChat();
 
     await typeAndSend('Crie 1 pergunta sobre listas');
 
@@ -197,8 +217,10 @@ describe('Chat', () => {
   });
 
   it('shows the fallback when the reply is not valid questions', async () => {
-    mockedGenerateContent.mockResolvedValue('isso não é json');
-    render(<ChatHarness />);
+    mockedGenerateQuestions.mockRejectedValue(
+      new ApiError('Não foi possível organizar as perguntas', 422)
+    );
+    renderChat();
 
     await typeAndSend('Crie 1 pergunta sobre listas');
 

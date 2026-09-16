@@ -4,19 +4,23 @@ import {
   setNewActivityChatMessages,
   type NewActivityChatMessageType,
 } from '@/data/newActivityStorage';
-import { generateContent } from '@/services/googleConfig';
+import { ApiError } from '@/services/api';
+import { generateQuestions } from '@/services/ia';
 import { useEffect, useState, type KeyboardEvent } from 'react';
 import { useForm, useFormContext } from 'react-hook-form';
-import { CHAT_SYSTEM_INSTRUCTION } from '../utils/constants';
+import { useParams } from 'react-router-dom';
 import { formatQuestionsMessage } from '../utils/formatQuestionsMessage';
-import { parseGeneratedQuestions } from '../utils/parseGeneratedQuestions';
 
 export type ChatMessageType = NewActivityChatMessageType;
+
+const FALLBACK_MESSAGE =
+  'Não consegui organizar as perguntas no formato da atividade. Tente de novo, por exemplo: “crie 3 perguntas sobre listas”.';
 
 const appliedKey = (messageIndex: number, questionIndex: number) =>
   `${messageIndex}-${questionIndex}`;
 
 export const useChat = () => {
+  const { moduloId = '' } = useParams();
   const {
     register,
     handleSubmit,
@@ -56,23 +60,32 @@ export const useChat = () => {
 
     try {
       const qtdQuestions = getValues('questions')?.length;
-      const prompt =
-        qtdQuestions > 0
-          ? `${userMessage}\n\n(A atividade atual tem ${qtdQuestions} pergunta(s). Se o usuário não pedir outra quantidade, gere exatamente ${qtdQuestions}.)`
-          : userMessage;
-
-      const response = await generateContent(prompt, CHAT_SYSTEM_INSTRUCTION);
-      const questions = parseGeneratedQuestions(response || '');
-      const content = questions
+      const questions = await generateQuestions(moduloId, {
+        mensagem: userMessage,
+        ...(qtdQuestions > 0 ? { quantidadeQuestoes: qtdQuestions } : {}),
+      });
+      const content = questions.length
         ? formatQuestionsMessage(questions)
-        : 'Não consegui organizar as perguntas no formato da atividade. Tente de novo, por exemplo: “crie 3 perguntas sobre listas”.';
+        : FALLBACK_MESSAGE;
 
       setMessages((prev) => [
         ...prev,
         { role: 'user', content: userMessage },
-        { role: 'assistant', content, questions: questions ?? undefined },
+        {
+          role: 'assistant',
+          content,
+          questions: questions.length ? questions : undefined,
+        },
       ]);
     } catch (error) {
+      if (error instanceof ApiError && error.status === 422) {
+        setMessages((prev) => [
+          ...prev,
+          { role: 'user', content: userMessage },
+          { role: 'assistant', content: FALLBACK_MESSAGE },
+        ]);
+        return;
+      }
       console.error('Erro ao gerar conteúdo', error);
       setMessages((prev) => [...prev, { role: 'user', content: userMessage }]);
     } finally {

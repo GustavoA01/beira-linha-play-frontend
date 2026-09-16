@@ -15,6 +15,8 @@ export const endpoints = {
   modules: {
     byId: (id: string) => `/api/modulos/${id}`,
     activities: (moduleId: string) => `/api/modulos/${moduleId}/atividades`,
+    generateQuestions: (moduleId: string) =>
+      `/api/modulos/${moduleId}/gerar-questoes`,
   },
   activities: {
     byId: (id: string) => `/api/atividades/${id}`,

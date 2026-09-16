@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { FormProvider, useForm } from 'react-hook-form';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { ChatDrawer } from '../container/ChatDrawer';
 import type { QuestionFormType } from '@/data/schemas/activity';
 
@@ -11,10 +12,6 @@ jest.mock('react-markdown', () => ({
 
 jest.mock('@/hooks/useMediaDevice', () => ({
   useMediaDevice: () => ({ isDesktop: true, containerClassName: '' }),
-}));
-
-jest.mock('@/services/googleConfig', () => ({
-  generateContent: jest.fn(),
 }));
 
 const DrawerHarness = () => {
@@ -32,7 +29,18 @@ const DrawerHarness = () => {
 describe('ChatDrawer', () => {
   it('opens the chat from the trigger', async () => {
     const user = userEvent.setup();
-    render(<DrawerHarness />);
+    render(
+      <MemoryRouter
+        initialEntries={['/cursos/curso-1/modulos/modulo-1/nova-atividade']}
+      >
+        <Routes>
+          <Route
+            path="/cursos/:cursoId/modulos/:moduloId/nova-atividade"
+            element={<DrawerHarness />}
+          />
+        </Routes>
+      </MemoryRouter>
+    );
 
     expect(screen.queryByText('Gerador de atividades')).not.toBeInTheDocument();
 
