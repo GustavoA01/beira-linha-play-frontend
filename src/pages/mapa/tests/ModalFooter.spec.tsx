@@ -48,4 +48,18 @@ describe('ModalFooter', () => {
 
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
+
+  it('explains the unlock requirement without student copy', () => {
+    renderFooter(
+      <ModalFooter concluded={false} showProgress={false} minPoints={10} />
+    );
+
+    expect(
+      screen.getByText('Os alunos liberam esta fase ao alcançar 10 pontos.')
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Voltar' })).toBeInTheDocument();
+    expect(
+      screen.queryByText('Parabéns! Você concluiu a fase com sucesso!')
+    ).not.toBeInTheDocument();
+  });
 });

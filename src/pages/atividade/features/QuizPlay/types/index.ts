@@ -10,7 +10,7 @@ export type QuizPhaseType = 'answering' | 'feedback' | 'summary';
 export type QuizFooterPropsType = {
   phase: QuizPhaseType;
   canCheck: boolean;
-  selectedIsCorrect: boolean;
+  selectedIsCorrect: boolean | null;
   revealCorrect: boolean;
   correctDescription?: string;
   earnedXp: number;

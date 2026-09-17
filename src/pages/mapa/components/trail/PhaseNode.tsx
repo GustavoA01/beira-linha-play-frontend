@@ -11,7 +11,7 @@ export const PhaseNode = ({ id, data: { minPoints } }: PhaseNodeProps) => {
     Icon,
     openDialog,
     setOpenDialog,
-    isInteractive,
+    showProgress,
     points,
     glowColors,
     glowShadows,
@@ -31,12 +31,8 @@ export const PhaseNode = ({ id, data: { minPoints } }: PhaseNodeProps) => {
   return (
     <>
       <div
-        onClick={isInteractive ? () => setOpenDialog(true) : undefined}
-        className={cn(
-          'relative w-20 h-20 rounded-full select-none',
-          isInteractive &&
-            'transition-all ease-in hover:scale-105 cursor-pointer'
-        )}
+        onClick={() => setOpenDialog(true)}
+        className="relative w-20 h-20 rounded-full select-none transition-all ease-in hover:scale-105 cursor-pointer"
       >
         <motion.div
           aria-hidden
@@ -77,11 +73,14 @@ export const PhaseNode = ({ id, data: { minPoints } }: PhaseNodeProps) => {
         />
       </div>
 
-      {isInteractive && (
-        <Dialog open={openDialog} onOpenChange={setOpenDialog}>
-          <PhaseProgressModal id={id} points={points} minPoints={minPoints} />
-        </Dialog>
-      )}
+      <Dialog open={openDialog} onOpenChange={setOpenDialog}>
+        <PhaseProgressModal
+          id={id}
+          points={points}
+          minPoints={minPoints}
+          showProgress={showProgress}
+        />
+      </Dialog>
     </>
   );
 };

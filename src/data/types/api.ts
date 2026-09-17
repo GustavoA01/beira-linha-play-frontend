@@ -63,7 +63,8 @@ export interface QuestaoType {
 export interface AlternativaType {
   id: string;
   descricao: string;
-  correta: boolean;
+  /** `null` quando a API omite o gabarito para o aluno. */
+  correta: boolean | null;
 }
 
 export interface TentativaType {

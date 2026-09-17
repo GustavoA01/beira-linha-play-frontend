@@ -7,7 +7,7 @@ alwaysApply: true
 
 `Home` é a rota `index` (`/`), filha do `HeaderLayout`. Não existe `/home`. Ela redireciona o **monitor** e o **admin** para `/cursos` e mostra o **mapa** para o **aluno**. Provider de usuário envolve o app (`App.tsx`), não o array do router.
 
-O mapa do **monitor** e do **admin** fica em `/mapa` (nav “Mapa”). Os dois vêem o ranking dos alunos, sem pontos e sem clicar nas fases. O aluno continua no mapa em `/`.
+O mapa do **monitor** e do **admin** fica em `/mapa` (nav “Mapa”). Os dois vêem o ranking dos alunos e podem abrir a fase para ver o nível e o XP mínimo, sem barra de progresso. O aluno continua no mapa em `/`, com o próprio progresso.
 
 Rotas privadas são filhas de `RequireAuth` (`src/components/layouts`). Sem `user`, redireciona para `/login`. `/login` e `/cadastro` ficam fora da guarda.
 
@@ -30,3 +30,7 @@ Nomes do diagrama em `api.ts` (`CursoType`, `ModuloType`, `AtividadeType`). `pos
 `cursoIds` fica em `UsuarioType`: no aluno é inscrição, no monitor é o que ele ministra. Um curso tem `monitorIds`. Os nomes dos monitores só entram na UI do card em `/cursos`. `codigoAcesso` fica no `CursoType` e só o monitor vê.
 
 O **admin** (`AdminType`, `tipo: 'ADMIN'`) cria, edita e exclui curso. Criar fica na lista `/cursos`; editar e excluir ficam no header do detalhe `/cursos/:cursoId`. Também cria outro admin na lista `/cursos`, ao lado de adicionar curso. Admin não tem `cursoIds`, e-mail nem apelido — só `nome` e `senha`.
+
+##Regras
+
+Após terminar de implementar algo, não precisa abrir o navegador na IDE para verificar ppor lá se ta certo, somente se for algo muito específico que precise disso.

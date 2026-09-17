@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import type { AtividadeType } from '@/data/types/api';
 import { activityXp } from '@/data/atividades';
 import { useAuthUser } from '@/providers/UserProvider';
@@ -9,20 +9,28 @@ import { useSubmitAttempt } from '../../../hooks/useMutation';
 export type QuizAnswerType = {
   questaoId: string;
   alternativaId: string;
-  correta: boolean;
+  correta: boolean | null;
   valor: number;
 };
+
+const questionHasGabarito = (
+  question: AtividadeType['questoes'][number] | undefined
+) => Boolean(question?.alternativas.some((item) => item.correta === true));
 
 export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
   const auth = useAuthUser();
   const { mutateAsync: sendAttempt, isPending: isSubmitting } =
     useSubmitAttempt(activity.id);
+  const persistedAttempt = useRef(false);
 
   const [attemptsUsed, setAttemptsUsed] = useState(usedAttempts);
   const [phase, setPhase] = useState<QuizPhaseType>('answering');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [answers, setAnswers] = useState<QuizAnswerType[]>([]);
+  const [selectedIsCorrect, setSelectedIsCorrect] = useState<boolean | null>(
+    null
+  );
   const [revealCorrect, setRevealCorrect] = useState(usedAttempts >= 1);
   const [attemptNumber, setAttemptNumber] = useState(usedAttempts + 1);
 
@@ -31,6 +39,7 @@ export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
   const totalQuestions = questions.length;
   const isLastQuestion = currentIndex === totalQuestions - 1;
   const totalXp = activityXp(activity);
+  const hasGabarito = questionHasGabarito(currentQuestion);
 
   const score = useMemo(
     () =>
@@ -41,13 +50,9 @@ export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
     [answers]
   );
 
-  const selectedAlternative = currentQuestion?.alternativas.find(
-    (item) => item.id === selectedId
-  );
   const correctAlternative = currentQuestion?.alternativas.find(
-    (item) => item.correta
+    (item) => item.correta === true
   );
-  const selectedIsCorrect = Boolean(selectedAlternative?.correta);
 
   const progressPercent =
     phase === 'summary'
@@ -59,33 +64,40 @@ export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
         );
 
   const persistAttempt = async (finalAnswers: QuizAnswerType[]) => {
-    if (!auth.isAluno) return;
+    if (!auth.isAluno || persistedAttempt.current) {
+      return finalAnswers;
+    }
 
-    const result = await sendAttempt({
-      respostas: finalAnswers.map(({ questaoId, alternativaId }) => ({
-        questaoId,
-        alternativaId,
-      })),
-    });
+    persistedAttempt.current = true;
+    try {
+      const result = await sendAttempt({
+        respostas: finalAnswers.map(({ questaoId, alternativaId }) => ({
+          questaoId,
+          alternativaId,
+        })),
+      });
 
-    setAttemptsUsed(result.tentativasUsadas);
-    auth.setUser({ ...auth.user, pontos: result.pontosTotais });
+      setAttemptsUsed(result.tentativasUsadas);
+      auth.setUser({ ...auth.user, pontos: result.pontosTotais });
 
-    const corretoPorQuestao = new Map(
-      (result.tentativa.respostas ?? []).map((item) => [
-        item.questaoId,
-        item.correta,
-      ])
-    );
+      const corretoPorQuestao = new Map(
+        (result.tentativa.respostas ?? []).map((item) => [
+          item.questaoId,
+          item.correta,
+        ])
+      );
 
-    if (corretoPorQuestao.size === 0) return;
-
-    setAnswers((prev) =>
-      prev.map((answer) => ({
+      const scoredAnswers = finalAnswers.map((answer) => ({
         ...answer,
         correta: corretoPorQuestao.get(answer.questaoId) ?? answer.correta,
-      }))
-    );
+      }));
+
+      setAnswers(scoredAnswers);
+      return scoredAnswers;
+    } catch (error) {
+      persistedAttempt.current = false;
+      throw error;
+    }
   };
 
   const selectAlternative = (id: string) => {
@@ -93,7 +105,7 @@ export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
     setSelectedId(id);
   };
 
-  const checkAnswer = () => {
+  const checkAnswer = async () => {
     if (phase !== 'answering' || !selectedId || !currentQuestion) return;
 
     const alternative = currentQuestion.alternativas.find(
@@ -102,30 +114,81 @@ export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
 
     if (!alternative) return;
 
-    setAnswers((prev) => [
-      ...prev,
+    const localCorrect = hasGabarito ? Boolean(alternative.correta) : null;
+    let nextAnswers: QuizAnswerType[] = [
+      ...answers,
       {
         questaoId: currentQuestion.id,
         alternativaId: alternative.id,
-        correta: alternative.correta,
+        correta: localCorrect,
         valor: currentQuestion.valor,
       },
-    ]);
+    ];
+
+    setAnswers(nextAnswers);
+
+    if (isLastQuestion && !hasGabarito) {
+      try {
+        nextAnswers = await persistAttempt(nextAnswers);
+      } catch {
+        return;
+      }
+      const last = nextAnswers.find(
+        (item) => item.questaoId === currentQuestion.id
+      );
+      setSelectedIsCorrect(last?.correta ?? null);
+      setPhase('feedback');
+      return;
+    }
+
+    setSelectedIsCorrect(localCorrect);
     setPhase('feedback');
+
+    if (!isLastQuestion || !hasGabarito) return;
+
+    try {
+      await persistAttempt(nextAnswers);
+    } catch {
+      return;
+    }
   };
 
   const goNext = async () => {
     if (phase !== 'feedback' || isSubmitting) return;
 
     if (isLastQuestion) {
-      await persistAttempt(answers);
+      if (!persistedAttempt.current) {
+        try {
+          await persistAttempt(answers);
+        } catch {
+          return;
+        }
+      }
       setPhase('summary');
       return;
     }
 
     setCurrentIndex((index) => index + 1);
     setSelectedId(null);
+    setSelectedIsCorrect(null);
     setPhase('answering');
+  };
+
+  const leaveQuiz = async () => {
+    if (persistedAttempt.current || answers.length === 0) return true;
+
+    if (answers.length === totalQuestions) {
+      try {
+        await persistAttempt(answers);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    return window.confirm(
+      'Se sair agora, as respostas desta tentativa serão perdidas. Deseja sair?'
+    );
   };
 
   const canRetry =
@@ -137,11 +200,13 @@ export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
 
     if (retryLimit || hasBoasted) return;
 
+    persistedAttempt.current = false;
     setRevealCorrect(attemptsUsed >= 1);
     setAttemptNumber(attemptsUsed + 1);
     setPhase('answering');
     setCurrentIndex(0);
     setSelectedId(null);
+    setSelectedIsCorrect(null);
     setAnswers([]);
   };
 
@@ -165,6 +230,7 @@ export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
     selectAlternative,
     checkAnswer,
     goNext,
+    leaveQuiz,
     retry,
   };
 };

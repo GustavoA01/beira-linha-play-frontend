@@ -5,13 +5,19 @@ import type {
   ModuloType,
   TentativaType,
 } from '@/data/types/api';
-import { bestStudentScore, countStudentAttempts } from '@/data/tentativas';
+import {
+  bestStudentScore,
+  countStudentAttempts,
+  studentAttemptsOnActivity,
+} from '@/data/tentativas';
 
 type WithFlattenedXp = {
   xpTotal?: number;
   xp?: number;
   valorTotal?: number;
 };
+
+type AttemptLike = Pick<TentativaType, 'pontuacaoObtida' | 'respostas'>;
 
 export const activityXp = (item: AtividadeType & WithFlattenedXp) => {
   const fromQuestions = (item.questoes ?? []).reduce(
@@ -21,12 +27,31 @@ export const activityXp = (item: AtividadeType & WithFlattenedXp) => {
   return fromQuestions || item.xpTotal || item.xp || item.valorTotal || 0;
 };
 
+const attemptHasAnswers = (attempt: AttemptLike) =>
+  (attempt.respostas?.length ?? 0) > 0;
+
+const attemptIsPerfect = (attempt: AttemptLike, xpTotal: number) => {
+  if (attemptHasAnswers(attempt)) {
+    return attempt.respostas!.every((resposta) => resposta.correta);
+  }
+  return xpTotal > 0 && attempt.pontuacaoObtida >= xpTotal;
+};
+
 export const isActivityConcluded = (
   usedAttempts: number,
   bestScore: number,
-  xpTotal: number
-) =>
-  usedAttempts === MAX_TENTATIVAS || (usedAttempts > 0 && bestScore >= xpTotal);
+  xpTotal: number,
+  attempts: AttemptLike[] = []
+) => {
+  if (usedAttempts >= MAX_TENTATIVAS) return true;
+  if (usedAttempts <= 0) return false;
+
+  if (attempts.some(attemptHasAnswers)) {
+    return attempts.some((attempt) => attemptIsPerfect(attempt, xpTotal));
+  }
+
+  return xpTotal > 0 && bestScore >= xpTotal;
+};
 
 export const isModuleConcluded = (
   modulo: ModuloType,
@@ -39,7 +64,8 @@ export const isModuleConcluded = (
     isActivityConcluded(
       countStudentAttempts(tentativas, alunoId, atividade.id),
       bestStudentScore(tentativas, alunoId, atividade.id),
-      activityXp(atividade)
+      activityXp(atividade),
+      studentAttemptsOnActivity(tentativas, alunoId, atividade.id)
     )
   );
 };

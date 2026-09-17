@@ -1,4 +1,4 @@
-import { activityXp, moduleXp } from '../atividades';
+import { activityXp, isActivityConcluded, moduleXp } from '../atividades';
 import type { AtividadeType, ModuloType } from '@/data/types/api';
 
 describe('activityXp', () => {
@@ -48,6 +48,55 @@ describe('activityXp', () => {
     expect(activityXp(activity({ xpTotal: 8 }))).toBe(8);
     expect(activityXp(activity({ xp: 6 }))).toBe(6);
     expect(activityXp(activity({ valorTotal: 4 }))).toBe(4);
+  });
+});
+
+describe('isActivityConcluded', () => {
+  it('stays pending after one incomplete attempt', () => {
+    expect(
+      isActivityConcluded(1, 0, 2, [
+        {
+          pontuacaoObtida: 0,
+          respostas: [
+            { id: 'r1', questaoId: 'q1', alternativaId: 'a1', correta: false },
+          ],
+        },
+      ])
+    ).toBe(false);
+  });
+
+  it('stays pending when the score matches xp but answers are wrong', () => {
+    expect(
+      isActivityConcluded(1, 2, 2, [
+        {
+          pontuacaoObtida: 2,
+          respostas: [
+            { id: 'r1', questaoId: 'q1', alternativaId: 'a1', correta: false },
+          ],
+        },
+      ])
+    ).toBe(false);
+  });
+
+  it('concludes when the student aces on the first attempt', () => {
+    expect(
+      isActivityConcluded(1, 2, 2, [
+        {
+          pontuacaoObtida: 2,
+          respostas: [
+            { id: 'r1', questaoId: 'q1', alternativaId: 'a2', correta: true },
+          ],
+        },
+      ])
+    ).toBe(true);
+  });
+
+  it('concludes after using both attempts', () => {
+    expect(isActivityConcluded(2, 0, 2)).toBe(true);
+  });
+
+  it('does not treat a zero-xp activity as aced', () => {
+    expect(isActivityConcluded(1, 0, 0)).toBe(false);
   });
 });
 

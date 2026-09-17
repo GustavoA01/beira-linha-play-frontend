@@ -11,7 +11,7 @@ const toQuestions = (
     ...questao,
     alternativas: (questao.alternativas ?? []).map((alternativa) => ({
       ...alternativa,
-      correta: alternativa.correta ?? false,
+      correta: alternativa.correta ?? null,
     })),
   }));
 

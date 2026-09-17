@@ -4,15 +4,25 @@ import { useNavigate } from 'react-router-dom';
 
 type GoBackProps = {
   to?: string;
+  onLeave?: () => boolean | Promise<boolean>;
 };
 
-export const GoBack = ({ to }: GoBackProps) => {
+export const GoBack = ({ to, onLeave }: GoBackProps) => {
   const { isDesktop } = useMediaDevice();
   const navigate = useNavigate();
 
+  const handleClick = async () => {
+    if (onLeave && (await onLeave()) === false) return;
+    if (to) navigate(to, { replace: true });
+    else navigate(-1);
+  };
+
   return (
     <button
-      onClick={() => (to ? navigate(to, { replace: true }) : navigate(-1))}
+      type="button"
+      onClick={() => {
+        void handleClick();
+      }}
       className="flex gap-2 items-center select-none font-semibold hover:text-blue-100 max-sm:text-sm cursor-pointer"
     >
       <ChevronLeft size={!isDesktop ? 20 : 24} />

@@ -3,7 +3,11 @@ import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { queryClientKeys } from '@/lib/queryClientKeys';
 import { activityXp, isActivityConcluded } from '@/data/atividades';
-import { countStudentAttempts, bestStudentScore } from '@/data/tentativas';
+import {
+  countStudentAttempts,
+  bestStudentScore,
+  studentAttemptsOnActivity,
+} from '@/data/tentativas';
 import { useAuthUser } from '@/providers/UserProvider';
 import { getActivity } from '@/services/atividades';
 import { listMyAttempts } from '@/services/tentativas';
@@ -39,8 +43,14 @@ export const useAtividade = () => {
     : 0;
   const bestScore = data ? bestStudentScore(attempts, studentId, data.id) : 0;
   const totalXp = data ? activityXp(data) : 0;
-  const hasConcluded =
-    Boolean(data) && isActivityConcluded(usedAttempts, bestScore, totalXp);
+  const hasConcluded = data
+    ? isActivityConcluded(
+        usedAttempts,
+        bestScore,
+        totalXp,
+        studentAttemptsOnActivity(attempts, studentId, data.id)
+      )
+    : false;
 
   useEffect(() => {
     if (data && !hasConcluded) setStayOnQuiz(true);

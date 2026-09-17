@@ -38,4 +38,28 @@ describe('PhaseProgressModal', () => {
     expect(screen.getByText('100%')).toBeInTheDocument();
     expect(screen.getByText('Concluído')).toBeInTheDocument();
   });
+
+  it('hides the progress bar for staff and shows the phase requirement', () => {
+    render(
+      <Dialog open>
+        <PhaseProgressModal
+          id="4"
+          points={44}
+          minPoints={10}
+          showProgress={false}
+        />
+      </Dialog>
+    );
+
+    expect(
+      screen.getByRole('heading', { name: 'Nível 4' })
+    ).toBeInTheDocument();
+    expect(screen.getByText('10 xp para liberar')).toBeInTheDocument();
+    expect(
+      screen.getByText('Os alunos liberam esta fase ao alcançar 10 pontos.')
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/Você acumulou/)).not.toBeInTheDocument();
+    expect(screen.queryByText('Em progresso')).not.toBeInTheDocument();
+    expect(screen.queryByText('Concluído')).not.toBeInTheDocument();
+  });
 });

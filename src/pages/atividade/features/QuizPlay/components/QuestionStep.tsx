@@ -25,10 +25,11 @@ export const QuestionStep = ({
 
   const statusFor = (
     alternativeId: string,
-    isCorrect: boolean
+    isCorrect: boolean | null
   ): AlternativeStatusType => {
     const isSameAsSelected = alternativeId === selectedId;
     if (!isFeedback) return isSameAsSelected ? 'selected' : 'unselected';
+    if (isCorrect == null) return isSameAsSelected ? 'selected' : 'unselected';
     if (isSameAsSelected && isCorrect) return 'correct';
     if (isSameAsSelected && !isCorrect) return 'wrong';
     if (revealCorrect && isCorrect) return 'reveal';

@@ -105,12 +105,25 @@ const renderPage = () => {
   );
 };
 
+const activityWithoutGabarito: ActivityResponseType = {
+  ...activity,
+  questoes: [
+    {
+      ...activity.questoes[0],
+      alternativas: activity.questoes[0].alternativas.map((alternativa) => ({
+        ...alternativa,
+        correta: null,
+      })),
+    },
+  ],
+};
+
 describe('ActivityPage', () => {
   beforeEach(() => {
     mockedGetActivity.mockReset();
     mockedListMyAttempts.mockReset();
     mockedSubmitAttempt.mockReset();
-    mockedGetActivity.mockResolvedValue(activity);
+    mockedGetActivity.mockResolvedValue(activityWithoutGabarito);
     mockedListMyAttempts.mockResolvedValue([]);
   });
 
@@ -131,7 +144,7 @@ describe('ActivityPage', () => {
     expect(mockedListMyAttempts).toHaveBeenCalledWith('atividade-1');
   });
 
-  it('submits the attempt and shows the summary', async () => {
+  it('submits the attempt and shows the correct feedback from the API', async () => {
     const user = userEvent.setup();
     mockedListMyAttempts
       .mockResolvedValueOnce([])
@@ -153,13 +166,15 @@ describe('ActivityPage', () => {
 
     await user.click(screen.getByRole('radio', { name: /1/ }));
     await user.click(screen.getByRole('button', { name: 'Enviar resposta' }));
-    await user.click(screen.getByRole('button', { name: 'Ver resultado' }));
 
+    expect(await screen.findByText('Acertou!')).toBeInTheDocument();
     await waitFor(() => {
       expect(mockedSubmitAttempt).toHaveBeenCalledWith('atividade-1', {
         respostas: [{ questaoId: 'q1', alternativaId: 'a2' }],
       });
     });
+
+    await user.click(screen.getByRole('button', { name: 'Ver resultado' }));
     expect(
       await screen.findByRole('heading', { name: 'Gabaritou!' })
     ).toBeInTheDocument();

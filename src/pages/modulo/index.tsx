@@ -4,7 +4,11 @@ import { ActivityCard } from './components/ActivityCard';
 import { NewActivityDialog } from './features/NewActivityDialog/container/NewActivityDialog';
 import { DeleteActivityDialog } from './components/DeleteActivityDialog';
 import { useParams } from 'react-router-dom';
-import { countStudentAttempts, bestStudentScore } from '@/data/tentativas';
+import {
+  countStudentAttempts,
+  bestStudentScore,
+  studentAttemptsOnActivity,
+} from '@/data/tentativas';
 import { useAuthUser } from '@/providers/UserProvider';
 import { cn } from '@/lib/utils';
 import { ResourceNotFound } from '@/components/ResourceNotFound';
@@ -92,6 +96,11 @@ export const ModulePage = () => {
                   atividade.id
                 )}
                 bestScore={bestStudentScore(attempts, user.id, atividade.id)}
+                attempts={studentAttemptsOnActivity(
+                  attempts,
+                  user.id,
+                  atividade.id
+                )}
               />
             ))
           )}

@@ -9,7 +9,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { EditDeleteActions } from '@/components/EditDeleteActions';
 import { Check, CircleDashed, Notebook } from 'lucide-react';
-import type { AtividadeType } from '@/data/types/api';
+import type { AtividadeType, TentativaType } from '@/data/types/api';
 import { activityXp, isActivityConcluded } from '@/data/atividades';
 import { cn } from '@/lib/utils';
 import { MAX_TENTATIVAS } from '@/data/constants';
@@ -18,6 +18,7 @@ type ActivityCardProps = {
   activity: AtividadeType;
   usedAttempts: number;
   bestScore: number;
+  attempts?: TentativaType[];
   isMonitor: boolean;
   onClick: () => void;
   onEdit: () => void;
@@ -28,6 +29,7 @@ export const ActivityCard = ({
   activity,
   usedAttempts,
   bestScore,
+  attempts = [],
   isMonitor,
   onClick,
   onEdit,
@@ -36,7 +38,12 @@ export const ActivityCard = ({
   const xpTotal = activityXp(activity);
   const questionsLabel = `${activity.quantQuestoes} ${activity.quantQuestoes === 1 ? 'PERGUNTA' : 'PERGUNTAS'}`;
   const attemptsLabel = `${usedAttempts}/${MAX_TENTATIVAS} tentativas`;
-  const concluded = isActivityConcluded(usedAttempts, bestScore, xpTotal);
+  const concluded = isActivityConcluded(
+    usedAttempts,
+    bestScore,
+    xpTotal,
+    attempts
+  );
 
   const StudentIcon = concluded ? Check : CircleDashed;
 

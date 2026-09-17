@@ -127,6 +127,24 @@ describe('ModulePage', () => {
     expect(mockedGetCourse).not.toHaveBeenCalled();
   });
 
+  it('keeps the activity pending after one incomplete attempt', async () => {
+    mockedListMyAttempts.mockResolvedValue([
+      attempt({
+        pontuacaoObtida: 5,
+        respostas: [
+          { id: 'r1', questaoId: 'q1', alternativaId: 'a1', correta: false },
+          { id: 'r2', questaoId: 'q2', alternativaId: 'a2', correta: false },
+        ],
+      }),
+    ]);
+
+    renderPage(mockLoggedAluno);
+
+    expect(await screen.findByText('1/2 tentativas')).toBeInTheDocument();
+    expect(document.querySelector('.lucide-check')).not.toBeInTheDocument();
+    expect(document.querySelector('.lucide-circle-dashed')).toBeInTheDocument();
+  });
+
   it('does not fetch attempts for the monitor', async () => {
     renderPage(mockLoggedMonitor);
 

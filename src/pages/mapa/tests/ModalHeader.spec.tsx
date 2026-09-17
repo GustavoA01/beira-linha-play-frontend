@@ -30,4 +30,22 @@ describe('ModalHeader', () => {
     expect(screen.getByText('Concluído')).toBeInTheDocument();
     expect(screen.queryByText('Em progresso')).not.toBeInTheDocument();
   });
+
+  it('shows the unlock requirement without progress for staff', () => {
+    renderHeader(
+      <ModalHeader
+        level="4"
+        concluded={false}
+        showProgress={false}
+        minPoints={10}
+      />
+    );
+
+    expect(
+      screen.getByRole('heading', { name: 'Nível 4' })
+    ).toBeInTheDocument();
+    expect(screen.getByText('10 xp para liberar')).toBeInTheDocument();
+    expect(screen.queryByText('Em progresso')).not.toBeInTheDocument();
+    expect(screen.queryByText('Concluído')).not.toBeInTheDocument();
+  });
 });

@@ -31,6 +31,7 @@ export const QuizPlay = ({ activity, usedAttempts }: QuizPlayPropsType) => {
     selectAlternative,
     checkAnswer,
     goNext,
+    leaveQuiz,
     retry,
   } = useQuizPlay(activity, usedAttempts);
 
@@ -40,6 +41,7 @@ export const QuizPlay = ({ activity, usedAttempts }: QuizPlayPropsType) => {
         title={activity.titulo}
         progressPercent={progressPercent}
         attemptNumber={attemptNumber}
+        onLeave={leaveQuiz}
       />
 
       {phase === 'summary' ? (
