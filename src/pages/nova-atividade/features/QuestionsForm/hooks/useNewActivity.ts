@@ -20,6 +20,7 @@ import {
   useCreateActivity,
   useUpdateActivity,
 } from '../../../hooks/useMutation';
+import { useCursoAlocado } from '@/hooks/useCursoAlocado';
 
 const toSaveActivityPayload = (
   titulo: string,
@@ -52,6 +53,7 @@ const emptyQuestion = () => ({
 export const useNewActivity = () => {
   const navigate = useNavigate();
   const { cursoId, moduloId = '', atividadeId } = useParams();
+  const { bloqueado } = useCursoAlocado(cursoId);
   const { mutateAsync: addActivity, isPending: isCreating } =
     useCreateActivity(moduloId);
   const { mutateAsync: editActivity, isPending: isUpdating } =
@@ -62,7 +64,7 @@ export const useNewActivity = () => {
   const { data: existing, isPending: isActivityPending } = useQuery({
     queryKey: queryClientKeys.activityKeys.detail(atividadeId ?? ''),
     queryFn: () => getActivity(atividadeId!),
-    enabled: Boolean(atividadeId),
+    enabled: Boolean(atividadeId) && !bloqueado,
   });
 
   const methods = useForm<QuestionFormType>({
@@ -136,5 +138,6 @@ export const useNewActivity = () => {
     isLoading,
     isMissing,
     handleCreateActivity,
+    bloqueado,
   };
 };

@@ -32,4 +32,19 @@ describe('BottomNavigation', () => {
       .map((link) => link.getAttribute('href'));
     expect(hrefs).toEqual(['/cursos', '/mapa', '/rankings']);
   });
+
+  it('disables the map shortcut when the monitor has no courses', () => {
+    renderWithProviders(<BottomNavigation />, {
+      route: '/cursos',
+      user: { ...mockLoggedMonitor, cursoIds: [] },
+    });
+
+    const hrefs = screen
+      .getAllByRole('link')
+      .map((link) => link.getAttribute('href'));
+    expect(hrefs).toEqual(['/cursos', '/rankings']);
+    expect(
+      document.querySelector('[aria-disabled="true"]')
+    ).toBeInTheDocument();
+  });
 });

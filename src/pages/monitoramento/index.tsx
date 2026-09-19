@@ -14,7 +14,10 @@ export const ManagementPage = () => {
     monitoring,
     isMonitoringPending,
     isMonitoringError,
+    bloqueado,
   } = useMonitoramento();
+
+  if (bloqueado) return null;
 
   if (!atividadeId)
     return <ResourceNotFound label="Atividade não encontrada" />;

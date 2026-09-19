@@ -5,6 +5,7 @@ import { useAuthUser } from '@/providers/UserProvider';
 import { MAX_TENTATIVAS } from '@/data/constants';
 import type { QuizPhaseType } from '@/pages/atividade/features/QuizPlay/types';
 import { useSubmitAttempt } from '../../../hooks/useMutation';
+import { toast } from '@/components/ui/toast';
 
 export type QuizAnswerType = {
   questaoId: string;
@@ -17,11 +18,21 @@ const questionHasGabarito = (
   question: AtividadeType['questoes'][number] | undefined
 ) => Boolean(question?.alternativas.some((item) => item.correta === true));
 
+const sameId = (left?: string | null, right?: string | null) =>
+  Boolean(left && right && left.toLowerCase() === right.toLowerCase());
+
+const toCorrectFlag = (value: unknown): boolean | null => {
+  if (value === true || value === 'true' || value === 1) return true;
+  if (value === false || value === 'false' || value === 0) return false;
+  return null;
+};
+
 export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
   const auth = useAuthUser();
   const { mutateAsync: sendAttempt, isPending: isSubmitting } =
     useSubmitAttempt(activity.id);
   const persistedAttempt = useRef(false);
+  const lastScore = useRef<number | null>(null);
 
   const [attemptsUsed, setAttemptsUsed] = useState(usedAttempts);
   const [phase, setPhase] = useState<QuizPhaseType>('answering');
@@ -79,18 +90,20 @@ export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
 
       setAttemptsUsed(result.tentativasUsadas);
       auth.setUser({ ...auth.user, pontos: result.pontosTotais });
+      lastScore.current = result.tentativa.pontuacaoObtida;
 
-      const corretoPorQuestao = new Map(
-        (result.tentativa.respostas ?? []).map((item) => [
-          item.questaoId,
-          item.correta,
-        ])
-      );
+      const scoredAnswers = finalAnswers.map((answer) => {
+        const fromApi = (result.tentativa.respostas ?? []).find(
+          (item) =>
+            sameId(item.questaoId, answer.questaoId) ||
+            sameId(item.alternativaId, answer.alternativaId)
+        );
 
-      const scoredAnswers = finalAnswers.map((answer) => ({
-        ...answer,
-        correta: corretoPorQuestao.get(answer.questaoId) ?? answer.correta,
-      }));
+        return {
+          ...answer,
+          correta: toCorrectFlag(fromApi?.correta) ?? answer.correta,
+        };
+      });
 
       setAnswers(scoredAnswers);
       return scoredAnswers;
@@ -127,30 +140,28 @@ export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
 
     setAnswers(nextAnswers);
 
-    if (isLastQuestion && !hasGabarito) {
+    if (isLastQuestion) {
       try {
         nextAnswers = await persistAttempt(nextAnswers);
       } catch {
         return;
       }
-      const last = nextAnswers.find(
-        (item) => item.questaoId === currentQuestion.id
-      );
-      setSelectedIsCorrect(last?.correta ?? null);
-      setPhase('feedback');
+      const total =
+        lastScore.current ??
+        nextAnswers.reduce(
+          (sum, answer) => sum + (answer.correta ? answer.valor : 0),
+          0
+        );
+      toast.add({
+        type: 'success',
+        title: `Você fez ${total} pts`,
+      });
+      setPhase('summary');
       return;
     }
 
-    setSelectedIsCorrect(localCorrect);
+    setSelectedIsCorrect(null);
     setPhase('feedback');
-
-    if (!isLastQuestion || !hasGabarito) return;
-
-    try {
-      await persistAttempt(nextAnswers);
-    } catch {
-      return;
-    }
   };
 
   const goNext = async () => {
@@ -164,6 +175,16 @@ export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
           return;
         }
       }
+      const total =
+        lastScore.current ??
+        answers.reduce(
+          (sum, answer) => sum + (answer.correta ? answer.valor : 0),
+          0
+        );
+      toast.add({
+        type: 'success',
+        title: `Você fez ${total} pts`,
+      });
       setPhase('summary');
       return;
     }
@@ -201,6 +222,7 @@ export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
     if (retryLimit || hasBoasted) return;
 
     persistedAttempt.current = false;
+    lastScore.current = null;
     setRevealCorrect(attemptsUsed >= 1);
     setAttemptNumber(attemptsUsed + 1);
     setPhase('answering');

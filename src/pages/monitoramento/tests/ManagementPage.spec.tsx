@@ -103,7 +103,9 @@ const renderPage = (ui: ReactElement) => {
 
   return render(
     <QueryClientProvider client={client}>
-      <UserProvider initialUser={mockLoggedMonitor}>
+      <UserProvider
+        initialUser={{ ...mockLoggedMonitor, cursoIds: ['curso-1'] }}
+      >
         <MemoryRouter
           initialEntries={[
             '/cursos/curso-1/modulos/modulo-1/monitoramento/atividade-1',

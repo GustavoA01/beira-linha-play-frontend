@@ -1,12 +1,16 @@
 import { Link, useLocation } from 'react-router-dom';
 import { LayoutGroup, motion } from 'motion/react';
-import { getBottomNavigateButtons } from '@/data/constants';
+import {
+  getBottomNavigateButtons,
+  isMonitorMapDisabled,
+} from '@/data/constants';
 import { useAuthUser } from '@/providers/UserProvider';
 import { cn } from '@/lib/utils';
 
 export const BottomNavigation = () => {
   const { pathname } = useLocation();
-  const { isAluno } = useAuthUser();
+  const { isAluno, user } = useAuthUser();
+  const mapDisabled = isMonitorMapDisabled(user);
 
   return (
     <LayoutGroup>
@@ -15,8 +19,20 @@ export const BottomNavigation = () => {
         animate={{ opacity: 1, y: 0 }}
         className="fixed bottom-6 z-40 flex items-center justify-center gap-6 w-50 left-1/2 -translate-x-1/2 rounded-full bg-white shadow-md py-2 sm:hidden"
       >
-        {getBottomNavigateButtons(isAluno).map((button) => {
+        {getBottomNavigateButtons({ isAluno, mapDisabled }).map((button) => {
           const selected = pathname === button.to;
+
+          if (button.disabled) {
+            return (
+              <span
+                key={button.to}
+                aria-disabled="true"
+                className="relative flex size-11 items-center justify-center opacity-40"
+              >
+                <button.icon className="relative z-10 text-zinc-400" />
+              </span>
+            );
+          }
 
           return (
             <Link

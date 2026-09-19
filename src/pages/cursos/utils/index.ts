@@ -35,6 +35,7 @@ export const toCourse = (course: CourseResponseType): CursoType => ({
   nome: course.nome,
   codigoAcesso: course.codigoAcesso ?? '',
   monitorIds: course.monitorIds,
+  monitorNomes: course.monitorNomes ?? [],
   modulos: (course.modulos ?? []).map((modulo) => ({
     id: modulo.id,
     nome: modulo.nome,
@@ -55,8 +56,13 @@ export const monitorNames = (
   ids: string[],
   monitors: UsuarioType[],
   currentUser?: UsuarioType,
-  courseId?: string
+  courseId?: string,
+  nomesDoCurso?: string[]
 ) => {
+  if (nomesDoCurso && nomesDoCurso.length > 0) {
+    return nomesDoCurso.join(', ');
+  }
+
   const known = currentUser ? [currentUser, ...monitors] : monitors;
   const names = ids
     .map((id) => known.find((monitor) => monitor.id === id)?.nome)

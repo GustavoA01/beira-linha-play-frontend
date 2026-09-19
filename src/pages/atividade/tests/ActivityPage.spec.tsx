@@ -8,6 +8,7 @@ import { UserProvider } from '@/providers/UserProvider';
 import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
 import { getActivity } from '@/services/atividades';
 import { listMyAttempts, submitAttempt } from '@/services/tentativas';
+import { toast } from '@/components/ui/toast';
 import type { ActivityResponseType } from '@/data/types/services';
 import type { TentativaType } from '@/data/types/api';
 
@@ -36,6 +37,7 @@ const mockedListMyAttempts = listMyAttempts as jest.MockedFunction<
 const mockedSubmitAttempt = submitAttempt as jest.MockedFunction<
   typeof submitAttempt
 >;
+const mockedToastAdd = toast.add as jest.MockedFunction<typeof toast.add>;
 
 const activity: ActivityResponseType = {
   id: 'atividade-1',
@@ -123,6 +125,7 @@ describe('ActivityPage', () => {
     mockedGetActivity.mockReset();
     mockedListMyAttempts.mockReset();
     mockedSubmitAttempt.mockReset();
+    mockedToastAdd.mockReset();
     mockedGetActivity.mockResolvedValue(activityWithoutGabarito);
     mockedListMyAttempts.mockResolvedValue([]);
   });
@@ -144,7 +147,7 @@ describe('ActivityPage', () => {
     expect(mockedListMyAttempts).toHaveBeenCalledWith('atividade-1');
   });
 
-  it('submits the attempt and shows the correct feedback from the API', async () => {
+  it('submits the attempt and goes to the result without per-question feedback', async () => {
     const user = userEvent.setup();
     mockedListMyAttempts
       .mockResolvedValueOnce([])
@@ -167,16 +170,93 @@ describe('ActivityPage', () => {
     await user.click(screen.getByRole('radio', { name: /1/ }));
     await user.click(screen.getByRole('button', { name: 'Enviar resposta' }));
 
-    expect(await screen.findByText('Acertou!')).toBeInTheDocument();
+    expect(screen.queryByText('Acertou!')).not.toBeInTheDocument();
+    expect(screen.queryByText('Errou')).not.toBeInTheDocument();
     await waitFor(() => {
       expect(mockedSubmitAttempt).toHaveBeenCalledWith('atividade-1', {
         respostas: [{ questaoId: 'q1', alternativaId: 'a2' }],
       });
     });
-
-    await user.click(screen.getByRole('button', { name: 'Ver resultado' }));
+    expect(mockedToastAdd).toHaveBeenCalledWith({
+      type: 'success',
+      title: 'Você fez 10 pts',
+    });
     expect(
       await screen.findByRole('heading', { name: 'Gabaritou!' })
     ).toBeInTheDocument();
+  });
+
+  it('grades the last question from the API even without gabarito', async () => {
+    const user = userEvent.setup();
+    mockedGetActivity.mockResolvedValue({
+      ...activityWithoutGabarito,
+      quantQuestoes: 2,
+      questoes: [
+        {
+          id: 'q1',
+          enunciado: 'Primeira?',
+          valor: 5,
+          alternativas: [
+            { id: 'a1', descricao: 'A', correta: null },
+            { id: 'a2', descricao: 'B', correta: null },
+          ],
+        },
+        {
+          id: 'q2',
+          enunciado: 'Última?',
+          valor: 5,
+          alternativas: [
+            { id: 'b1', descricao: 'C', correta: null },
+            { id: 'b2', descricao: 'D', correta: null },
+          ],
+        },
+      ],
+    });
+    mockedSubmitAttempt.mockResolvedValue({
+      tentativa: attempt({
+        pontuacaoObtida: 10,
+        respostas: [
+          {
+            id: 'r1',
+            questaoId: 'q1',
+            alternativaId: 'a2',
+            correta: true,
+          },
+          {
+            id: 'r2',
+            questaoId: 'q2',
+            alternativaId: 'b2',
+            correta: true,
+          },
+        ],
+      }),
+      tentativasUsadas: 1,
+      melhorPontuacao: 10,
+      pontosDelta: 10,
+      pontosTotais: 50,
+      concluida: true,
+    });
+
+    renderPage();
+
+    expect(await screen.findByText('Primeira?')).toBeInTheDocument();
+    await user.click(screen.getByRole('radio', { name: /B/ }));
+    await user.click(screen.getByRole('button', { name: 'Enviar resposta' }));
+    expect(await screen.findByText('Resposta registrada')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Avançar' }));
+    expect(await screen.findByText('Última?')).toBeInTheDocument();
+    await user.click(screen.getByRole('radio', { name: /D/ }));
+    await user.click(screen.getByRole('button', { name: 'Enviar resposta' }));
+
+    expect(
+      await screen.findByRole('heading', { name: 'Gabaritou!' })
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Acertou!')).not.toBeInTheDocument();
+    expect(screen.queryByText('Errou')).not.toBeInTheDocument();
+    expect(mockedToastAdd).toHaveBeenCalledWith({
+      type: 'success',
+      title: 'Você fez 10 pts',
+    });
   });
 });

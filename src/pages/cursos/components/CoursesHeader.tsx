@@ -1,12 +1,13 @@
 import { Button } from '@/components/ui/button';
 import type { UsuarioType } from '@/data/types/api';
-import { Plus, UserPlus } from 'lucide-react';
+import { KeyRound, Plus, UserPlus } from 'lucide-react';
 
 type CoursesHeaderProps = {
   role: UsuarioType['tipo'];
   isAdmin: boolean;
   onAddCourse: () => void;
   onAddAdmin: () => void;
+  onEnterCode?: () => void;
 };
 
 const labels = {
@@ -20,6 +21,7 @@ export const CoursesHeader = ({
   isAdmin,
   onAddCourse,
   onAddAdmin,
+  onEnterCode,
 }: CoursesHeaderProps) => (
   <header className="flex justify-between items-center gap-4">
     <div>
@@ -30,6 +32,13 @@ export const CoursesHeader = ({
         {labels[role]}
       </p>
     </div>
+
+    {role === 'ALUNO' && onEnterCode && (
+      <Button className="max-sm:w-10" onClick={onEnterCode}>
+        <KeyRound />
+        <p className="max-sm:hidden">Entrar com código</p>
+      </Button>
+    )}
 
     {isAdmin && (
       <div className="flex shrink-0 items-center gap-2">

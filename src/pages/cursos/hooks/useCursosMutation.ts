@@ -1,13 +1,13 @@
-import { toCourse, withModuleDetails } from '../utils';
+import { toCourse } from '../utils';
 import { listCourses } from '@/services/cursos';
 import { listMonitors } from '@/services/usuarios';
-import { useQueries, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { queryClientKeys } from '@/lib/queryClientKeys';
-import { toModule } from '@/pages/modulo/utils';
-import { getModule } from '@/services/modulos';
 import { useDeleteCourse } from './useMutation';
+import { useAuthUser } from '@/providers/UserProvider';
 
 export const useCursosMutation = () => {
+  const { user, isAdmin, isAluno } = useAuthUser();
   const { mutate: removeCourse } = useDeleteCourse();
 
   const {
@@ -22,32 +22,16 @@ export const useCursosMutation = () => {
   const { data: monitors = [] } = useQuery({
     queryKey: queryClientKeys.monitorKeys.all,
     queryFn: listMonitors,
+    enabled: !isAluno,
   });
 
-  const moduleIds = [
-    ...new Set(
-      courses.flatMap((course) =>
-        (course.modulos ?? []).map((modulo) => modulo.id)
-      )
-    ),
-  ];
-
-  const moduleQueries = useQueries({
-    queries: moduleIds.map((id) => ({
-      queryKey: queryClientKeys.moduleKeys.detail(id),
-      queryFn: async () => toModule(await getModule(id)),
-    })),
-  });
-
-  const modulesById = new Map(
-    moduleQueries.flatMap((query) =>
-      query.data ? [[query.data.id, query.data] as const] : []
-    )
+  const visibleCourses = courses.filter(
+    (course) =>
+      isAdmin ||
+      (user != null && 'cursoIds' in user && user.cursoIds.includes(course.id))
   );
 
-  const cursos = courses.map((course) =>
-    withModuleDetails(toCourse(course), modulesById)
-  );
+  const cursos = visibleCourses.map(toCourse);
 
   return {
     cursos,

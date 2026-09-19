@@ -10,47 +10,28 @@ export const useCursos = () => {
   const navigate = useNavigate();
   const { mutateAsync: enroll } = useEnrollCourse();
   const [openCodeDialog, setOpenCodeDialog] = useState(false);
-  const [selectedCourse, setSelectedCourse] = useState<CursoType | null>(null);
   const [openCourseDialog, setOpenCourseDialog] = useState(false);
   const [editingCourse, setEditingCourse] = useState<CursoType>();
   const [openAdminDialog, setOpenAdminDialog] = useState(false);
 
-  const isLocked = (cursoId: string) =>
-    user.tipo !== 'ADMIN' && !user.cursoIds.includes(cursoId);
+  const openCourse = (cursoId: string) => navigate(`/cursos/${cursoId}`);
 
-  const openCourse = (curso: CursoType) => navigate(`/cursos/${curso.id}`);
-
-  const handleCourseClick = (curso: CursoType) => {
-    if (!isLocked(curso.id)) {
-      openCourse(curso);
-      return;
-    }
-
-    if (user.tipo !== 'ALUNO') return;
-
-    setSelectedCourse(curso);
-    setOpenCodeDialog(true);
-  };
+  const handleCourseClick = (cursoId: string) => openCourse(cursoId);
 
   const handleCodeSubmit = async (code: string) => {
-    if (!selectedCourse) return 'Curso não encontrado';
-
     try {
-      await enroll({
-        id: selectedCourse.id,
-        codigoAcesso: code,
-      });
+      const curso = await enroll(code);
 
       if (user.tipo === 'ALUNO') {
         setUser({
           ...user,
-          cursoIds: user.cursoIds.includes(selectedCourse.id)
+          cursoIds: user.cursoIds.includes(curso.id)
             ? user.cursoIds
-            : [...user.cursoIds, selectedCourse.id],
+            : [...user.cursoIds, curso.id],
         });
       }
 
-      openCourse(selectedCourse);
+      openCourse(curso.id);
     } catch (error) {
       return error instanceof ApiError &&
         error.message !== 'Não foi possível completar a operação'
@@ -67,7 +48,6 @@ export const useCursos = () => {
   return {
     openCodeDialog,
     setOpenCodeDialog,
-    isLocked,
     handleCourseClick,
     handleCodeSubmit,
     openCourseDialog,

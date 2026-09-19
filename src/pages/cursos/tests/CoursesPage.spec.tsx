@@ -7,7 +7,8 @@ import { CoursesPage } from '../index';
 import { useAuthUser } from '@/providers/UserProvider';
 import { mockLoggedAdmin } from '@/data/temporaryMocks/admins';
 import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
-import { listCourses } from '@/services/cursos';
+import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
+import { enrollCourse, listCourses } from '@/services/cursos';
 import { getModule } from '@/services/modulos';
 import { listMonitors } from '@/services/usuarios';
 
@@ -46,6 +47,9 @@ const mockedListMonitors = listMonitors as jest.MockedFunction<
   typeof listMonitors
 >;
 const mockedGetModule = getModule as jest.MockedFunction<typeof getModule>;
+const mockedEnrollCourse = enrollCourse as jest.MockedFunction<
+  typeof enrollCourse
+>;
 const renderPage = (ui: ReactElement) => {
   const client = new QueryClient({
     defaultOptions: {
@@ -66,6 +70,7 @@ describe('CoursesPage', () => {
     mockedListCourses.mockReset();
     mockedListMonitors.mockReset();
     mockedGetModule.mockReset();
+    mockedEnrollCourse.mockReset();
     mockedListCourses.mockResolvedValue([]);
     mockedListMonitors.mockResolvedValue([]);
     mockedGetModule.mockResolvedValue({
@@ -95,7 +100,7 @@ describe('CoursesPage', () => {
       screen.queryByRole('button', { name: 'Adicionar Curso' })
     ).not.toBeInTheDocument();
     expect(
-      await screen.findByText('Nenhum curso cadastrado.')
+      await screen.findByText('Você não está alocado em nenhum curso.')
     ).toBeInTheDocument();
   });
 
@@ -162,7 +167,7 @@ describe('CoursesPage', () => {
     ).toBeInTheDocument();
   });
 
-  it('shows the activity count from the module details', async () => {
+  it('shows the activity count from the course payload', async () => {
     mockedUseAuthUser.mockReturnValue({
       user: mockLoggedAdmin,
       setUser: jest.fn(),
@@ -182,38 +187,34 @@ describe('CoursesPage', () => {
             id: 'modulo-1',
             nome: 'Limites',
             cursoId: 'curso-1',
+            atividades: [
+              {
+                id: 'atv-1',
+                titulo: 'Noção de limite',
+                quantQuestoes: 2,
+                moduloId: 'modulo-1',
+              },
+              {
+                id: 'atv-2',
+                titulo: 'Continuidade',
+                quantQuestoes: 1,
+                moduloId: 'modulo-1',
+              },
+            ],
           },
         ],
       },
     ]);
-    mockedGetModule.mockResolvedValue({
-      id: 'modulo-1',
-      nome: 'Limites',
-      cursoId: 'curso-1',
-      atividades: [
-        {
-          id: 'atv-1',
-          titulo: 'Noção de limite',
-          quantQuestoes: 2,
-          moduloId: 'modulo-1',
-        },
-        {
-          id: 'atv-2',
-          titulo: 'Continuidade',
-          quantQuestoes: 1,
-          moduloId: 'modulo-1',
-        },
-      ],
-    });
 
     renderPage(<CoursesPage />);
 
     expect(await screen.findByText('Cálculo I')).toBeInTheDocument();
     expect(screen.getByText('1 módulo')).toBeInTheDocument();
-    expect(await screen.findByText('2 Ativ.')).toBeInTheDocument();
+    expect(screen.getByText('2 Ativ.')).toBeInTheDocument();
+    expect(mockedGetModule).not.toHaveBeenCalled();
   });
 
-  it('locks courses the monitor does not teach and shows her name on her course', async () => {
+  it('hides courses the monitor does not teach and shows her name on her course', async () => {
     mockedUseAuthUser.mockReturnValue({
       user: mockLoggedMonitor,
       setUser: jest.fn(),
@@ -239,17 +240,60 @@ describe('CoursesPage', () => {
       },
     ]);
 
-    const user = userEvent.setup();
     renderPage(<CoursesPage />);
 
     expect(await screen.findByText('Cálculo')).toBeInTheDocument();
     expect(screen.getByText('Maria Souza')).toBeInTheDocument();
-    expect(screen.getByText('Programação 1')).toBeInTheDocument();
-    expect(screen.getByText('Sem monitor')).toBeInTheDocument();
+    expect(screen.queryByText('Programação 1')).not.toBeInTheDocument();
+  });
 
-    await user.click(screen.getByText('Programação 1'));
+  it('shows the monitor names of enrolled courses for the student', async () => {
+    mockedUseAuthUser.mockReturnValue({
+      user: mockLoggedAluno,
+      setUser: jest.fn(),
+      status: 'autenticado',
+      isAluno: true,
+      isMonitor: false,
+      isAdmin: false,
+    });
+    mockedListCourses.mockResolvedValue([
+      {
+        id: 'curso-calculo-1',
+        nome: 'Cálculo I',
+        codigoAcesso: 'CALC-2026-A',
+        monitorIds: ['monitor-1'],
+        monitorNomes: ['Maria Souza'],
+        modulos: [],
+      },
+    ]);
+    mockedListMonitors.mockRejectedValue({
+      response: { status: 403 },
+    });
+
+    renderPage(<CoursesPage />);
+
+    expect(await screen.findByText('Cálculo I')).toBeInTheDocument();
+    expect(screen.getByText('Maria Souza')).toBeInTheDocument();
+    expect(screen.queryByText('Sem monitor')).not.toBeInTheDocument();
+  });
+
+  it('opens the code dialog so the student can join a course', async () => {
+    const user = userEvent.setup();
+    mockedUseAuthUser.mockReturnValue({
+      user: mockLoggedAluno,
+      setUser: jest.fn(),
+      status: 'autenticado',
+      isAluno: true,
+      isMonitor: false,
+      isAdmin: false,
+    });
+
+    renderPage(<CoursesPage />);
+
+    await user.click(screen.getByRole('button', { name: 'Entrar com código' }));
+
     expect(
-      screen.queryByRole('heading', { name: 'Entrar na turma' })
-    ).not.toBeInTheDocument();
+      screen.getByRole('heading', { name: 'Entrar na turma' })
+    ).toBeInTheDocument();
   });
 });

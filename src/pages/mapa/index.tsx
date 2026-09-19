@@ -9,10 +9,17 @@ import { RankTable } from '@/features/RanksTable/container/RanksTable';
 import { useMap } from './hooks/useMap';
 import { edgeTypes } from './constants/edges';
 import { extend, miniMapStyles } from './constants/sizeLimits';
+import { Navigate } from 'react-router-dom';
+import { useAuthUser } from '@/providers/UserProvider';
+import { isMonitorMapDisabled } from '@/data/constants';
 
 export const Map = () => {
-  const { currentNode, edges, nodes, onEdgesChange, onNodesChange } =
-    useMap();
+  const { user } = useAuthUser();
+  const { currentNode, edges, nodes, onEdgesChange, onNodesChange } = useMap();
+
+  if (isMonitorMapDisabled(user)) {
+    return <Navigate to="/cursos" replace />;
+  }
 
   const fitViewOptions = {
     nodes: currentNode ? [{ id: currentNode.id }] : [],

@@ -12,8 +12,21 @@ export const DrawerSection = ({
       <h2 className="text-xs text-zinc-500 pl-2 mb-2">{title}</h2>
 
       <div className="flex flex-col gap-2">
-        {sectionItens.map(({ label, path, icon: Icon, onClick }) => {
+        {sectionItens.map(({ label, path, icon: Icon, onClick, disabled }) => {
           if (label !== 'Sair') {
+            if (disabled) {
+              return (
+                <span
+                  key={label}
+                  aria-disabled="true"
+                  className="flex pl-2 items-center py-2 space-x-4 text-zinc-400 opacity-60"
+                >
+                  <Icon className="text-zinc-300" size={20} />
+                  <p>{label}</p>
+                </span>
+              );
+            }
+
             return (
               <Link
                 key={label}

@@ -3,10 +3,12 @@ import { useQuery } from '@tanstack/react-query';
 import { queryClientKeys } from '@/lib/queryClientKeys';
 import { toActivity } from '@/pages/atividade/utils';
 import { getActivity, getActivityMonitoring } from '@/services/atividades';
+import { useCursoAlocado } from '@/hooks/useCursoAlocado';
 
 export const useMonitoramento = () => {
-  const { atividadeId } = useParams();
-  const enabled = Boolean(atividadeId);
+  const { atividadeId, cursoId } = useParams();
+  const { bloqueado } = useCursoAlocado(cursoId);
+  const enabled = Boolean(atividadeId) && !bloqueado;
 
   const {
     data: activity,
@@ -38,5 +40,6 @@ export const useMonitoramento = () => {
     monitoring,
     isMonitoringPending,
     isMonitoringError,
+    bloqueado,
   };
 };

@@ -8,6 +8,7 @@ import { getActivity } from '@/services/atividades';
 import { listMyAttempts } from '@/services/tentativas';
 import type { AtividadeType } from '@/data/types/api';
 import { useNavigate } from 'react-router-dom';
+import { useCursoAlocado } from '@/hooks/useCursoAlocado';
 
 export const useModulo = (
   moduloId: string,
@@ -16,6 +17,7 @@ export const useModulo = (
   cursoId: string
 ) => {
   const navigate = useNavigate();
+  const { bloqueado } = useCursoAlocado(cursoId);
   const [openActivityDialog, setOpenActivityDialog] = useState(false);
   const [editingActivity, setEditingActivity] = useState<AtividadeType>();
   const [activityToDelete, setActivityToDelete] = useState<AtividadeType>();
@@ -29,13 +31,13 @@ export const useModulo = (
         atividades: await fillActivityXp(modulo.atividades, getActivity),
       };
     },
-    enabled: Boolean(moduloId),
+    enabled: Boolean(moduloId) && !bloqueado,
   });
 
   const { data: course } = useQuery({
     queryKey: queryClientKeys.courseKeys.detail(cursoId ?? ''),
     queryFn: () => getCourse(cursoId!),
-    enabled: Boolean(cursoId) && isMonitor,
+    enabled: Boolean(cursoId) && isMonitor && !bloqueado,
   });
 
   const {
@@ -53,7 +55,7 @@ export const useModulo = (
     if (!activityId || !cursoId || !moduloId) return;
     const basePath = `/cursos/${cursoId}/modulos/${moduloId}`;
     if (isMonitor) navigate(`${basePath}/monitoramento/${activityId}`);
-    else navigate(`${basePath}/atividade/${activityId}`);
+    else navigate(`${basePath}/atividades/${activityId}`);
   };
 
   const handleActivityDialogChange = (open: boolean) => {
@@ -77,5 +79,6 @@ export const useModulo = (
     isAttemptsError,
     onClickActivity,
     handleActivityDialogChange,
+    bloqueado,
   };
 };

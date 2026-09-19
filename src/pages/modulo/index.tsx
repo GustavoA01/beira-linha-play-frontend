@@ -39,7 +39,10 @@ export const ModulePage = () => {
     setEditingActivity,
     activityToDelete,
     setActivityToDelete,
+    bloqueado,
   } = useModulo(moduloId ?? '', isAluno, isMonitor, cursoId ?? '');
+
+  if (bloqueado) return null;
 
   if (!moduloId) return <ResourceNotFound label="Módulo não encontrado" />;
 

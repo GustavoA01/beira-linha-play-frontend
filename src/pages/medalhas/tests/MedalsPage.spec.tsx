@@ -1,11 +1,13 @@
 import type { ReactElement } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MedalsPage } from '../index';
 import { useAuthUser } from '@/providers/UserProvider';
 import { mockLoggedAdmin } from '@/data/temporaryMocks/admins';
 import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
+import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
 import { equipMedal, listMedals } from '@/services/medalhas';
 import { toast } from '@/components/ui/toast';
 
@@ -47,7 +49,9 @@ const renderPage = (ui: ReactElement) => {
   });
 
   return render(
-    <QueryClientProvider client={client}>{ui}</QueryClientProvider>
+    <QueryClientProvider client={client}>
+      <MemoryRouter initialEntries={['/medalhas']}>{ui}</MemoryRouter>
+    </QueryClientProvider>
   );
 };
 
@@ -165,5 +169,22 @@ describe('MedalsPage', () => {
       type: 'success',
       title: 'Medalha selecionada',
     });
+  });
+
+  it('redirects the monitor away from medals', () => {
+    mockedUseAuthUser.mockReturnValue({
+      user: mockLoggedMonitor,
+      setUser: jest.fn(),
+      status: 'autenticado',
+      isAluno: false,
+      isMonitor: true,
+      isAdmin: false,
+    });
+
+    renderPage(<MedalsPage />);
+
+    expect(
+      screen.queryByRole('heading', { name: 'Galeria de Medalhas' })
+    ).not.toBeInTheDocument();
   });
 });

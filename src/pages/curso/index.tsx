@@ -5,7 +5,6 @@ import { DeleteModuleDialog } from './components/DeleteModuleDialog';
 import { useNavigate } from 'react-router-dom';
 import { ResourceNotFound } from '@/components/ResourceNotFound';
 import { HeaderListPageSkeleton } from '@/components/PageSkeleton';
-import type { ModuloType } from '@/data/types/api';
 import { isModuleConcluded } from '@/data/atividades';
 import { useDeleteModule } from './hooks/useMutation';
 import { useCurso } from './hooks/useCurso';
@@ -17,7 +16,6 @@ export const CoursePage = () => {
     cursoId,
     isPending,
     isError,
-    moduleDetails,
     attempts,
     alunoId,
     isAluno,
@@ -29,11 +27,14 @@ export const CoursePage = () => {
     handleModuleDialogChange,
     openModuleDialog,
     setOpenModuleDialog,
+    bloqueado,
   } = useCurso();
 
   const { mutate: removeModule, isPending: isDeleting } = useDeleteModule(
     cursoId ?? ''
   );
+
+  if (bloqueado) return null;
 
   if (!cursoId || isError) {
     return <ResourceNotFound label="Curso não encontrado" />;
@@ -42,9 +43,6 @@ export const CoursePage = () => {
   if (isPending) return <HeaderListPageSkeleton />;
 
   if (!curso) return <ResourceNotFound label="Curso não encontrado" />;
-
-  const moduloForCard = (modulo: ModuloType) =>
-    moduleDetails.find((item) => item.data?.id === modulo.id)?.data ?? modulo;
 
   return (
     <>
@@ -66,21 +64,19 @@ export const CoursePage = () => {
               </p>
             ) : (
               curso.modulos.map((modulo) => {
-                const moduloCard = moduloForCard(modulo);
                 return (
                   <ModuleCard
                     key={modulo.id}
-                    modulo={moduloCard}
+                    modulo={modulo}
                     isMonitor={isMonitor}
                     concluded={
-                      isAluno &&
-                      isModuleConcluded(moduloCard, attempts, alunoId)
+                      isAluno && isModuleConcluded(modulo, attempts, alunoId)
                     }
                     onEdit={() => {
-                      setEditingModule(moduloCard);
+                      setEditingModule(modulo);
                       setOpenModuleDialog(true);
                     }}
-                    onDelete={() => setModuleToDelete(moduloCard)}
+                    onDelete={() => setModuleToDelete(modulo)}
                     onClick={() =>
                       navigate(`/cursos/${curso.id}/modulos/${modulo.id}`)
                     }

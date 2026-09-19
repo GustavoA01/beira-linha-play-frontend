@@ -12,6 +12,13 @@ import { CoursesPageSkeleton } from '@/components/PageSkeleton';
 import { monitorNames } from './utils';
 import { useCursosMutation } from './hooks/useCursosMutation';
 
+const emptyCoursesMessage = {
+  ADMIN: 'Nenhum curso cadastrado.',
+  MONITOR: 'Você não está alocado em nenhum curso.',
+  ALUNO:
+    'Você ainda não está em nenhum curso. Use o código que o monitor passou.',
+} as const;
+
 export const CoursesPage = () => {
   const { containerClassName } = useMediaDevice();
   const { user, isAdmin, isAluno } = useAuthUser();
@@ -20,7 +27,6 @@ export const CoursesPage = () => {
   const {
     openCodeDialog,
     setOpenCodeDialog,
-    isLocked,
     handleCourseClick,
     handleCodeSubmit,
     openCourseDialog,
@@ -47,6 +53,7 @@ export const CoursesPage = () => {
           setOpenCourseDialog(true);
         }}
         onAddAdmin={() => setOpenAdminDialog(true)}
+        onEnterCode={isAluno ? () => setOpenCodeDialog(true) : undefined}
       />
 
       {isPending && <CoursesPageSkeleton />}
@@ -59,7 +66,7 @@ export const CoursesPage = () => {
 
       {!isPending && !isError && cursos.length === 0 && (
         <p className="mt-8 text-sm text-muted-foreground font-montserrat">
-          Nenhum curso cadastrado.
+          {emptyCoursesMessage[user.tipo]}
         </p>
       )}
 
@@ -73,18 +80,14 @@ export const CoursesPage = () => {
           >
             <CourseCard
               curso={curso}
-              locked={isLocked(curso.id)}
               codCurso={curso.codigoAcesso}
-              onClick={
-                isLocked(curso.id) && !isAluno
-                  ? undefined
-                  : () => handleCourseClick(curso)
-              }
+              onClick={() => handleCourseClick(curso.id)}
               monitorNome={monitorNames(
                 curso.monitorIds,
                 monitors,
                 user,
-                curso.id
+                curso.id,
+                curso.monitorNomes
               )}
               canDelete={isAdmin}
               onEdit={() => {

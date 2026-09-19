@@ -77,6 +77,7 @@ export type CourseModuleResponseType = Pick<
 
 export type CourseResponseType = Omit<CursoType, 'codigoAcesso' | 'modulos'> & {
   codigoAcesso: string | null;
+  monitorNomes?: string[];
   modulos: CourseModuleResponseType[];
 };
 

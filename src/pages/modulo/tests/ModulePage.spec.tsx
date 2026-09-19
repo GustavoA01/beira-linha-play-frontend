@@ -146,7 +146,7 @@ describe('ModulePage', () => {
   });
 
   it('does not fetch attempts for the monitor', async () => {
-    renderPage(mockLoggedMonitor);
+    renderPage({ ...mockLoggedMonitor, cursoIds: ['curso-1'] });
 
     expect(await screen.findByText('Noção de limite')).toBeInTheDocument();
     expect(screen.getByText('0/2 tentativas')).toBeInTheDocument();
@@ -181,7 +181,7 @@ describe('ModulePage', () => {
       ],
     });
 
-    renderPage(mockLoggedMonitor);
+    renderPage({ ...mockLoggedMonitor, cursoIds: ['curso-1'] });
 
     expect(await screen.findByText('+ 3 pts')).toBeInTheDocument();
     expect(screen.getByText('3 XP')).toBeInTheDocument();
@@ -191,7 +191,7 @@ describe('ModulePage', () => {
   it('shows an empty state when there are no activities', async () => {
     mockedGetModule.mockResolvedValue({ ...modulo, atividades: [] });
 
-    renderPage(mockLoggedMonitor);
+    renderPage({ ...mockLoggedMonitor, cursoIds: ['curso-1'] });
 
     expect(
       await screen.findByText('Nenhuma atividade cadastrada.')

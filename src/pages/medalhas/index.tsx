@@ -7,8 +7,11 @@ import { AddMedalDialog } from './components/AddMedalDialog';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useMedalhas } from './hooks/useMedalhas';
+import { Navigate } from 'react-router-dom';
+import { useAuthUser } from '@/providers/UserProvider';
 
 export const MedalsPage = () => {
+  const { isMonitor } = useAuthUser();
   const {
     isAdmin,
     selectMedal,
@@ -20,6 +23,10 @@ export const MedalsPage = () => {
     openDialog,
     setOpenDialog,
   } = useMedalhas();
+
+  if (isMonitor) {
+    return <Navigate to="/cursos" replace />;
+  }
 
   return (
     <div className="container mx-auto mt-8 px-4 sm:px-8 flex flex-col items-center overflow-y-auto custom-bar">

@@ -7,7 +7,7 @@ alwaysApply: true
 
 `Home` é a rota `index` (`/`), filha do `HeaderLayout`. Não existe `/home`. Ela redireciona o **monitor** e o **admin** para `/cursos` e mostra o **mapa** para o **aluno**. Provider de usuário envolve o app (`App.tsx`), não o array do router.
 
-O mapa do **monitor** e do **admin** fica em `/mapa` (nav “Mapa”). Os dois vêem o ranking dos alunos e podem abrir a fase para ver o nível e o XP mínimo, sem barra de progresso. O aluno continua no mapa em `/`, com o próprio progresso.
+O mapa do **monitor** e do **admin** fica em `/mapa` (nav “Mapa”). Os dois vêem o ranking dos alunos e podem abrir a fase para ver o nível e o XP mínimo, sem barra de progresso. O aluno continua no mapa em `/`, com o próprio progresso. Se o monitor não ministra nenhum curso, o atalho de Mapa fica desabilitado.
 
 Rotas privadas são filhas de `RequireAuth` (`src/components/layouts`). Sem `user`, redireciona para `/login`. `/login` e `/cadastro` ficam fora da guarda.
 
@@ -28,6 +28,8 @@ Nomes do diagrama em `api.ts` (`CursoType`, `ModuloType`, `AtividadeType`). `pos
 `nome` é o nome institucional. `apelido` só existe em `AlunoType` e é o que o jogador vê no ranking, mapa e header. Na UI do **monitor** (turma e ranking) os dois aparecem: `nome` para identificar, `apelido` para cruzar com o que o aluno escolheu.
 
 `cursoIds` fica em `UsuarioType`: no aluno é inscrição, no monitor é o que ele ministra. Um curso tem `monitorIds`. Os nomes dos monitores só entram na UI do card em `/cursos`. `codigoAcesso` fica no `CursoType` e só o monitor vê.
+
+`/cursos` lista só os cursos alocados para **aluno** e **monitor**; o **admin** vê todos. O aluno entra em turma nova pelo botão “Entrar com código” (mesmo `CodeDialog` de antes), não por card travado. Monitor sem `cursoIds` tem o botão Mapa desabilitado e `/mapa` redireciona para `/cursos`. Medalhas ficam na nav do aluno e do admin; o monitor não vê o item e `/medalhas` redireciona para `/cursos`. Leitura de curso, módulo, atividade e monitoramento exige alocação: monitor só se está em `monitorIds`, aluno só se está inscrito.
 
 O **admin** (`AdminType`, `tipo: 'ADMIN'`) cria, edita e exclui curso. Criar fica na lista `/cursos`; editar e excluir ficam no header do detalhe `/cursos/:cursoId`. Também cria outro admin na lista `/cursos`, ao lado de adicionar curso. Admin não tem `cursoIds`, e-mail nem apelido — só `nome` e `senha`.
 

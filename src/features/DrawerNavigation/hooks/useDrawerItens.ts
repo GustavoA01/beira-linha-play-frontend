@@ -6,7 +6,7 @@ import {
   Trophy,
   UserPen,
 } from 'lucide-react';
-import { mapPath } from '@/data/constants';
+import { mapPath, isMonitorMapDisabled } from '@/data/constants';
 import { useAuthUser } from '@/providers/UserProvider';
 import type { useDrawerItensProps } from '../types';
 
@@ -14,7 +14,8 @@ export const useDrawerItens = ({
   setOpenDrawer,
   setOpenDialog,
 }: useDrawerItensProps) => {
-  const { isAluno } = useAuthUser();
+  const { isAluno, isAdmin, user } = useAuthUser();
+  const mapDisabled = isMonitorMapDisabled(user);
 
   const headerAcademicItems = [
     {
@@ -30,7 +31,11 @@ export const useDrawerItens = ({
       label: 'Mapa',
       path: mapPath(isAluno),
       icon: MapIcon,
-      onClick: () => setOpenDrawer(false),
+      disabled: mapDisabled,
+      onClick: () => {
+        if (mapDisabled) return;
+        setOpenDrawer(false);
+      },
     },
     {
       label: 'Rankings',
@@ -38,12 +43,16 @@ export const useDrawerItens = ({
       icon: Trophy,
       onClick: () => setOpenDrawer(false),
     },
-    {
-      label: 'Medalhas',
-      path: '/medalhas',
-      icon: CircleStar,
-      onClick: () => setOpenDrawer(false),
-    },
+    ...(isAluno || isAdmin
+      ? [
+          {
+            label: 'Medalhas',
+            path: '/medalhas',
+            icon: CircleStar,
+            onClick: () => setOpenDrawer(false),
+          },
+        ]
+      : []),
   ];
 
   const configurationItems = [

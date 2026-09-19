@@ -8,6 +8,7 @@ import { UserProvider } from '@/providers/UserProvider';
 import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
 import { getCourse } from '@/services/cursos';
 import { createModule, getModule } from '@/services/modulos';
+import { getActivity } from '@/services/atividades';
 import type { CourseResponseType } from '@/data/types/services';
 
 jest.mock('@/assets/logo-beira-linha.png', () => 'logo.png');
@@ -31,11 +32,21 @@ jest.mock('@/services/modulos', () => ({
   deleteModule: jest.fn(),
 }));
 
+jest.mock('@/services/atividades', () => ({
+  getActivity: jest.fn(),
+  getActivityMonitoring: jest.fn(),
+  updateActivity: jest.fn(),
+  deleteActivity: jest.fn(),
+}));
+
 const mockedGetCourse = getCourse as jest.MockedFunction<typeof getCourse>;
 const mockedCreateModule = createModule as jest.MockedFunction<
   typeof createModule
 >;
 const mockedGetModule = getModule as jest.MockedFunction<typeof getModule>;
+const mockedGetActivity = getActivity as jest.MockedFunction<
+  typeof getActivity
+>;
 
 beforeAll(() => {
   class IntersectionObserverMock {
@@ -69,7 +80,9 @@ const renderPage = (ui: ReactElement) => {
 
   return render(
     <QueryClientProvider client={client}>
-      <UserProvider initialUser={mockLoggedMonitor}>
+      <UserProvider
+        initialUser={{ ...mockLoggedMonitor, cursoIds: ['curso-1'] }}
+      >
         <MemoryRouter initialEntries={['/cursos/curso-1']}>
           <Routes>
             <Route path="/cursos/:cursoId" element={ui} />
@@ -85,6 +98,7 @@ describe('CoursePage', () => {
     mockedGetCourse.mockReset();
     mockedCreateModule.mockReset();
     mockedGetModule.mockReset();
+    mockedGetActivity.mockReset();
     mockedGetCourse.mockResolvedValue(course);
     mockedGetModule.mockResolvedValue({
       id: 'modulo-novo',
@@ -124,7 +138,7 @@ describe('CoursePage', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('shows the activity count and xp from the module details', async () => {
+  it('shows the activity count and xp from the course payload', async () => {
     mockedGetCourse.mockResolvedValue({
       ...course,
       modulos: [
@@ -132,27 +146,24 @@ describe('CoursePage', () => {
           id: 'modulo-1',
           nome: 'Limites 45',
           cursoId: 'curso-1',
-        },
-      ],
-    });
-    mockedGetModule.mockResolvedValue({
-      id: 'modulo-1',
-      nome: 'Limites 45',
-      cursoId: 'curso-1',
-      atividades: [
-        {
-          id: 'atv-1',
-          titulo: 'Noção de limite',
-          quantQuestoes: 1,
-          moduloId: 'modulo-1',
-          xpTotal: 4,
-        },
-        {
-          id: 'atv-2',
-          titulo: 'Continuidade',
-          quantQuestoes: 1,
-          moduloId: 'modulo-1',
-          questoes: [{ id: 'q1', enunciado: 'a', valor: 2, alternativas: [] }],
+          atividades: [
+            {
+              id: 'atv-1',
+              titulo: 'Noção de limite',
+              quantQuestoes: 1,
+              moduloId: 'modulo-1',
+              xpTotal: 4,
+            },
+            {
+              id: 'atv-2',
+              titulo: 'Continuidade',
+              quantQuestoes: 1,
+              moduloId: 'modulo-1',
+              questoes: [
+                { id: 'q1', enunciado: 'a', valor: 2, alternativas: [] },
+              ],
+            },
+          ],
         },
       ],
     });
@@ -161,5 +172,6 @@ describe('CoursePage', () => {
 
     expect(await screen.findByText('2 atividades')).toBeInTheDocument();
     expect(screen.getByText('6 XP')).toBeInTheDocument();
+    expect(mockedGetModule).not.toHaveBeenCalled();
   });
 });

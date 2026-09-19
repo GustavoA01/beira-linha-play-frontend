@@ -95,8 +95,7 @@ export const useEnrollCourse = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, codigoAcesso }: { id: string; codigoAcesso: string }) =>
-      enrollCourse(id, { codigoAcesso }),
+    mutationFn: (codigoAcesso: string) => enrollCourse({ codigoAcesso }),
     onSuccess: () => {
       void queryClient.invalidateQueries({
         queryKey: queryClientKeys.courseKeys.all,

@@ -6,7 +6,7 @@ import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
 import { renderWithProviders } from './renderWithProviders';
 
 describe('HeaderDesktopNav', () => {
-  it('sends the student to the home map', () => {
+  it('sends the student to the home map and medals', () => {
     renderWithProviders(<HeaderDesktopNav onLogout={jest.fn()} />, {
       route: '/cursos',
       user: mockLoggedAluno,
@@ -16,15 +16,16 @@ describe('HeaderDesktopNav', () => {
       'href',
       '/'
     );
+    expect(screen.getByRole('link', { name: 'Medalhas' })).toHaveAttribute(
+      'href',
+      '/medalhas'
+    );
   });
 
-  it.each([
-    ['monitor', mockLoggedMonitor],
-    ['admin', mockLoggedAdmin],
-  ] as const)('sends the %s to /mapa', (_role, user) => {
+  it('sends the monitor to /mapa without medals', () => {
     renderWithProviders(<HeaderDesktopNav onLogout={jest.fn()} />, {
       route: '/cursos',
-      user,
+      user: mockLoggedMonitor,
     });
 
     expect(screen.getByRole('link', { name: 'Cursos' })).toHaveAttribute(
@@ -35,9 +36,36 @@ describe('HeaderDesktopNav', () => {
       'href',
       '/mapa'
     );
+    expect(
+      screen.queryByRole('link', { name: 'Medalhas' })
+    ).not.toBeInTheDocument();
+  });
+
+  it('keeps medals for the admin', () => {
+    renderWithProviders(<HeaderDesktopNav onLogout={jest.fn()} />, {
+      route: '/cursos',
+      user: mockLoggedAdmin,
+    });
+
+    expect(screen.getByRole('link', { name: 'Mapa' })).toHaveAttribute(
+      'href',
+      '/mapa'
+    );
     expect(screen.getByRole('link', { name: 'Medalhas' })).toHaveAttribute(
       'href',
       '/medalhas'
     );
+  });
+
+  it('disables the map when the monitor has no courses', () => {
+    renderWithProviders(<HeaderDesktopNav onLogout={jest.fn()} />, {
+      route: '/cursos',
+      user: { ...mockLoggedMonitor, cursoIds: [] },
+    });
+
+    expect(
+      screen.queryByRole('link', { name: 'Mapa' })
+    ).not.toBeInTheDocument();
+    expect(screen.getByText('Mapa')).toHaveAttribute('aria-disabled', 'true');
   });
 });

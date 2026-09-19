@@ -71,6 +71,7 @@ export const QuizPlay = ({ activity, usedAttempts }: QuizPlayPropsType) => {
                       question={currentQuestion}
                       questionNumber={currentIndex + 1}
                       selectedId={selectedId}
+                      selectedIsCorrect={selectedIsCorrect}
                       phase={phase}
                       revealCorrect={revealCorrect}
                       onSelect={selectAlternative}

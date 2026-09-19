@@ -9,7 +9,7 @@ export const endpoints = {
   courses: {
     list: '/api/cursos',
     byId: (id: string) => `/api/cursos/${id}`,
-    enroll: (id: string) => `/api/cursos/${id}/inscrever`,
+    enroll: '/api/cursos/inscrever',
     modules: (courseId: string) => `/api/cursos/${courseId}/modulos`,
   },
   modules: {

@@ -20,4 +20,5 @@ type SectionItemProps = {
   path: string;
   icon: React.ComponentType<{ size: number; className?: string }>;
   onClick: () => void;
+  disabled?: boolean;
 };

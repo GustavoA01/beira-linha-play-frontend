@@ -1,28 +1,22 @@
 import { useParams } from 'react-router-dom';
-import { useQuery, useQueries } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { queryClientKeys } from '@/lib/queryClientKeys';
 import { getCourse } from '@/services/cursos';
-import { toModule } from '@/pages/modulo/utils';
 import { toCourse } from '@/pages/cursos/utils';
 import { useAuthUser } from '@/providers/UserProvider';
-import { getModule } from '@/services/modulos';
 import { listMyAttempts } from '@/services/tentativas';
 import { useState } from 'react';
 import type { ModuloType } from '@/data/types/api';
+import { useCursoAlocado } from '@/hooks/useCursoAlocado';
 
 export const useCurso = () => {
   const { cursoId } = useParams();
   const { isAluno, isMonitor, user } = useAuthUser();
+  const { bloqueado } = useCursoAlocado(cursoId);
   const { data, isPending, isError } = useQuery({
     queryKey: queryClientKeys.courseKeys.detail(cursoId ?? ''),
     queryFn: () => getCourse(cursoId!),
-    enabled: Boolean(cursoId),
-  });
-  const moduleDetails = useQueries({
-    queries: (data?.modulos ?? []).map((modulo) => ({
-      queryKey: queryClientKeys.moduleKeys.detail(modulo.id),
-      queryFn: async () => toModule(await getModule(modulo.id)),
-    })),
+    enabled: Boolean(cursoId) && !bloqueado,
   });
   const { data: attempts = [] } = useQuery({
     queryKey: queryClientKeys.attemptKeys.mine(),
@@ -44,7 +38,6 @@ export const useCurso = () => {
     curso,
     isPending,
     isError,
-    moduleDetails,
     attempts,
     alunoId: user.id,
     isAluno,
@@ -57,5 +50,6 @@ export const useCurso = () => {
     setModuleToDelete,
     handleModuleDialogChange,
     cursoId,
+    bloqueado,
   };
 };

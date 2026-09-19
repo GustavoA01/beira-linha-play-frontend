@@ -7,6 +7,7 @@ type QuestionStepPropsType = {
   question: QuestaoType;
   questionNumber: number;
   selectedId: string | null;
+  selectedIsCorrect: boolean | null;
   phase: QuizPhaseType;
   revealCorrect: boolean;
   onSelect: (id: string) => void;
@@ -16,6 +17,7 @@ export const QuestionStep = ({
   question,
   questionNumber,
   selectedId,
+  selectedIsCorrect,
   phase,
   revealCorrect,
   onSelect,
@@ -58,7 +60,11 @@ export const QuestionStep = ({
             description={alternative.descricao}
             selected={selectedId === alternative.id}
             onSelect={() => onSelect(alternative.id)}
-            status={statusFor(alternative.id, alternative.correta)}
+            status={statusFor(
+              alternative.id,
+              alternative.correta ??
+                (alternative.id === selectedId ? selectedIsCorrect : null)
+            )}
           />
         ))}
       </div>

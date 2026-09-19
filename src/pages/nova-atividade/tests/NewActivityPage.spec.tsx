@@ -1,9 +1,11 @@
 import type { ReactElement } from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { NewActivityPage } from '../index';
+import { UserProvider } from '@/providers/UserProvider';
+import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
 import {
   createActivity,
   getActivity,
@@ -54,22 +56,24 @@ const renderPage = (
 
   return render(
     <QueryClientProvider client={client}>
-      <MemoryRouter initialEntries={[path]}>
-        <Routes>
-          <Route
-            path="/cursos/:cursoId/modulos/:moduloId/nova-atividade"
-            element={ui}
-          />
-          <Route
-            path="/cursos/:cursoId/modulos/:moduloId/nova-atividade/:atividadeId"
-            element={ui}
-          />
-          <Route
-            path="/cursos/:cursoId/modulos/:moduloId"
-            element={<p>Módulo</p>}
-          />
-        </Routes>
-      </MemoryRouter>
+      <UserProvider initialUser={mockLoggedMonitor}>
+        <MemoryRouter initialEntries={[path]}>
+          <Routes>
+            <Route
+              path="/cursos/:cursoId/modulos/:moduloId/nova-atividade"
+              element={ui}
+            />
+            <Route
+              path="/cursos/:cursoId/modulos/:moduloId/nova-atividade/:atividadeId"
+              element={ui}
+            />
+            <Route
+              path="/cursos/:cursoId/modulos/:moduloId"
+              element={<p>Módulo</p>}
+            />
+          </Routes>
+        </MemoryRouter>
+      </UserProvider>
     </QueryClientProvider>
   );
 };
@@ -115,17 +119,17 @@ describe('NewActivityPage', () => {
       screen.getByRole('heading', { name: 'Limites' })
     ).toBeInTheDocument();
 
-    await user.type(
-      screen.getByPlaceholderText('Escreva a pergunta...'),
-      'O que é um limite?'
-    );
-    await user.type(
-      screen.getByPlaceholderText('Alternativa 1'),
-      'Uma tendência'
-    );
-    await user.type(screen.getByPlaceholderText('Alternativa 2'), 'Um número');
-    await user.type(screen.getByPlaceholderText('Alternativa 3'), 'Uma função');
-    await user.type(screen.getByPlaceholderText('Alternativa 4'), 'Um gráfico');
+    const fill = (placeholder: string, value: string) => {
+      fireEvent.change(screen.getByPlaceholderText(placeholder), {
+        target: { value },
+      });
+    };
+
+    fill('Escreva a pergunta...', 'O que é um limite?');
+    fill('Alternativa 1', 'Uma tendência');
+    fill('Alternativa 2', 'Um número');
+    fill('Alternativa 3', 'Uma função');
+    fill('Alternativa 4', 'Um gráfico');
     await user.click(screen.getAllByRole('radio')[0]);
     await user.click(screen.getByRole('button', { name: 'Salvar' }));
 

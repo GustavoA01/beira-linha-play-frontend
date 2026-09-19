@@ -41,12 +41,9 @@ export const deleteCourse = async (id: string) => {
   await api.delete(endpoints.courses.byId(id));
 };
 
-export const enrollCourse = async (
-  id: string,
-  payload: EnrollCoursePayloadType
-) => {
+export const enrollCourse = async (payload: EnrollCoursePayloadType) => {
   const { data } = await api.post<CourseResponseType>(
-    endpoints.courses.enroll(id),
+    endpoints.courses.enroll,
     payload
   );
   return data;

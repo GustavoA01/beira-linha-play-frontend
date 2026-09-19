@@ -14,7 +14,10 @@ export const NewActivityPage = () => {
     isSubmitting,
     isLoading,
     isMissing,
+    bloqueado,
   } = useNewActivity();
+
+  if (bloqueado) return null;
 
   if (isLoading) return <HeaderListPageSkeleton />;
 

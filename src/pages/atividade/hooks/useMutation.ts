@@ -17,9 +17,6 @@ export const useSubmitAttempt = (activityId: string) => {
       void queryClient.invalidateQueries({
         queryKey: queryClientKeys.rankingKeys.all,
       });
-      void queryClient.invalidateQueries({
-        queryKey: queryClientKeys.activityKeys.detail(activityId),
-      });
     },
     onError: (error) => {
       toastError(error, 'Não foi possível enviar a tentativa');

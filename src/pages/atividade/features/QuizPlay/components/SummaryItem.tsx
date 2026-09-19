@@ -4,7 +4,7 @@ import { Check, X } from 'lucide-react';
 type SummaryItemPropsType = {
   index: number;
   enunciado: string;
-  answerCorrect?: boolean;
+  answerCorrect?: boolean | null;
   chosenDescription?: string;
   correctDescription?: string;
   revealCorrect: boolean;
