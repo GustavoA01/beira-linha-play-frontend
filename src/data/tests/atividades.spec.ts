@@ -1,5 +1,10 @@
-import { activityXp, isActivityConcluded, moduleXp } from '../atividades';
-import type { AtividadeType, ModuloType } from '@/data/types/api';
+import {
+  activityXp,
+  courseProgressPercent,
+  isActivityConcluded,
+  moduleXp,
+} from '../atividades';
+import type { AtividadeType, CursoType, ModuloType } from '@/data/types/api';
 
 describe('activityXp', () => {
   const activity = (
@@ -126,5 +131,66 @@ describe('moduleXp', () => {
     };
 
     expect(moduleXp(modulo)).toBe(6);
+  });
+});
+
+describe('courseProgressPercent', () => {
+  const curso = (atividades: AtividadeType[]): CursoType => ({
+    id: 'curso-1',
+    nome: 'Cálculo 1',
+    codigoAcesso: 'ABC123',
+    monitorIds: ['monitor-1'],
+    modulos: [
+      {
+        id: 'modulo-1',
+        nome: 'Limites',
+        cursoId: 'curso-1',
+        atividades,
+      },
+    ],
+  });
+
+  const activity = (id: string): AtividadeType => ({
+    id,
+    titulo: id,
+    quantQuestoes: 1,
+    moduloId: 'modulo-1',
+    questoes: [{ id: `${id}-q`, enunciado: 'a', valor: 2, alternativas: [] }],
+  });
+
+  it('returns 0 when the course has no activities', () => {
+    expect(courseProgressPercent(curso([]), [], 'aluno-1')).toBe(0);
+  });
+
+  it('returns the share of concluded activities', () => {
+    expect(
+      courseProgressPercent(
+        curso([
+          activity('atv-1'),
+          activity('atv-2'),
+          activity('atv-3'),
+          activity('atv-4'),
+        ]),
+        [
+          {
+            id: 't1',
+            alunoId: 'aluno-1',
+            atividadeId: 'atv-1',
+            pontuacaoObtida: 2,
+            dataEnvio: '2026-09-14T12:00:00.000Z',
+            respostas: [],
+          },
+          {
+            id: 't2',
+            alunoId: 'aluno-1',
+            atividadeId: 'atv-1',
+            pontuacaoObtida: 0,
+            dataEnvio: '2026-09-15T12:00:00.000Z',
+            respostas: [],
+          },
+        ],
+        'aluno-1'
+      )
+    ).toBe(25);
   });
 });

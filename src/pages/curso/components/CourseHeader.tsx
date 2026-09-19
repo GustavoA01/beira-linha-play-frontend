@@ -8,6 +8,7 @@ type CourseHeaderProps = {
   curso: CursoType;
   isAluno: boolean;
   isMonitor: boolean;
+  progress?: number;
   handleNewModule: () => void;
 };
 
@@ -15,6 +16,7 @@ export const CourseHeader = ({
   curso,
   isAluno,
   isMonitor,
+  progress = 0,
   handleNewModule,
 }: CourseHeaderProps) => (
   <header className={` bg-blue-puc rounded-b-4xl pb-14`}>
@@ -42,11 +44,11 @@ export const CourseHeader = ({
             <p className="text-blue-onSurface font-bold text-xs sm:text-sm">
               Progresso do Curso
             </p>
-            <p className="text-white text-xs sm:text-sm">50%</p>
+            <p className="text-white text-xs sm:text-sm">{progress}%</p>
           </div>
 
           <Progress
-            value={50}
+            value={progress}
             barColor="bg-green-400"
             className="bg-primary-dark"
           />

@@ -1,12 +1,25 @@
 import { render, screen } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import { Dialog } from '@/components/ui/dialog';
 import { PhaseProgressModal } from '../components/ProgressModal/PhaseProgressModal';
 
-const renderModal = (points: number, minPoints: number, id = '3') =>
+const renderModal = (
+  points: number,
+  minPoints: number,
+  id = '3',
+  courses?: { id: string; nome: string; progresso: number }[]
+) =>
   render(
-    <Dialog open>
-      <PhaseProgressModal id={id} points={points} minPoints={minPoints} />
-    </Dialog>
+    <MemoryRouter>
+      <Dialog open>
+        <PhaseProgressModal
+          id={id}
+          points={points}
+          minPoints={minPoints}
+          courses={courses}
+        />
+      </Dialog>
+    </MemoryRouter>
   );
 
 describe('PhaseProgressModal', () => {
@@ -61,5 +74,19 @@ describe('PhaseProgressModal', () => {
     expect(screen.queryByText(/Você acumulou/)).not.toBeInTheDocument();
     expect(screen.queryByText('Em progresso')).not.toBeInTheDocument();
     expect(screen.queryByText('Concluído')).not.toBeInTheDocument();
+    expect(screen.queryByText('Seus cursos')).not.toBeInTheDocument();
+  });
+
+  it('lists enrolled courses with progress and a link to activities', () => {
+    renderModal(40, 100, '3', [
+      { id: 'curso-1', nome: 'Cálculo 1', progresso: 25 },
+    ]);
+
+    expect(screen.getByText('Seus cursos')).toBeInTheDocument();
+    expect(screen.getByText('Cálculo 1')).toBeInTheDocument();
+    expect(screen.getByText('25%')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Ver atividades' })
+    ).toHaveAttribute('href', '/cursos/curso-1');
   });
 });

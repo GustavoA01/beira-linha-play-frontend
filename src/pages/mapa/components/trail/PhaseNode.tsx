@@ -3,6 +3,7 @@ import { motion } from 'motion/react';
 import { PhaseProgressModal } from '@/pages/mapa/components/ProgressModal/PhaseProgressModal';
 import type { PhaseNodeProps } from '@/data/types/reactFlow';
 import { usePhaseNode } from '@/pages/mapa/hooks/usePhaseNode';
+import { useAlunoCursosProgresso } from '@/pages/mapa/hooks/useAlunoCursosProgresso';
 import { Dialog } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 
@@ -19,6 +20,9 @@ export const PhaseNode = ({ id, data: { minPoints } }: PhaseNodeProps) => {
     glowScales,
     iconClassName,
   } = usePhaseNode(minPoints);
+  const { cursos, isPending: coursesPending } = useAlunoCursosProgresso(
+    openDialog && showProgress
+  );
 
   const pulseDelay = ((Number(id) || 1) % 5) * 0.6;
   const colorTransition = {
@@ -79,6 +83,8 @@ export const PhaseNode = ({ id, data: { minPoints } }: PhaseNodeProps) => {
           points={points}
           minPoints={minPoints}
           showProgress={showProgress}
+          courses={cursos}
+          coursesPending={coursesPending}
         />
       </Dialog>
     </>

@@ -6,10 +6,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { CoursePage } from '../index';
 import { UserProvider } from '@/providers/UserProvider';
 import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
+import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
 import { getCourse } from '@/services/cursos';
 import { createModule, getModule } from '@/services/modulos';
 import { getActivity } from '@/services/atividades';
+import { listMyAttempts } from '@/services/tentativas';
 import type { CourseResponseType } from '@/data/types/services';
+import type { UsuarioType } from '@/data/types/api';
 
 jest.mock('@/assets/logo-beira-linha.png', () => 'logo.png');
 
@@ -39,6 +42,11 @@ jest.mock('@/services/atividades', () => ({
   deleteActivity: jest.fn(),
 }));
 
+jest.mock('@/services/tentativas', () => ({
+  listMyAttempts: jest.fn(),
+  submitAttempt: jest.fn(),
+}));
+
 const mockedGetCourse = getCourse as jest.MockedFunction<typeof getCourse>;
 const mockedCreateModule = createModule as jest.MockedFunction<
   typeof createModule
@@ -46,6 +54,9 @@ const mockedCreateModule = createModule as jest.MockedFunction<
 const mockedGetModule = getModule as jest.MockedFunction<typeof getModule>;
 const mockedGetActivity = getActivity as jest.MockedFunction<
   typeof getActivity
+>;
+const mockedListMyAttempts = listMyAttempts as jest.MockedFunction<
+  typeof listMyAttempts
 >;
 
 beforeAll(() => {
@@ -70,7 +81,10 @@ const course: CourseResponseType = {
   modulos: [],
 };
 
-const renderPage = (ui: ReactElement) => {
+const renderPage = (
+  ui: ReactElement,
+  user: UsuarioType = { ...mockLoggedMonitor, cursoIds: ['curso-1'] }
+) => {
   const client = new QueryClient({
     defaultOptions: {
       queries: { retry: false },
@@ -80,9 +94,7 @@ const renderPage = (ui: ReactElement) => {
 
   return render(
     <QueryClientProvider client={client}>
-      <UserProvider
-        initialUser={{ ...mockLoggedMonitor, cursoIds: ['curso-1'] }}
-      >
+      <UserProvider initialUser={user}>
         <MemoryRouter initialEntries={['/cursos/curso-1']}>
           <Routes>
             <Route path="/cursos/:cursoId" element={ui} />
@@ -99,6 +111,8 @@ describe('CoursePage', () => {
     mockedCreateModule.mockReset();
     mockedGetModule.mockReset();
     mockedGetActivity.mockReset();
+    mockedListMyAttempts.mockReset();
+    mockedListMyAttempts.mockResolvedValue([]);
     mockedGetCourse.mockResolvedValue(course);
     mockedGetModule.mockResolvedValue({
       id: 'modulo-novo',
@@ -173,5 +187,72 @@ describe('CoursePage', () => {
     expect(await screen.findByText('2 atividades')).toBeInTheDocument();
     expect(screen.getByText('6 XP')).toBeInTheDocument();
     expect(mockedGetModule).not.toHaveBeenCalled();
+  });
+
+  it('shows course progress from concluded activities', async () => {
+    mockedGetCourse.mockResolvedValue({
+      ...course,
+      modulos: [
+        {
+          id: 'modulo-1',
+          nome: 'Limites',
+          cursoId: 'curso-1',
+          atividades: [
+            {
+              id: 'atv-1',
+              titulo: 'Noção de limite',
+              quantQuestoes: 1,
+              moduloId: 'modulo-1',
+              xpTotal: 2,
+            },
+            {
+              id: 'atv-2',
+              titulo: 'Continuidade',
+              quantQuestoes: 1,
+              moduloId: 'modulo-1',
+              xpTotal: 2,
+            },
+            {
+              id: 'atv-3',
+              titulo: 'Derivadas',
+              quantQuestoes: 1,
+              moduloId: 'modulo-1',
+              xpTotal: 2,
+            },
+            {
+              id: 'atv-4',
+              titulo: 'Integrais',
+              quantQuestoes: 1,
+              moduloId: 'modulo-1',
+              xpTotal: 2,
+            },
+          ],
+        },
+      ],
+    });
+    mockedListMyAttempts.mockResolvedValue([
+      {
+        id: 't1',
+        alunoId: mockLoggedAluno.id,
+        atividadeId: 'atv-1',
+        pontuacaoObtida: 2,
+        dataEnvio: '2026-09-14T12:00:00.000Z',
+        respostas: [],
+      },
+      {
+        id: 't2',
+        alunoId: mockLoggedAluno.id,
+        atividadeId: 'atv-1',
+        pontuacaoObtida: 0,
+        dataEnvio: '2026-09-15T12:00:00.000Z',
+        respostas: [],
+      },
+    ]);
+
+    renderPage(<CoursePage />, { ...mockLoggedAluno, cursoIds: ['curso-1'] });
+
+    expect(await screen.findByText('Progresso do Curso')).toBeInTheDocument();
+    expect(screen.getByText('25%')).toBeInTheDocument();
+    expect(screen.queryByText('50%')).not.toBeInTheDocument();
   });
 });
