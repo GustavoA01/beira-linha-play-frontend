@@ -2,14 +2,20 @@ import { CourseSharedHeader } from '@/components/Header/CourseSharedHeader';
 import { DescriptionCircle } from '@/components/DescriptionCircle';
 import { NewButtonFloat } from '@/components/NewButtonFloat';
 import { Progress } from '@/components/ui/progress';
-import type { ModuloType } from '@/data/types/api';
-import { countModuleActivities, moduleXp } from '@/data/atividades';
+import type { ModuloType, TentativaType } from '@/data/types/api';
+import {
+  countModuleActivities,
+  moduleProgressPercent,
+  moduleXp,
+} from '@/data/atividades';
 
 type ModuloHeaderProps = {
   modulo: ModuloType;
   setOpenActivityDialog: (open: boolean) => void;
   isAluno: boolean;
   isMonitor: boolean;
+  attempts?: TentativaType[];
+  alunoId?: string;
 };
 
 export const ModuloHeader = ({
@@ -17,9 +23,14 @@ export const ModuloHeader = ({
   setOpenActivityDialog,
   isAluno,
   isMonitor,
+  attempts = [],
+  alunoId = '',
 }: ModuloHeaderProps) => {
   const atividadesCount = countModuleActivities(modulo);
   const atividadesLabel = `${atividadesCount} ${atividadesCount === 1 ? 'atividade' : 'atividades'}`;
+  const progress = isAluno
+    ? moduleProgressPercent(modulo, attempts, alunoId)
+    : 0;
 
   return (
     <header className={` bg-blue-puc rounded-b-4xl pb-10`}>
@@ -48,12 +59,12 @@ export const ModuloHeader = ({
         {isAluno && (
           <div className="flex items-center gap-2 mt-5 px-2 py-1 border rounded-full bg-blue-900/50 border-blue-onSurface/30">
             <Progress
-              value={40}
+              value={progress}
               barColor="bg-green-300"
               className="bg-primary-dark"
             />
             <p className="text-xs sm:text-sm text-green-300 font-semibold">
-              40%
+              {progress}%
             </p>
           </div>
         )}

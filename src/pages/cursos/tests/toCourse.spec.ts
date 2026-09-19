@@ -41,7 +41,7 @@ describe('toCourse', () => {
     expect(result.modulos[0].atividades).toHaveLength(2);
   });
 
-  it('uses quantAtividades when the list is missing', () => {
+  it('keeps the activity list empty when the payload only has a count', () => {
     const result = toCourse(
       course([
         {
@@ -53,10 +53,10 @@ describe('toCourse', () => {
       ])
     );
 
-    expect(result.modulos[0].atividades).toHaveLength(3);
+    expect(result.modulos[0].atividades).toHaveLength(0);
   });
 
-  it('uses quantidadeAtividades when the list is missing', () => {
+  it('does not invent activities from quantidadeAtividades', () => {
     const result = toCourse(
       course([
         {
@@ -68,7 +68,7 @@ describe('toCourse', () => {
       ])
     );
 
-    expect(result.modulos[0].atividades).toHaveLength(2);
+    expect(result.modulos[0].atividades).toHaveLength(0);
   });
 });
 

@@ -13,22 +13,7 @@ import { toActivitySummary } from '@/pages/atividade/utils';
 
 const toCourseActivities = (
   modulo: CourseModuleResponseType
-): AtividadeType[] => {
-  const atividades = (modulo.atividades ?? []).map(toActivitySummary);
-
-  if (atividades.length > 0) return atividades;
-
-  const quantAtividades =
-    modulo.quantAtividades ?? modulo.quantidadeAtividades ?? 0;
-
-  return Array.from({ length: quantAtividades }, (_, index) => ({
-    id: `${modulo.id}-atividade-${index}`,
-    titulo: '',
-    quantQuestoes: 0,
-    moduloId: modulo.id,
-    questoes: [],
-  }));
-};
+): AtividadeType[] => (modulo.atividades ?? []).map(toActivitySummary);
 
 export const toCourse = (course: CourseResponseType): CursoType => ({
   id: course.id,

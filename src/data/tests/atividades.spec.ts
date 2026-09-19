@@ -2,6 +2,7 @@ import {
   activityXp,
   courseProgressPercent,
   isActivityConcluded,
+  moduleProgressPercent,
   moduleXp,
 } from '../atividades';
 import type { AtividadeType, CursoType, ModuloType } from '@/data/types/api';
@@ -192,5 +193,47 @@ describe('courseProgressPercent', () => {
         'aluno-1'
       )
     ).toBe(25);
+  });
+});
+
+describe('moduleProgressPercent', () => {
+  const activity = (id: string): AtividadeType => ({
+    id,
+    titulo: id,
+    quantQuestoes: 1,
+    moduloId: 'modulo-1',
+    questoes: [{ id: `${id}-q`, enunciado: 'a', valor: 2, alternativas: [] }],
+  });
+
+  it('returns the share of concluded activities in the module', () => {
+    expect(
+      moduleProgressPercent(
+        {
+          id: 'modulo-1',
+          nome: 'Limites',
+          cursoId: 'curso-1',
+          atividades: [activity('atv-1'), activity('atv-2')],
+        },
+        [
+          {
+            id: 't1',
+            alunoId: 'aluno-1',
+            atividadeId: 'atv-1',
+            pontuacaoObtida: 2,
+            dataEnvio: '2026-09-14T12:00:00.000Z',
+            respostas: [],
+          },
+          {
+            id: 't2',
+            alunoId: 'aluno-1',
+            atividadeId: 'atv-1',
+            pontuacaoObtida: 0,
+            dataEnvio: '2026-09-15T12:00:00.000Z',
+            respostas: [],
+          },
+        ],
+        'aluno-1'
+      )
+    ).toBe(50);
   });
 });

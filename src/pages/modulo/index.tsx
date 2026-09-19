@@ -65,6 +65,8 @@ export const ModulePage = () => {
           modulo={modulo}
           isAluno={isAluno}
           isMonitor={isMonitor}
+          attempts={attempts}
+          alunoId={user.id}
           setOpenActivityDialog={() => {
             setEditingActivity(undefined);
             setOpenActivityDialog(true);
