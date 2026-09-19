@@ -23,12 +23,6 @@ body {
     user-select: none;
   }
 
-  button,
-  a {
-    cursor: pointer;
-    user-select: none;
-  }
-
   .custom-bar::-webkit-scrollbar {
     width: 8px;
     height: 8px;
@@ -167,6 +161,15 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+  }
+  a,
+  button:not(:disabled),
+  [role='button']:not(:disabled) {
+    cursor: pointer;
+  }
+  a,
+  button {
+    user-select: none;
   }
 }
 

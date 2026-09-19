@@ -53,6 +53,18 @@ export const isActivityConcluded = (
   return xpTotal > 0 && bestScore >= xpTotal;
 };
 
+export const isStudentActivityConcluded = (
+  atividade: AtividadeType,
+  tentativas: TentativaType[],
+  alunoId: string
+) =>
+  isActivityConcluded(
+    countStudentAttempts(tentativas, alunoId, atividade.id),
+    bestStudentScore(tentativas, alunoId, atividade.id),
+    activityXp(atividade),
+    studentAttemptsOnActivity(tentativas, alunoId, atividade.id)
+  );
+
 export const isModuleConcluded = (
   modulo: ModuloType,
   tentativas: TentativaType[],
@@ -61,13 +73,23 @@ export const isModuleConcluded = (
   if (modulo.atividades.length === 0) return false;
 
   return modulo.atividades.every((atividade) =>
-    isActivityConcluded(
-      countStudentAttempts(tentativas, alunoId, atividade.id),
-      bestStudentScore(tentativas, alunoId, atividade.id),
-      activityXp(atividade),
-      studentAttemptsOnActivity(tentativas, alunoId, atividade.id)
-    )
+    isStudentActivityConcluded(atividade, tentativas, alunoId)
   );
+};
+
+export const courseProgressPercent = (
+  curso: CursoType,
+  tentativas: TentativaType[],
+  alunoId: string
+) => {
+  const atividades = curso.modulos.flatMap((modulo) => modulo.atividades);
+  if (atividades.length === 0) return 0;
+
+  const concluded = atividades.filter((atividade) =>
+    isStudentActivityConcluded(atividade, tentativas, alunoId)
+  ).length;
+
+  return Math.round((concluded / atividades.length) * 100);
 };
 
 export const moduleXp = (modulo: ModuloType & WithFlattenedXp) => {

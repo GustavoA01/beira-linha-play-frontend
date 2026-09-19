@@ -34,7 +34,14 @@ export const HeaderUserMenu = ({ onLogout }: HeaderUserMenuPropsType) => {
             {initials}
           </AvatarFallback>
         </Avatar>
-        <p>Olá, {greetingName}</p>
+        <div className="flex flex-col items-start leading-tight">
+          <p>Olá, {greetingName}</p>
+          {auth.isAluno && (
+            <span className="text-green-400 text-xs font-semibold">
+              {auth.user.pontos} xp
+            </span>
+          )}
+        </div>
         <ChevronDown
           size={16}
           className="transition-transform duration-200 group-data-popup-open:rotate-180"

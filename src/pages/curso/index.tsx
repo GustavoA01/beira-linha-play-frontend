@@ -5,7 +5,7 @@ import { DeleteModuleDialog } from './components/DeleteModuleDialog';
 import { useNavigate } from 'react-router-dom';
 import { ResourceNotFound } from '@/components/ResourceNotFound';
 import { HeaderListPageSkeleton } from '@/components/PageSkeleton';
-import { isModuleConcluded } from '@/data/atividades';
+import { courseProgressPercent, isModuleConcluded } from '@/data/atividades';
 import { useDeleteModule } from './hooks/useMutation';
 import { useCurso } from './hooks/useCurso';
 
@@ -51,6 +51,9 @@ export const CoursePage = () => {
           curso={curso}
           isAluno={isAluno}
           isMonitor={isMonitor}
+          progress={
+            isAluno ? courseProgressPercent(curso, attempts, alunoId) : 0
+          }
           handleNewModule={() => {
             setEditingModule(undefined);
             setOpenModuleDialog(true);
