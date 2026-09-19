@@ -20,8 +20,10 @@ export const PhaseNode = ({ id, data: { minPoints } }: PhaseNodeProps) => {
     glowScales,
     iconClassName,
   } = usePhaseNode(minPoints);
+  const phaseProgress = Math.min(100, Math.round((points / minPoints) * 100));
+  const phaseConcluded = showProgress && phaseProgress === 100;
   const { cursos, isPending: coursesPending } = useAlunoCursosProgresso(
-    openDialog && showProgress
+    openDialog && showProgress && !phaseConcluded
   );
 
   const pulseDelay = ((Number(id) || 1) % 5) * 0.6;

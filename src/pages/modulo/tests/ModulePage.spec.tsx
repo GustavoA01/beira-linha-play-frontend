@@ -123,6 +123,7 @@ describe('ModulePage', () => {
     expect(await screen.findByText('Noção de limite')).toBeInTheDocument();
     expect(screen.getByText('1/2 tentativas')).toBeInTheDocument();
     expect(screen.getByText('+ 5 pts')).toBeInTheDocument();
+    expect(screen.getByText('0%')).toBeInTheDocument();
     expect(mockedListMyAttempts).toHaveBeenCalledWith();
     expect(mockedGetCourse).not.toHaveBeenCalled();
   });
@@ -197,5 +198,35 @@ describe('ModulePage', () => {
       await screen.findByText('Nenhuma atividade cadastrada.')
     ).toBeInTheDocument();
     expect(screen.queryByText('Noção de limite')).not.toBeInTheDocument();
+  });
+
+  it('shows module progress from concluded activities', async () => {
+    mockedGetModule.mockResolvedValue({
+      ...modulo,
+      atividades: [
+        modulo.atividades[0],
+        {
+          id: 'atv-2',
+          titulo: 'Continuidade',
+          quantQuestoes: 1,
+          moduloId: 'modulo-1',
+          xpTotal: 2,
+        },
+      ],
+    });
+    mockedListMyAttempts.mockResolvedValue([
+      attempt({ id: 't1', pontuacaoObtida: 5 }),
+      attempt({
+        id: 't2',
+        pontuacaoObtida: 0,
+        dataEnvio: '2026-09-15T12:00:00.000Z',
+      }),
+    ]);
+
+    renderPage(mockLoggedAluno);
+
+    expect(await screen.findByText('Noção de limite')).toBeInTheDocument();
+    expect(screen.getByText('50%')).toBeInTheDocument();
+    expect(screen.queryByText('40%')).not.toBeInTheDocument();
   });
 });

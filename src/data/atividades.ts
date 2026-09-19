@@ -77,12 +77,11 @@ export const isModuleConcluded = (
   );
 };
 
-export const courseProgressPercent = (
-  curso: CursoType,
+export const activitiesProgressPercent = (
+  atividades: AtividadeType[],
   tentativas: TentativaType[],
   alunoId: string
 ) => {
-  const atividades = curso.modulos.flatMap((modulo) => modulo.atividades);
   if (atividades.length === 0) return 0;
 
   const concluded = atividades.filter((atividade) =>
@@ -91,6 +90,23 @@ export const courseProgressPercent = (
 
   return Math.round((concluded / atividades.length) * 100);
 };
+
+export const courseProgressPercent = (
+  curso: CursoType,
+  tentativas: TentativaType[],
+  alunoId: string
+) =>
+  activitiesProgressPercent(
+    curso.modulos.flatMap((modulo) => modulo.atividades),
+    tentativas,
+    alunoId
+  );
+
+export const moduleProgressPercent = (
+  modulo: ModuloType,
+  tentativas: TentativaType[],
+  alunoId: string
+) => activitiesProgressPercent(modulo.atividades, tentativas, alunoId);
 
 export const moduleXp = (modulo: ModuloType & WithFlattenedXp) => {
   const fromActivities = modulo.atividades.reduce(

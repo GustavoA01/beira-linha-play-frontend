@@ -50,6 +50,7 @@ describe('PhaseProgressModal', () => {
 
     expect(screen.getByText('100%')).toBeInTheDocument();
     expect(screen.getByText('Concluído')).toBeInTheDocument();
+    expect(screen.queryByText('Seus cursos')).not.toBeInTheDocument();
   });
 
   it('hides the progress bar for staff and shows the phase requirement', () => {
@@ -77,7 +78,7 @@ describe('PhaseProgressModal', () => {
     expect(screen.queryByText('Seus cursos')).not.toBeInTheDocument();
   });
 
-  it('lists enrolled courses with progress and a link to activities', () => {
+  it('lists enrolled courses as cards that open the course on in-progress phases', () => {
     renderModal(40, 100, '3', [
       { id: 'curso-1', nome: 'Cálculo 1', progresso: 25 },
     ]);
@@ -86,7 +87,29 @@ describe('PhaseProgressModal', () => {
     expect(screen.getByText('Cálculo 1')).toBeInTheDocument();
     expect(screen.getByText('25%')).toBeInTheDocument();
     expect(
-      screen.getByRole('link', { name: 'Ver atividades' })
+      screen.getByRole('link', { name: 'Cálculo 1, 25% concluído' })
     ).toHaveAttribute('href', '/cursos/curso-1');
+    expect(
+      screen.queryByRole('link', { name: 'Ver atividades' })
+    ).not.toBeInTheDocument();
+  });
+
+  it('hides enrolled courses on a concluded phase', () => {
+    render(
+      <MemoryRouter>
+        <Dialog open>
+          <PhaseProgressModal
+            id="1"
+            points={80}
+            minPoints={80}
+            courses={[{ id: 'curso-1', nome: 'Cálculo 1', progresso: 25 }]}
+          />
+        </Dialog>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('Concluído')).toBeInTheDocument();
+    expect(screen.queryByText('Seus cursos')).not.toBeInTheDocument();
+    expect(screen.queryByText('Cálculo 1')).not.toBeInTheDocument();
   });
 });

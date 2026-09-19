@@ -52,7 +52,7 @@ export const PhaseProgressModal = ({
           />
         )}
 
-        {showProgress && (
+        {showProgress && !concluded && (
           <CourseProgressList cursos={courses} isPending={coursesPending} />
         )}
 
