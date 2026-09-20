@@ -22,7 +22,7 @@ export class ApiError extends Error {
 type RetryConfig = InternalAxiosRequestConfig & { _retry?: boolean };
 
 export const api = axios.create({
-  baseURL: process.env.VITE_API_URL ?? 'http://localhost:8080',
+  baseURL: process.env.VITE_API_URL || undefined,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json' },
 });
