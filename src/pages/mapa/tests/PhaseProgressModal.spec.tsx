@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { Dialog } from '@/components/ui/dialog';
 import { PhaseProgressModal } from '../components/ProgressModal/PhaseProgressModal';
@@ -54,12 +54,16 @@ describe('PhaseProgressModal', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('Concluído')).toBeInTheDocument();
     expect(screen.getByText('100%')).toBeInTheDocument();
-    expect(screen.getAllByText('Gustavo Aguiar').length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/nível 1/).length).toBeGreaterThan(0);
     expect(
       screen.getByRole('button', { name: 'Compartilhar' })
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Legal!' })).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('dialog')).queryByText('Gustavo Aguiar')
+    ).not.toBeInTheDocument();
+    expect(
+      within(screen.getByRole('dialog')).queryByText('Beira Linha Play')
+    ).not.toBeInTheDocument();
   });
 
   it('caps progress at 100% when points exceed the minimum', () => {
