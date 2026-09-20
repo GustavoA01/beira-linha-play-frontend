@@ -49,7 +49,6 @@ export const PhaseProgressModal = ({
           >
             <AchievementCard
               ref={cardRef}
-              variant="export"
               nome={studentName}
               level={id}
               points={points}
@@ -86,20 +85,12 @@ export const PhaseProgressModal = ({
         )}
 
         {concluded && (
-          <>
-            <AchievementCard
-              nome={studentName}
-              level={id}
-              points={points}
-              minPoints={minPoints}
-            />
-            <ShareButtons
-              cardRef={cardRef}
-              nome={studentName}
-              level={id}
-              points={points}
-            />
-          </>
+          <ShareButtons
+            cardRef={cardRef}
+            nome={studentName}
+            level={id}
+            points={points}
+          />
         )}
 
         {showProgress && !concluded && (
