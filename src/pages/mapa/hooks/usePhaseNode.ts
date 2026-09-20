@@ -50,6 +50,7 @@ export const usePhaseNode = (minPoints: number) => {
     openDialog,
     setOpenDialog,
     showProgress: isAluno,
+    studentName: isAluno ? user.nome : '',
     points,
     isLocked,
     glowColors,

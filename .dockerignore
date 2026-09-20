@@ -1,0 +1,14 @@
+node_modules
+dist
+.git
+.gitignore
+.env
+*.env
+!.env.example
+coverage
+*.md
+.cursor
+.vscode
+.idea
+src/**/*.spec.ts
+src/**/*.spec.tsx

@@ -3,11 +3,19 @@ import { MemoryRouter } from 'react-router-dom';
 import { Dialog } from '@/components/ui/dialog';
 import { PhaseProgressModal } from '../components/ProgressModal/PhaseProgressModal';
 
+jest.mock('html-to-image', () => ({
+  toBlob: jest.fn(() =>
+    Promise.resolve(new Blob(['png'], { type: 'image/png' }))
+  ),
+  toPng: jest.fn(() => Promise.resolve('data:image/png;base64,xx')),
+}));
+
 const renderModal = (
   points: number,
   minPoints: number,
   id = '3',
-  courses?: { id: string; nome: string; progresso: number }[]
+  courses?: { id: string; nome: string; progresso: number }[],
+  studentName = 'Gustavo Aguiar'
 ) =>
   render(
     <MemoryRouter>
@@ -16,6 +24,7 @@ const renderModal = (
           id={id}
           points={points}
           minPoints={minPoints}
+          studentName={studentName}
           courses={courses}
         />
       </Dialog>
@@ -32,6 +41,9 @@ describe('PhaseProgressModal', () => {
     expect(screen.getByText('Em progresso')).toBeInTheDocument();
     expect(screen.getByText('40%')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Voltar' })).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Compartilhar' })
+    ).not.toBeInTheDocument();
   });
 
   it('shows completed copy when the bar is full', () => {
@@ -42,6 +54,11 @@ describe('PhaseProgressModal', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('Concluído')).toBeInTheDocument();
     expect(screen.getByText('100%')).toBeInTheDocument();
+    expect(screen.getAllByText('Gustavo Aguiar').length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/nível 1/).length).toBeGreaterThan(0);
+    expect(
+      screen.getByRole('button', { name: 'Compartilhar' })
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Legal!' })).toBeInTheDocument();
   });
 
@@ -50,6 +67,9 @@ describe('PhaseProgressModal', () => {
 
     expect(screen.getByText('100%')).toBeInTheDocument();
     expect(screen.getByText('Concluído')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Compartilhar' })
+    ).toBeInTheDocument();
     expect(screen.queryByText('Seus cursos')).not.toBeInTheDocument();
   });
 
@@ -76,6 +96,9 @@ describe('PhaseProgressModal', () => {
     expect(screen.queryByText('Em progresso')).not.toBeInTheDocument();
     expect(screen.queryByText('Concluído')).not.toBeInTheDocument();
     expect(screen.queryByText('Seus cursos')).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Compartilhar' })
+    ).not.toBeInTheDocument();
   });
 
   it('lists enrolled courses as cards that open the course on in-progress phases', () => {
@@ -95,20 +118,14 @@ describe('PhaseProgressModal', () => {
   });
 
   it('hides enrolled courses on a concluded phase', () => {
-    render(
-      <MemoryRouter>
-        <Dialog open>
-          <PhaseProgressModal
-            id="1"
-            points={80}
-            minPoints={80}
-            courses={[{ id: 'curso-1', nome: 'Cálculo 1', progresso: 25 }]}
-          />
-        </Dialog>
-      </MemoryRouter>
-    );
+    renderModal(80, 80, '1', [
+      { id: 'curso-1', nome: 'Cálculo 1', progresso: 25 },
+    ]);
 
     expect(screen.getByText('Concluído')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Compartilhar' })
+    ).toBeInTheDocument();
     expect(screen.queryByText('Seus cursos')).not.toBeInTheDocument();
     expect(screen.queryByText('Cálculo 1')).not.toBeInTheDocument();
   });

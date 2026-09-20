@@ -13,6 +13,7 @@ export const PhaseNode = ({ id, data: { minPoints } }: PhaseNodeProps) => {
     openDialog,
     setOpenDialog,
     showProgress,
+    studentName,
     points,
     glowColors,
     glowShadows,
@@ -85,6 +86,7 @@ export const PhaseNode = ({ id, data: { minPoints } }: PhaseNodeProps) => {
           points={points}
           minPoints={minPoints}
           showProgress={showProgress}
+          studentName={studentName}
           courses={cursos}
           coursesPending={coursesPending}
         />
