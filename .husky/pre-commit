@@ -1,4 +1,4 @@
-npm run lint
-npm run test
-npx prettier . --write
+npm run lint &&
+npm run test &&
+npx prettier . --write &&
 git add .
