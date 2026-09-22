@@ -13,8 +13,9 @@ export const achievementCaption = (
   points: number
 ) => `${nome} concluiu o nível ${level} no Beira Linha Play com ${points} XP.`;
 
-const canShareData = (data: ShareData) => {
+const canShareFiles = (file: File) => {
   if (typeof navigator.share !== 'function') return false;
+  const data: ShareData = { files: [file], title: SHARE_TITLE };
   if (typeof navigator.canShare !== 'function') return true;
   try {
     return navigator.canShare(data);
@@ -59,24 +60,6 @@ const exportCardBlob = async (card: HTMLElement) => {
   });
   if (!blob) throw new Error('Falha ao gerar o PNG da conquista');
   return blob;
-};
-
-const copyText = async (caption: string) => {
-  try {
-    await navigator.clipboard.writeText(caption);
-    return true;
-  } catch {
-    return false;
-  }
-};
-
-const copyBlob = async (blob: Blob) => {
-  try {
-    await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
-    return true;
-  } catch {
-    return false;
-  }
 };
 
 const downloadBlob = (blob: Blob) => {
@@ -144,29 +127,12 @@ export const useShareAchievement = (
   const shareNative = useCallback(() => {
     void withCardBlob(async (blob) => {
       const file = blobToPngFile(blob);
-      const withImage: ShareData = {
-        files: [file],
-        title: SHARE_TITLE,
-        text: caption,
-      };
-      const textOnly: ShareData = {
-        title: SHARE_TITLE,
-        text: caption,
-      };
-
       try {
-        if (canShareData(withImage)) {
-          await navigator.share(withImage);
-          return;
-        }
-        if (canShareData(textOnly)) {
-          await navigator.share(textOnly);
-          const copied = await copyBlob(blob);
-          toast.add({
-            type: 'success',
-            title: copied
-              ? 'Texto enviado. A imagem foi copiada — cole no app se ele não recebeu o card.'
-              : 'Texto enviado. Copie a imagem do card se o app não recebeu o arquivo.',
+        if (canShareFiles(file)) {
+          await navigator.share({
+            files: [file],
+            title: SHARE_TITLE,
+            text: caption,
           });
           return;
         }
@@ -174,23 +140,8 @@ export const useShareAchievement = (
         if (isShareAbort(error)) return;
       }
 
-      const copiedImage = await copyBlob(blob);
-      const copiedText = await copyText(caption);
-      if (copiedImage && copiedText) {
-        toast.add({
-          type: 'success',
-          title:
-            'Este navegador não abre o menu de compartilhar. Imagem e texto copiados para colar no app.',
-        });
-        return;
-      }
-      if (!copiedImage) downloadBlob(blob);
-      toast.add({
-        type: copiedText ? 'success' : 'error',
-        title: copiedImage
-          ? 'Imagem copiada.'
-          : 'Imagem baixada. Anexe o arquivo no post.',
-      });
+      downloadBlob(blob);
+      toast.add({ type: 'success', title: 'Imagem baixada.' });
     });
   }, [caption, withCardBlob]);
 
