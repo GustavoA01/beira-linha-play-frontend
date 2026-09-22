@@ -1,14 +1,18 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { queryClientKeys } from '@/lib/queryClientKeys';
 import { toast } from '@/components/ui/toast';
 import { toastError } from '@/lib/utils';
-import { createMedal, deleteMedal, equipMedal } from '@/services/medalhas';
+import {
+  createMedal,
+  deleteMedal,
+  equipMedal,
+  listMedals,
+} from '@/services/medalhas';
 import { useAuthUser } from '@/providers/UserProvider';
 import { toUser } from '@/services/auth';
 
 export const useCreateMedal = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: createMedal,
     onSuccess: () => {
@@ -23,6 +27,13 @@ export const useCreateMedal = () => {
     onError: (error) => {
       toastError(error, 'Não foi possível adicionar a medalha');
     },
+  });
+};
+
+export const useGetMedals = () => {
+  return useQuery({
+    queryKey: queryClientKeys.medalKeys.all,
+    queryFn: listMedals,
   });
 };
 
@@ -47,7 +58,6 @@ export const useSelectMedal = () => {
 
 export const useDeleteMedal = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: deleteMedal,
     onSuccess: () => {

@@ -23,32 +23,37 @@ export const useNewModuleDialog = (
     useCreateModule(courseId);
   const { mutateAsync: editModule, isPending: isUpdating } =
     useUpdateModule(courseId);
-  const methods = useForm<NewModuleFormType>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting: formSubmitting, errors },
+  } = useForm<NewModuleFormType>({
     resolver: zodResolver(newModuleSchema),
     defaultValues: valuesFromModule(modulo),
   });
-  const isSubmitting =
-    methods.formState.isSubmitting || isCreating || isUpdating;
 
   useEffect(() => {
-    methods.reset(valuesFromModule(modulo));
-  }, [modulo, methods]);
+    reset(valuesFromModule(modulo));
+  }, [modulo, reset]);
 
   const handleOpenChange = (nextOpen: boolean) => {
-    if (!nextOpen) methods.reset(valuesFromModule(modulo));
+    if (!nextOpen) reset(valuesFromModule(modulo));
     onOpenChange(nextOpen);
   };
 
-  const onSubmit = methods.handleSubmit(async (data: NewModuleFormType) => {
+  const onSubmit = handleSubmit(async (data: NewModuleFormType) => {
     if (modulo) await editModule({ id: modulo.id, payload: data });
     else await addModule(data);
     handleOpenChange(false);
   });
 
+  const isSubmitting = formSubmitting || isCreating || isUpdating;
+
   return {
     onSubmit,
-    register: methods.register,
-    errors: methods.formState.errors,
+    register: register,
+    errors: errors,
     handleOpenChange,
     isSubmitting,
     isEditing: Boolean(modulo),

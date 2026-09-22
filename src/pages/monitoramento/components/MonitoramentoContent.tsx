@@ -9,6 +9,7 @@ import { StudentsTable } from './StudentsTable';
 import { AttemptDialog } from './AttemptDialog';
 import type { StudentRowType } from '../types';
 import { useActivityMonitor } from '../hooks/useActivityMonitor';
+import { cn } from '@/lib/utils';
 
 type MonitoramentoContentPropsType = {
   activity: AtividadeType;
@@ -43,7 +44,7 @@ export const MonitoramentoContent = ({
       <MonitorHeader activity={monitoredActivity} totalXp={totalXp} />
 
       <div
-        className={`flex-1 min-h-0 overflow-y-auto custom-bar space-y-6 pb-20 ${containerClassName}`}
+        className={cn('flex-1 min-h-0 overflow-y-auto custom-bar space-y-6 pb-20', containerClassName)}
       >
         <SummaryCards
           submissions={submissions}

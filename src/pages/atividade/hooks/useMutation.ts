@@ -6,7 +6,6 @@ import type { SubmitAttemptPayloadType } from '@/data/types/services';
 
 export const useSubmitAttempt = (activityId: string) => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (payload: SubmitAttemptPayloadType) =>
       submitAttempt(activityId, payload),

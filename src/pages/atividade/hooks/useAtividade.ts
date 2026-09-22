@@ -14,17 +14,24 @@ import { listMyAttempts } from '@/services/tentativas';
 import { toActivity } from '../utils';
 
 export const useAtividade = () => {
-  const { cursoId, moduloId, atividadeId } = useParams();
   const auth = useAuthUser();
+  const { cursoId, moduloId, atividadeId } = useParams();
+  const [stayOnQuiz, setStayOnQuiz] = useState(false);
   const validIds = Boolean(cursoId && moduloId && atividadeId);
 
-  const { data, isPending, isError, error } = useQuery({
+  const {
+    data: atividade,
+    isPending,
+    isError,
+    error,
+  } = useQuery({
     queryKey: queryClientKeys.activityKeys.detail(atividadeId ?? ''),
     queryFn: async () => toActivity(await getActivity(atividadeId!)),
     enabled: validIds && !auth.isMonitor,
   });
 
   const attemptsEnabled = validIds && auth.isAluno;
+
   const {
     data: attempts = [],
     isPending: isAttemptsPending,
@@ -35,26 +42,26 @@ export const useAtividade = () => {
     enabled: attemptsEnabled,
   });
 
-  const [stayOnQuiz, setStayOnQuiz] = useState(false);
-
   const studentId = auth.user.id;
-  const usedAttempts = data
-    ? countStudentAttempts(attempts, studentId, data.id)
+  const usedAttempts = atividade
+    ? countStudentAttempts(attempts, studentId, atividade.id)
     : 0;
-  const bestScore = data ? bestStudentScore(attempts, studentId, data.id) : 0;
-  const totalXp = data ? activityXp(data) : 0;
-  const hasConcluded = data
+  const bestScore = atividade
+    ? bestStudentScore(attempts, studentId, atividade.id)
+    : 0;
+  const totalXp = atividade ? activityXp(atividade) : 0;
+  const hasConcluded = atividade
     ? isActivityConcluded(
         usedAttempts,
         bestScore,
         totalXp,
-        studentAttemptsOnActivity(attempts, studentId, data.id)
+        studentAttemptsOnActivity(attempts, studentId, atividade.id)
       )
     : false;
 
   useEffect(() => {
-    if (data && !hasConcluded) setStayOnQuiz(true);
-  }, [data, hasConcluded]);
+    if (atividade && !hasConcluded) setStayOnQuiz(true);
+  }, [atividade, hasConcluded]);
 
   return {
     cursoId,
@@ -62,7 +69,7 @@ export const useAtividade = () => {
     atividadeId,
     auth,
     validIds,
-    data,
+    atividade,
     isPending,
     isError,
     error,

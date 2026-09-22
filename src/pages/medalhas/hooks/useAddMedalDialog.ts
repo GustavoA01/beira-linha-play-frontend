@@ -40,9 +40,7 @@ export const useAddMedalDialog = (onOpenChange: (open: boolean) => void) => {
       });
       handleOpenChange(false);
     } catch (error) {
-      if (error instanceof ApiError) {
-        return;
-      }
+      if (error instanceof ApiError) return;
       methods.setError('imagem', {
         message: 'Não foi possível enviar a imagem. Tente de novo.',
       });

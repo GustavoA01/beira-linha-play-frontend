@@ -70,7 +70,6 @@ export const useNewCourseDialog = (
   const onSubmit = methods.handleSubmit(async (data: NewCourseFormType) => {
     if (curso) await editCourse({ id: curso.id, payload: data });
     else await addCourse(data);
-
     handleOpenChange(false);
   });
 

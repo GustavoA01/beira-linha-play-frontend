@@ -18,7 +18,6 @@ const addCreatedModuleToCourse = (
     queryClientKeys.courseKeys.detail(courseId),
     (current) => {
       if (!current) return current;
-
       const modulos = current.modulos ?? [];
       if (modulos.some((item) => item.id === created.id)) return current;
 
@@ -60,7 +59,6 @@ const invalidateModuleQueries = (
 
 export const useCreateModule = (courseId: string) => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: (payload: SaveModulePayloadType) =>
       createModule(courseId, payload),

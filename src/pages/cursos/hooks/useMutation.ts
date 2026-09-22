@@ -33,7 +33,6 @@ export const useCreateCourse = () => {
 
 export const useUpdateCourse = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: ({
       id,
@@ -51,15 +50,12 @@ export const useUpdateCourse = () => {
         title: 'Curso atualizado',
       });
     },
-    onError: (error) => {
-      toastError(error, 'Não foi possível atualizar o curso');
-    },
+    onError: (error) => toastError(error, 'Não foi possível atualizar o curso'),
   });
 };
 
 export const useDeleteCourse = () => {
   const queryClient = useQueryClient();
-
   return useMutation({
     mutationFn: deleteCourse,
     onSuccess: () => {
@@ -71,9 +67,7 @@ export const useDeleteCourse = () => {
         title: 'Curso excluído',
       });
     },
-    onError: (error) => {
-      toastError(error, 'Não foi possível excluir o curso');
-    },
+    onError: (error) => toastError(error, 'Não foi possível excluir o curso'),
   });
 };
 

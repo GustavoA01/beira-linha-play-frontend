@@ -13,7 +13,7 @@ export const ActivityPage = () => {
     atividadeId,
     auth,
     validIds,
-    data,
+    atividade,
     isPending,
     isError,
     error,
@@ -36,13 +36,13 @@ export const ActivityPage = () => {
     );
   }
 
+  const isLoading = isPending || (attemptsEnabled && isAttemptsPending);
+
   if (!validIds) return <ResourceNotFound label="Atividade não encontrada" />;
 
-  if (isPending || (attemptsEnabled && isAttemptsPending)) {
-    return <QuizPageSkeleton />;
-  }
+  if (isLoading) return <QuizPageSkeleton />;
 
-  if (isError || !data) {
+  if (isError || !atividade) {
     const isMissing =
       error instanceof ApiError &&
       (error.status === 404 || error.status === 400);
@@ -66,12 +66,12 @@ export const ActivityPage = () => {
   if (hasConcluded && !stayOnQuiz) {
     return (
       <ActivityConcluded
-        activity={data}
+        title={atividade.titulo}
         bestScore={bestScore}
         totalXp={totalXp}
       />
     );
   }
 
-  return <QuizPlay activity={data} usedAttempts={usedAttempts} />;
+  return <QuizPlay activity={atividade} usedAttempts={usedAttempts} />;
 };

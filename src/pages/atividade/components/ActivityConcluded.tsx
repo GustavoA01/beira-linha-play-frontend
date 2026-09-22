@@ -1,16 +1,15 @@
 import { GoBack } from '@/components/GoBack';
 import { Button } from '@/components/ui/button';
-import type { AtividadeType } from '@/data/types/api';
 import { useNavigate, useParams } from 'react-router-dom';
 
 type ActivityConcludedPropsType = {
-  activity: AtividadeType;
+  title: string;
   bestScore: number;
   totalXp: number;
 };
 
 export const ActivityConcluded = ({
-  activity,
+  title,
   bestScore,
   totalXp,
 }: ActivityConcludedPropsType) => {
@@ -23,7 +22,7 @@ export const ActivityConcluded = ({
       <header className="bg-blue-puc px-4 pt-4 pb-8 text-blue-onSurface sm:px-8 sm:pt-8">
         <div className="container mx-auto flex items-center justify-between">
           <GoBack to={modulePath} />
-          <h1 className="truncate font-semibold">{activity.titulo}</h1>
+          <h1 className="truncate font-semibold">{title}</h1>
           <span className="w-16" />
         </div>
       </header>

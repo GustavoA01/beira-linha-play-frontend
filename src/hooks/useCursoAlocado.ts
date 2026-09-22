@@ -13,9 +13,7 @@ export const useCursoAlocado = (cursoId?: string) => {
   const bloqueado = isMonitor && Boolean(cursoId) && !alocado;
 
   useEffect(() => {
-    if (bloqueado) {
-      navigate('/cursos', { replace: true });
-    }
+    if (bloqueado) navigate('/cursos', { replace: true });
   }, [bloqueado, navigate]);
 
   return { alocado, bloqueado };

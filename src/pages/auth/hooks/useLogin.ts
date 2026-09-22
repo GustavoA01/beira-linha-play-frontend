@@ -10,23 +10,16 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useLoginMutation } from './useMutation';
 
-const credentialsMessage = (tipo: LoginRoleType) => {
-  if (tipo === 'ALUNO') {
-    return 'Apelido ou senha incorretos. Confira e tente de novo.';
-  }
-  if (tipo === 'MONITOR') {
-    return 'E-mail ou senha incorretos. Confira e tente de novo.';
-  }
-  return 'Nome ou senha incorretos. Confira e tente de novo.';
-};
+const errorsMsgTipos: Record<LoginRoleType, string> = {
+  ALUNO: 'Apelido ou senha incorretos. Confira e tente de novo.',
+  MONITOR: 'E-mail ou senha incorretos. Confira e tente de novo.',
+  ADMIN: 'Nome ou senha incorretos. Confira e tente de novo.',
+} as const;
 
 const loginErrorMessage = (tipo: LoginRoleType, error: unknown) => {
-  if (
-    error instanceof ApiError &&
-    (error.status === 401 || error.status === 403)
-  ) {
-    return credentialsMessage(tipo);
-  }
+  const unathorized =
+    error instanceof ApiError && (error.status === 401 || error.status === 403);
+  if (unathorized) return errorsMsgTipos[tipo];
 
   return error instanceof Error &&
     error.message !== 'Não foi possível completar a operação'
