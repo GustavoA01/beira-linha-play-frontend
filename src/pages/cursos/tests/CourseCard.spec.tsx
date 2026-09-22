@@ -81,4 +81,24 @@ describe('CourseCard', () => {
     expect(screen.getByText('1 módulo')).toBeInTheDocument();
     expect(screen.getByText('2 Ativ.')).toBeInTheDocument();
   });
+
+  it('clamps long course titles to one line', () => {
+    render(
+      <CourseCard
+        curso={{
+          ...curso,
+          nome: 'Biologia para o Enem com nome bem longo',
+        }}
+        monitorNome="Maria Souza"
+        onClick={jest.fn()}
+        codCurso="ABC123"
+      />
+    );
+
+    expect(
+      screen.getByRole('heading', {
+        name: 'Biologia para o Enem com nome bem longo',
+      })
+    ).toHaveClass('line-clamp-1');
+  });
 });

@@ -16,7 +16,7 @@ import {
 } from './hooks/useMutation';
 
 export const MedalsPage = () => {
-  const { isMonitor, isAdmin } = useAuthUser();
+  const { isMonitor, isAdmin, isAluno } = useAuthUser();
   const {
     data: medals = [],
     isPending: isGetingMedals,
@@ -29,31 +29,36 @@ export const MedalsPage = () => {
   if (isMonitor) return <Navigate to="/cursos" replace />;
 
   return (
-    <div className="container mx-auto mt-8 px-4 sm:px-8 flex flex-col items-center overflow-y-auto custom-bar">
-      <h1 className="font-bold font-fredoka text-3xl text-primary-dark">
+    <div className="container mx-auto flex min-h-0 flex-1 flex-col items-center overflow-y-auto custom-bar px-4 pb-8 pt-6 sm:px-8">
+      <h1 className="font-fredoka text-3xl font-bold text-primary-dark">
         Galeria de Medalhas
       </h1>
 
-      <h2 className="font-medium my-4 text-zinc-500">
-        Selecione uma medalha alcançada para usar como foto de perfil
-      </h2>
-
-      {isAdmin && (
-        <Button className="my-4" onClick={() => setOpenDialog(true)}>
-          Adicionar medalha
-        </Button>
-      )}
+      {isAluno ? (
+        <h2 className="my-3 text-center font-medium text-zinc-500">
+          Selecione uma medalha alcançada para usar como foto de perfil
+        </h2>
+      ) : isAdmin ? (
+        <>
+          <h2 className="my-3 text-center font-medium text-zinc-500">
+            Use o botão direito do mouse para deletar uma medalha
+          </h2>
+          <Button className="mb-2" onClick={() => setOpenDialog(true)}>
+            Adicionar medalha
+          </Button>
+        </>
+      ) : null}
 
       {isGetingMedals && <MedalsPageSkeleton />}
 
       {isError && (
-        <p className="mt-8 text-sm text-destructive font-montserrat">
+        <p className="mt-8 font-montserrat text-sm text-destructive">
           Não foi possível carregar as medalhas.
         </p>
       )}
 
       {!isGetingMedals && !isError && medals.length === 0 && (
-        <p className="mt-8 text-sm text-muted-foreground font-montserrat">
+        <p className="mt-8 font-montserrat text-sm text-muted-foreground">
           Nenhuma medalha no catálogo.
         </p>
       )}
@@ -62,7 +67,7 @@ export const MedalsPage = () => {
         {isSelectingMedal && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded-lg bg-white/60 backdrop-blur-[1px]">
             <Spinner className="size-6 text-primary" />
-            <p className="text-sm font-montserrat text-zinc-600">
+            <p className="font-montserrat text-sm text-zinc-600">
               Atualizando foto de perfil...
             </p>
           </div>
@@ -70,7 +75,7 @@ export const MedalsPage = () => {
 
         <div
           className={cn(
-            'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 mt-4 pb-6 mx-auto',
+            'mx-auto mt-4 grid grid-cols-2 items-stretch gap-4 pb-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 sm:gap-6',
             isSelectingMedal && 'pointer-events-none select-none'
           )}
           aria-busy={isSelectingMedal || undefined}
@@ -81,6 +86,7 @@ export const MedalsPage = () => {
             return (
               <motion.div
                 key={medal.id}
+                className="h-full"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.08, duration: 0.3 }}

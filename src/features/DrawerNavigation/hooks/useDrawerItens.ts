@@ -58,7 +58,7 @@ export const useDrawerItens = ({
   const configurationItems = [
     {
       label: 'Editar conta',
-      path: '/',
+      path: '/editar-conta',
       icon: UserPen,
       onClick: () => setOpenDrawer(false),
     },

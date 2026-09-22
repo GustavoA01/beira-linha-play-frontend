@@ -44,7 +44,10 @@ export const MonitoramentoContent = ({
       <MonitorHeader activity={monitoredActivity} totalXp={totalXp} />
 
       <div
-        className={cn('flex-1 min-h-0 overflow-y-auto custom-bar space-y-6 pb-20', containerClassName)}
+        className={cn(
+          'flex-1 min-h-0 overflow-y-auto custom-bar space-y-6 pb-20',
+          containerClassName
+        )}
       >
         <SummaryCards
           submissions={submissions}

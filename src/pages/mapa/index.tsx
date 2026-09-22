@@ -29,8 +29,8 @@ export const Map = () => {
   } as FitViewOptionsType;
 
   return (
-    <div style={{ width: '100vw', height: '100vh' }}>
-      <div className="hidden sm:flex container mx-auto">
+    <div className="h-full w-full">
+      <div className="container mx-auto hidden sm:flex">
         <RankTable />
       </div>
 

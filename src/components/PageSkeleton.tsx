@@ -66,12 +66,15 @@ export const MedalsPageSkeleton = () => (
   <div
     role="status"
     aria-label="Carregando"
-    className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 mt-4 pb-6 mx-auto"
+    className="mx-auto mt-4 grid grid-cols-2 gap-4 pb-6 sm:grid-cols-3 sm:gap-6 md:grid-cols-4 lg:grid-cols-5"
   >
     {times(8).map((index) => (
-      <div key={index} className="flex flex-col items-center gap-3">
+      <div
+        key={index}
+        className="flex flex-col items-center gap-2 rounded-xl border py-4"
+      >
         <Skeleton className="size-20 rounded-full" />
-        <Skeleton className="h-4 w-24" />
+        <Skeleton className="h-6 w-24" />
         <Skeleton className="h-3 w-12" />
       </div>
     ))}

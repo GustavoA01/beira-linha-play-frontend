@@ -13,6 +13,7 @@ describe('WonMedal', () => {
 
     expect(screen.getByAltText('PUC Minas')).toBeInTheDocument();
     expect(screen.getByText('PUC Minas')).toBeInTheDocument();
+    expect(screen.getByText('PUC Minas')).toHaveClass('line-clamp-1');
     expect(screen.getByText('20 xp')).toBeInTheDocument();
   });
 });

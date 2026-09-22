@@ -54,7 +54,7 @@ export const CourseCard = ({
     >
       <header>
         <div className="flex items-start justify-between gap-2">
-          <h1 className="font-bold text-lg group-hover:text-primary min-w-0">
+          <h1 className="font-bold text-lg group-hover:text-primary min-w-0 line-clamp-1">
             {curso.nome}
           </h1>
 

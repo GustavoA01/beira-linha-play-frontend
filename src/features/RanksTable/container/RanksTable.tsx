@@ -5,6 +5,7 @@ import {
 } from '@/components/ui/accordion';
 import { RankTableHeader } from '@/features/RanksTable/components/RankTableHeader';
 import { RanksList } from '@/features/RanksTable/components/RanksList';
+import { Spinner } from '@/components/ui/spinner';
 import { useMediaDevice } from '@/hooks/useMediaDevice';
 import { useRanksTable } from '../hooks/useRanksTable';
 
@@ -22,9 +23,27 @@ export const RankTable = ({ floating = true }: RankTableProps) => {
     loggedAlunoId,
     scrollToLoggedRow,
     ranks,
+    isRanksLoading,
     shellClassName,
     maxHeight,
   } = useRanksTable({ floating });
+
+  const ranksContent = isRanksLoading ? (
+    <div
+      role="status"
+      aria-label="Carregando ranking"
+      className="flex flex-col items-center justify-center"
+    >
+      <Spinner className="size-6 text-primary" />
+    </div>
+  ) : (
+    <RanksList
+      ranks={ranks}
+      ref={scrollToLoggedRow}
+      loggedAlunoId={loggedAlunoId}
+      showName={showName}
+    />
+  );
 
   if (!isDesktop) {
     return (
@@ -34,13 +53,8 @@ export const RankTable = ({ floating = true }: RankTableProps) => {
           setSelected={setSelected}
           items={items}
         />
-        <div className="flex-1 scrollbar-hidden overflow-y-auto min-h-0 bg-white rounded-b-md">
-          <RanksList
-            ranks={ranks}
-            ref={scrollToLoggedRow}
-            loggedAlunoId={loggedAlunoId}
-            showName={showName}
-          />
+        <div className="min-h-0 flex-1 overflow-y-auto rounded-b-md bg-white scrollbar-hidden">
+          {ranksContent}
         </div>
       </div>
     );
@@ -57,13 +71,8 @@ export const RankTable = ({ floating = true }: RankTableProps) => {
             setSelected={setSelected}
           />
           <AccordionContent className="p-0">
-            <div className="max-h-56 overflow-y-auto custom-bar min-h-0 bg-white border rounded-b-md">
-              <RanksList
-                ranks={ranks}
-                ref={scrollToLoggedRow}
-                loggedAlunoId={loggedAlunoId}
-                showName={showName}
-              />
+            <div className="custom-bar max-h-56 min-h-0 overflow-y-auto rounded-b-md border bg-white">
+              {ranksContent}
             </div>
           </AccordionContent>
         </AccordionItem>

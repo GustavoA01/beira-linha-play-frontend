@@ -51,7 +51,11 @@ export const useRanksTable = ({ floating }: UseRanksTableProps) => {
 
   const courseId = selected === GERAL.id ? undefined : selected;
 
-  const { data: ranks = [] } = useQuery({
+  const {
+    data: ranks = [],
+    isPending: isRanksPending,
+    isFetching: isRanksFetching,
+  } = useQuery({
     queryKey: queryClientKeys.rankingKeys.list(courseId),
     queryFn: () => listRankings(courseId),
   });
@@ -63,6 +67,7 @@ export const useRanksTable = ({ floating }: UseRanksTableProps) => {
     loggedAlunoId,
     scrollToLoggedRow,
     ranks,
+    isRanksLoading: isRanksPending || isRanksFetching,
     shellClassName,
     maxHeight,
     showName: !auth.isAluno,

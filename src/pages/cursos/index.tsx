@@ -41,7 +41,7 @@ export const CoursesPage = () => {
   return (
     <div
       className={cn(
-        'flex flex-col h-dvh custom-bar sm:large-bar overflow-hidden',
+        'flex min-h-0 flex-1 flex-col custom-bar sm:large-bar overflow-hidden',
         containerClassName
       )}
     >

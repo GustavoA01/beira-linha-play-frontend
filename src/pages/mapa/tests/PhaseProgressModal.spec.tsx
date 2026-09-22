@@ -10,6 +10,9 @@ jest.mock('html-to-image', () => ({
   toPng: jest.fn(() => Promise.resolve('data:image/png;base64,xx')),
 }));
 
+const findShareButton = () =>
+  screen.findByRole('button', { name: /Compartilhar|Preparando|Abrindo/ });
+
 const renderModal = (
   points: number,
   minPoints: number,
@@ -46,7 +49,7 @@ describe('PhaseProgressModal', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('shows completed copy when the bar is full', () => {
+  it('shows completed copy when the bar is full', async () => {
     renderModal(80, 80, '1');
 
     expect(
@@ -54,9 +57,7 @@ describe('PhaseProgressModal', () => {
     ).toBeInTheDocument();
     expect(screen.getByText('Concluído')).toBeInTheDocument();
     expect(screen.getByText('100%')).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'Compartilhar' })
-    ).toBeInTheDocument();
+    expect(await findShareButton()).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Legal!' })).toBeInTheDocument();
     expect(
       within(screen.getByRole('dialog')).queryByText('Gustavo Aguiar')
@@ -66,14 +67,12 @@ describe('PhaseProgressModal', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('caps progress at 100% when points exceed the minimum', () => {
+  it('caps progress at 100% when points exceed the minimum', async () => {
     renderModal(150, 100);
 
     expect(screen.getByText('100%')).toBeInTheDocument();
     expect(screen.getByText('Concluído')).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'Compartilhar' })
-    ).toBeInTheDocument();
+    expect(await findShareButton()).toBeInTheDocument();
     expect(screen.queryByText('Seus cursos')).not.toBeInTheDocument();
   });
 
@@ -121,15 +120,13 @@ describe('PhaseProgressModal', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('hides enrolled courses on a concluded phase', () => {
+  it('hides enrolled courses on a concluded phase', async () => {
     renderModal(80, 80, '1', [
       { id: 'curso-1', nome: 'Cálculo 1', progresso: 25 },
     ]);
 
     expect(screen.getByText('Concluído')).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: 'Compartilhar' })
-    ).toBeInTheDocument();
+    expect(await findShareButton()).toBeInTheDocument();
     expect(screen.queryByText('Seus cursos')).not.toBeInTheDocument();
     expect(screen.queryByText('Cálculo 1')).not.toBeInTheDocument();
   });

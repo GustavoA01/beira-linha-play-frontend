@@ -28,7 +28,7 @@ export const PhaseNode = ({ id, data: { minPoints } }: PhaseNodeProps) => {
   );
 
   const pulseDelay = ((Number(id) || 1) % 5) * 0.6;
-  
+
   const colorTransition = {
     duration: 6,
     delay: pulseDelay,

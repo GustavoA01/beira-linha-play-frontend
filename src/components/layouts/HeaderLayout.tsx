@@ -20,9 +20,11 @@ export const HeaderLayout = () => {
   );
 
   return (
-    <div className="flex flex-col h-dvh">
+    <div className="flex h-dvh flex-col">
       <Header />
-      <Outlet />
+      <div className="flex min-h-0 flex-1 flex-col">
+        <Outlet />
+      </div>
       {shouldShowBottomNav && <BottomNavigation />}
     </div>
   );
