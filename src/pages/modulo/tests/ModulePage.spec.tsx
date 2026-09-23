@@ -150,7 +150,7 @@ describe('ModulePage', () => {
     renderPage({ ...mockLoggedMonitor, cursoIds: ['curso-1'] });
 
     expect(await screen.findByText('Noção de limite')).toBeInTheDocument();
-    expect(screen.getByText('0/2 tentativas')).toBeInTheDocument();
+    expect(screen.queryByText('· 0/2 tentativas')).not.toBeInTheDocument();
     expect(screen.getByText('+ 5 pts')).toBeInTheDocument();
     expect(screen.getByText('1 atividade')).toBeInTheDocument();
     expect(screen.getByText('5 XP')).toBeInTheDocument();

@@ -7,7 +7,7 @@ export const ChatDrawer = () => {
   const { isDesktop } = useMediaDevice();
 
   return (
-    <Drawer direction="right">
+    <Drawer direction="right" repositionInputs={false}>
       <DrawerTrigger
         className={
           isDesktop
@@ -17,7 +17,7 @@ export const ChatDrawer = () => {
       >
         <MessageCircle className="text-zinc-300" size={18} />
       </DrawerTrigger>
-      <DrawerContent className="max-sm:h-dvh max-sm:w-full! max-sm:max-w-none!">
+      <DrawerContent className="max-sm:inset-0 max-sm:h-auto max-sm:w-full! max-sm:max-w-none!">
         <Chat />
       </DrawerContent>
     </Drawer>

@@ -72,8 +72,14 @@ export const ActivityCard = ({
         </ItemTitle>
         <ItemDescription className="flex flex-wrap items-center gap-x-1.5 font-semibold text-xs text-zinc-400">
           <span>{questionsLabel}</span>
-          <span aria-hidden>·</span>
-          <span>{attemptsLabel}</span>
+          {!isMonitor && (
+            <>
+              <span aria-hidden className="max-sm:hidden">
+                ·
+              </span>
+              <span>{attemptsLabel}</span>
+            </>
+          )}
         </ItemDescription>
       </ItemContent>
 
