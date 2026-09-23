@@ -20,9 +20,7 @@ export const GoBack = ({ to, onLeave }: GoBackProps) => {
   return (
     <button
       type="button"
-      onClick={() => {
-        void handleClick();
-      }}
+      onClick={handleClick}
       className="flex gap-2 items-center select-none font-semibold hover:text-blue-100 max-sm:text-sm cursor-pointer"
     >
       <ChevronLeft size={!isDesktop ? 20 : 24} />
