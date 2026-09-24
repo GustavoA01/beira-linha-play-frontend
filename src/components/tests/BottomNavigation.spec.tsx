@@ -1,8 +1,8 @@
 import { screen } from '@testing-library/react';
 import { BottomNavigation } from '@/components/BottomNavigation';
-import { mockLoggedAdmin } from '@/data/temporaryMocks/admins';
-import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
-import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
+import { mockLoggedAdmin } from '@/data/mocks/admins';
+import { mockLoggedMonitor } from '@/data/mocks/monitores';
+import { mockLoggedAluno } from '@/data/mocks/usuario';
 import { renderWithProviders } from './renderWithProviders';
 
 describe('BottomNavigation', () => {

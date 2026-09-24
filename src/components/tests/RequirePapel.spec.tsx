@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { RequirePapel } from '@/components/layouts/RequirePapel';
-import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
-import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
+import { mockLoggedAluno } from '@/data/mocks/usuario';
+import { mockLoggedMonitor } from '@/data/mocks/monitores';
 import { useAuthUser } from '@/providers/UserProvider';
 
 jest.mock('@/providers/UserProvider', () => ({

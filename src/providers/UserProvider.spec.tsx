@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { UserProvider, useUserProvider } from '@/providers/UserProvider';
-import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
+import { mockLoggedAluno } from '@/data/mocks/usuario';
 import { currentUser } from '@/services/auth';
 
 jest.mock('@/services/auth', () => ({

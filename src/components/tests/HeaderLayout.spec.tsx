@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { HeaderLayout } from '@/components/layouts/HeaderLayout';
-import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
+import { mockLoggedAluno } from '@/data/mocks/usuario';
 import { UserProvider } from '@/providers/UserProvider';
 
 jest.mock('@/assets/logo-beira-linha.png', () => 'logo.png');

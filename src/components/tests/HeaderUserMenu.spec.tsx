@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react';
 import { HeaderUserMenu } from '@/components/Header/HeaderUserMenu';
-import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
-import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
+import { mockLoggedMonitor } from '@/data/mocks/monitores';
+import { mockLoggedAluno } from '@/data/mocks/usuario';
 import { renderWithProviders } from './renderWithProviders';
 
 describe('HeaderUserMenu', () => {

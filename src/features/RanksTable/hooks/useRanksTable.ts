@@ -19,8 +19,8 @@ export const useRanksTable = ({ floating }: UseRanksTableProps) => {
   const loggedAlunoId = auth.isAluno ? auth.user.id : undefined;
 
   const shellClassName = cn(
-    'flex flex-col w-80 bg-white border rounded-md shadow-lg',
-    floating ? 'fixed m-5 z-50' : 'relative max-h-full'
+    'flex h-fit flex-col overflow-hidden w-80 bg-white border rounded-md shadow-lg',
+    floating ? 'fixed m-5 z-50' : 'relative self-start'
   );
 
   const maxHeight = floating ? 'calc(100dvh - 180px)' : 'calc(100dvh - 14rem)';

@@ -5,7 +5,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { NewActivityPage } from '../index';
 import { UserProvider } from '@/providers/UserProvider';
-import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
+import { mockLoggedMonitor } from '@/data/mocks/monitores';
 import {
   createActivity,
   getActivity,

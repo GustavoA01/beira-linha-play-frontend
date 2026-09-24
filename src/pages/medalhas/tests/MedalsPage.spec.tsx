@@ -5,9 +5,9 @@ import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MedalsPage } from '../index';
 import { useAuthUser } from '@/providers/UserProvider';
-import { mockLoggedAdmin } from '@/data/temporaryMocks/admins';
-import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
-import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
+import { mockLoggedAdmin } from '@/data/mocks/admins';
+import { mockLoggedAluno } from '@/data/mocks/usuario';
+import { mockLoggedMonitor } from '@/data/mocks/monitores';
 import { equipMedal, listMedals } from '@/services/medalhas';
 import { toast } from '@/components/ui/toast';
 

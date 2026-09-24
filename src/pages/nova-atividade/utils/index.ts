@@ -55,5 +55,7 @@ export const emptyQuestion = () => ({
   ],
 });
 
-export const radioValueFor = (questionNumber: number, alternativeIndex: number) =>
-  `id-question-${questionNumber - 1}-alternative-${alternativeIndex}`;
+export const radioValueFor = (
+  questionNumber: number,
+  alternativeIndex: number
+) => `id-question-${questionNumber - 1}-alternative-${alternativeIndex}`;

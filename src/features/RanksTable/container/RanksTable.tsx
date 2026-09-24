@@ -32,7 +32,7 @@ export const RankTable = ({ floating = true }: RankTableProps) => {
     <div
       role="status"
       aria-label="Carregando ranking"
-      className="flex flex-col items-center justify-center"
+      className="flex min-h-24 flex-col items-center justify-center py-6"
     >
       <Spinner className="size-6 text-primary" />
     </div>
@@ -53,7 +53,7 @@ export const RankTable = ({ floating = true }: RankTableProps) => {
           setSelected={setSelected}
           items={items}
         />
-        <div className="min-h-0 flex-1 overflow-y-auto rounded-b-md bg-white scrollbar-hidden">
+        <div className="min-h-0 overflow-y-auto rounded-b-md bg-white scrollbar-hidden">
           {ranksContent}
         </div>
       </div>

@@ -4,7 +4,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ManagementPage } from '../index';
 import { UserProvider } from '@/providers/UserProvider';
-import { mockLoggedMonitor } from '@/data/temporaryMocks/monitores';
+import { mockLoggedMonitor } from '@/data/mocks/monitores';
 import { getActivity, getActivityMonitoring } from '@/services/atividades';
 import { ApiError } from '@/services/api';
 import type { ActivityResponseType } from '@/data/types/services';

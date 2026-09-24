@@ -3,7 +3,7 @@ import { render } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { QueryProvider } from '@/providers/QueryProvider';
 import { UserProvider } from '@/providers/UserProvider';
-import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
+import { mockLoggedAluno } from '@/data/mocks/usuario';
 import type { UsuarioType } from '@/data/types/api';
 
 export const renderWithProviders = (

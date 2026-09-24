@@ -5,7 +5,7 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ActivityPage } from '../index';
 import { UserProvider } from '@/providers/UserProvider';
-import { mockLoggedAluno } from '@/data/temporaryMocks/usuario';
+import { mockLoggedAluno } from '@/data/mocks/usuario';
 import { getActivity } from '@/services/atividades';
 import { listMyAttempts, submitAttempt } from '@/services/tentativas';
 import { toast } from '@/components/ui/toast';
