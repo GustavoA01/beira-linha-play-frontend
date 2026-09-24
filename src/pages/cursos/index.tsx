@@ -9,15 +9,8 @@ import { useCursos } from './hooks/useCursos';
 import { useAuthUser } from '@/providers/UserProvider';
 import { cn } from '@/lib/utils';
 import { CoursesPageSkeleton } from '@/components/PageSkeleton';
-import { monitorNames } from './utils';
+import { emptyCoursesMessage, monitorNames } from './utils';
 import { useCursosMutation } from './hooks/useCursosMutation';
-
-const emptyCoursesMessage = {
-  ADMIN: 'Nenhum curso cadastrado.',
-  MONITOR: 'Você não está alocado em nenhum curso.',
-  ALUNO:
-    'Você ainda não está em nenhum curso. Use o código que o monitor passou.',
-} as const;
 
 export const CoursesPage = () => {
   const { containerClassName } = useMediaDevice();

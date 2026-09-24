@@ -1,8 +1,6 @@
 import type { QuestionFormType } from '@/data/schemas/activity';
+import { radioValueFor } from '@/pages/nova-atividade/utils';
 import { useFormContext } from 'react-hook-form';
-
-const radioValueFor = (questionNumber: number, alternativeIndex: number) =>
-  `id-question-${questionNumber - 1}-alternative-${alternativeIndex}`;
 
 export const useQuestionCard = (questionNumber: number) => {
   const {

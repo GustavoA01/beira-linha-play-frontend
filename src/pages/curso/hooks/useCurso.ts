@@ -13,6 +13,10 @@ export const useCurso = () => {
   const { cursoId } = useParams();
   const { isAluno, isMonitor, user } = useAuthUser();
   const { bloqueado } = useCursoAlocado(cursoId);
+  const [openModuleDialog, setOpenModuleDialog] = useState(false);
+  const [editingModule, setEditingModule] = useState<ModuloType>();
+  const [moduleToDelete, setModuleToDelete] = useState<ModuloType>();
+
   const { data, isPending, isError } = useQuery({
     queryKey: queryClientKeys.courseKeys.detail(cursoId ?? ''),
     queryFn: () => getCourse(cursoId!),
@@ -24,10 +28,6 @@ export const useCurso = () => {
     enabled: isAluno,
   });
   const curso = data ? toCourse(data) : undefined;
-
-  const [openModuleDialog, setOpenModuleDialog] = useState(false);
-  const [editingModule, setEditingModule] = useState<ModuloType>();
-  const [moduleToDelete, setModuleToDelete] = useState<ModuloType>();
 
   const handleModuleDialogChange = (open: boolean) => {
     setOpenModuleDialog(open);

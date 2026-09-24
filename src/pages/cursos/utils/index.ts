@@ -11,6 +11,13 @@ import type {
 } from '@/data/types/services';
 import { toActivitySummary } from '@/pages/atividade/utils';
 
+export const emptyCoursesMessage = {
+  ADMIN: 'Nenhum curso cadastrado.',
+  MONITOR: 'Você não está alocado em nenhum curso.',
+  ALUNO:
+    'Você ainda não está em nenhum curso. Use o código que o monitor passou.',
+} as const;
+
 const toCourseActivities = (
   modulo: CourseModuleResponseType
 ): AtividadeType[] => (modulo.atividades ?? []).map(toActivitySummary);
@@ -53,14 +60,13 @@ export const monitorNames = (
     .map((id) => known.find((monitor) => monitor.id === id)?.nome)
     .filter((nome): nome is string => Boolean(nome));
 
-  if (
+  const isValidMonitor =
     names.length === 0 &&
     currentUser?.tipo === 'MONITOR' &&
     courseId &&
-    currentUser.cursoIds.includes(courseId)
-  ) {
-    return currentUser.nome;
-  }
+    currentUser.cursoIds.includes(courseId);
+
+  if (isValidMonitor) return currentUser.nome;
 
   return names.join(', ') || 'Sem monitor';
 };

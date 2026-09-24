@@ -35,13 +35,9 @@ export const CoursePage = () => {
   );
 
   if (bloqueado) return null;
-
-  if (!cursoId || isError) {
+  if (!cursoId || isError)
     return <ResourceNotFound label="Curso não encontrado" />;
-  }
-
   if (isPending) return <HeaderListPageSkeleton />;
-
   if (!curso) return <ResourceNotFound label="Curso não encontrado" />;
 
   return (
@@ -66,26 +62,24 @@ export const CoursePage = () => {
                 Nenhum módulo cadastrado.
               </p>
             ) : (
-              curso.modulos.map((modulo) => {
-                return (
-                  <ModuleCard
-                    key={modulo.id}
-                    modulo={modulo}
-                    isMonitor={isMonitor}
-                    concluded={
-                      isAluno && isModuleConcluded(modulo, attempts, alunoId)
-                    }
-                    onEdit={() => {
-                      setEditingModule(modulo);
-                      setOpenModuleDialog(true);
-                    }}
-                    onDelete={() => setModuleToDelete(modulo)}
-                    onClick={() =>
-                      navigate(`/cursos/${curso.id}/modulos/${modulo.id}`)
-                    }
-                  />
-                );
-              })
+              curso.modulos.map((modulo) => (
+                <ModuleCard
+                  key={modulo.id}
+                  modulo={modulo}
+                  isMonitor={isMonitor}
+                  concluded={
+                    isAluno && isModuleConcluded(modulo, attempts, alunoId)
+                  }
+                  onEdit={() => {
+                    setEditingModule(modulo);
+                    setOpenModuleDialog(true);
+                  }}
+                  onDelete={() => setModuleToDelete(modulo)}
+                  onClick={() =>
+                    navigate(`/cursos/${curso.id}/modulos/${modulo.id}`)
+                  }
+                />
+              ))
             )}
           </div>
         </div>
@@ -99,9 +93,7 @@ export const CoursePage = () => {
       />
       <DeleteModuleDialog
         open={Boolean(moduleToDelete)}
-        onOpenChange={(open) => {
-          if (!open) setModuleToDelete(undefined);
-        }}
+        onOpenChange={(open) => !open && setModuleToDelete(undefined)}
         moduleName={moduleToDelete?.nome ?? ''}
         codigoAcesso={curso.codigoAcesso}
         isPending={isDeleting}

@@ -1,6 +1,6 @@
 import { Header } from './features/QuestionsForm/components/Header';
 import { QuestionCard } from './features/QuestionsForm/container/QuestionCard';
-import { FormFooter } from './features/QuestionsForm/components/FormFooter';
+import { FormFooter } from './features/QuestionsForm/container/FormFooter';
 import { FormProvider } from 'react-hook-form';
 import { useNewActivity } from './features/QuestionsForm/hooks/useNewActivity';
 import { HeaderListPageSkeleton } from '@/components/PageSkeleton';

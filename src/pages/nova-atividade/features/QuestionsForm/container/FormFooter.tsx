@@ -9,20 +9,17 @@ type FormFooterProps = {
 
 export const FormFooter = ({ isSubmitting }: FormFooterProps) => {
   const navigate = useNavigate();
-  const goBack = () => navigate(-1);
 
   return (
-    <div className="flex flex-col sm:flex-row w-full sm:justify-end gap-2">
+    <footer className="flex flex-col-reverse sm:flex-row w-full sm:justify-end gap-2">
       <Button
         type="button"
-        onClick={goBack}
+        onClick={() => navigate(-1)}
         variant="outline"
-        className="max-sm:hidden"
         disabled={isSubmitting}
       >
         Cancelar
       </Button>
-
       <Button type="submit" disabled={isSubmitting}>
         {isSubmitting ? (
           <Spinner />
@@ -33,16 +30,6 @@ export const FormFooter = ({ isSubmitting }: FormFooterProps) => {
           </>
         )}
       </Button>
-
-      <Button
-        type="button"
-        onClick={goBack}
-        variant="outline"
-        className="sm:hidden"
-        disabled={isSubmitting}
-      >
-        Cancelar
-      </Button>
-    </div>
+    </footer>
   );
 };

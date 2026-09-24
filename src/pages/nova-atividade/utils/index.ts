@@ -1,5 +1,8 @@
 import type { QuestionFormType } from '@/data/schemas/activity';
-import type { ActivityResponseType } from '@/data/types/services';
+import type {
+  ActivityResponseType,
+  SaveActivityPayloadType,
+} from '@/data/types/services';
 
 const ignoredAlternative = () => ({ text: 'ignore', isCorrect: false });
 const emptyAlternative = () => ({ text: '', isCorrect: false });
@@ -23,3 +26,34 @@ export const toQuestionForm = (
     };
   }),
 });
+
+export const toSaveActivityPayload = (
+  titulo: string,
+  questions: QuestionFormType['questions']
+): SaveActivityPayloadType => ({
+  titulo,
+  questoes: questions.map((question) => ({
+    enunciado: question.statement,
+    valor: question.xp,
+    alternativas: question.alternatives
+      .filter((alternative) => alternative.text !== 'ignore')
+      .map((alternative) => ({
+        descricao: alternative.text,
+        correta: alternative.isCorrect,
+      })),
+  })),
+});
+
+export const emptyQuestion = () => ({
+  statement: '',
+  xp: 1,
+  alternatives: [
+    { text: '', isCorrect: false },
+    { text: '', isCorrect: false },
+    { text: '', isCorrect: false },
+    { text: '', isCorrect: false },
+  ],
+});
+
+export const radioValueFor = (questionNumber: number, alternativeIndex: number) =>
+  `id-question-${questionNumber - 1}-alternative-${alternativeIndex}`;

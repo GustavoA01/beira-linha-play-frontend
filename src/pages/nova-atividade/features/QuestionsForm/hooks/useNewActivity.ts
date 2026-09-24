@@ -7,7 +7,6 @@ import {
   getNewActivityStorage,
   type NewActivityStorageType,
 } from '@/data/newActivityStorage';
-import type { SaveActivityPayloadType } from '@/data/types/services';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
 import { queryClientKeys } from '@/lib/queryClientKeys';
@@ -15,40 +14,16 @@ import { useEffect, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getActivity } from '@/services/atividades';
-import { toQuestionForm } from '../../../utils';
+import {
+  emptyQuestion,
+  toQuestionForm,
+  toSaveActivityPayload,
+} from '../../../utils';
 import {
   useCreateActivity,
   useUpdateActivity,
 } from '../../../hooks/useMutation';
 import { useCursoAlocado } from '@/hooks/useCursoAlocado';
-
-const toSaveActivityPayload = (
-  titulo: string,
-  questions: QuestionFormType['questions']
-): SaveActivityPayloadType => ({
-  titulo,
-  questoes: questions.map((question) => ({
-    enunciado: question.statement,
-    valor: question.xp,
-    alternativas: question.alternatives
-      .filter((alternative) => alternative.text !== 'ignore')
-      .map((alternative) => ({
-        descricao: alternative.text,
-        correta: alternative.isCorrect,
-      })),
-  })),
-});
-
-const emptyQuestion = () => ({
-  statement: '',
-  xp: 1,
-  alternatives: [
-    { text: '', isCorrect: false },
-    { text: '', isCorrect: false },
-    { text: '', isCorrect: false },
-    { text: '', isCorrect: false },
-  ],
-});
 
 export const useNewActivity = () => {
   const navigate = useNavigate();

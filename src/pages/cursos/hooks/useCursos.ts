@@ -15,7 +15,6 @@ export const useCursos = () => {
   const [openAdminDialog, setOpenAdminDialog] = useState(false);
 
   const openCourse = (cursoId: string) => navigate(`/cursos/${cursoId}`);
-
   const handleCourseClick = (cursoId: string) => openCourse(cursoId);
 
   const handleCodeSubmit = async (code: string) => {
