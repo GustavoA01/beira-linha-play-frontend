@@ -3,6 +3,20 @@ import { PhaseNode } from '@/pages/mapa/components/trail/PhaseNode';
 import type { PhaseNodeType } from '@/data/types/reactFlow';
 import type { NodeTypes } from '@xyflow/react';
 
+export const LOCKED_GLOW = [
+  { color: '#3a6ea5', strength: 0.4 },
+  { color: '#0284c7', strength: 1 },
+  { color: '#6128a3', strength: 0.2 },
+  { color: '#3a6ea5', strength: 0.4 },
+] as const;
+
+export const UNLOCKED_GLOW = [
+  { color: '#4ade80', strength: 0.45 },
+  { color: '#a3e635', strength: 1 },
+  { color: '#86efac', strength: 0.55 },
+  { color: '#4ade80', strength: 0.45 },
+] as const;
+
 const FIRST_PHASE_XP = 1;
 const EASY_STEP = 3;
 const HARD_STEP = 4;

@@ -1,18 +1,18 @@
 import { Map as MapIcon, NotebookPen, Trophy } from 'lucide-react';
 import type { UsuarioType } from '@/data/types/api';
 
+type NavOptions = {
+  isAluno: boolean;
+  showMedalhas: boolean;
+  mapDisabled?: boolean;
+};
+
 export const MAX_TENTATIVAS = 2;
 
 export const mapPath = (isAluno: boolean) => (isAluno ? '/' : '/mapa');
 
 export const isMonitorMapDisabled = (user: UsuarioType | null) =>
   user?.tipo === 'MONITOR' && user.cursoIds.length === 0;
-
-type NavOptions = {
-  isAluno: boolean;
-  showMedalhas: boolean;
-  mapDisabled?: boolean;
-};
 
 export const getHeaderItems = ({
   isAluno,

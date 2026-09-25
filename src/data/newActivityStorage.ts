@@ -1,7 +1,5 @@
 import type { NewActivityFormType, QuestionFormType } from './schemas/activity';
 
-export const NEW_ACTIVITY_STORAGE_KEY = 'newActivityData';
-
 export type NewActivityChatMessageType = {
   role: 'user' | 'assistant';
   content: string;
@@ -11,6 +9,8 @@ export type NewActivityChatMessageType = {
 export type NewActivityStorageType = NewActivityFormType & {
   messages: NewActivityChatMessageType[];
 };
+
+export const NEW_ACTIVITY_STORAGE_KEY = 'newActivityData';
 
 export const getNewActivityStorage = (): NewActivityStorageType | null => {
   const raw = localStorage.getItem(NEW_ACTIVITY_STORAGE_KEY);

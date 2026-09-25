@@ -10,7 +10,8 @@ module.exports = {
     '^@/(.*)$': '<rootDir>/src/$1',
   },
   transform: {
-    '^.+\\.tsx?$': [
+    'services[\\\\/]cloudinary\\.ts$': '<rootDir>/jest.cloudinary.cjs',
+    '^(?!.*[\\\\/]services[\\\\/]cloudinary\\.ts$).+\\.tsx?$': [
       'ts-jest',
       {
         tsconfig: {

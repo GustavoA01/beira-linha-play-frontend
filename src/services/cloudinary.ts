@@ -1,19 +1,14 @@
+import type {
+  CloudinaryDestroyResponse,
+  CloudinaryUploadResponse,
+} from '@/data/types/services';
+
 const CLOUD_NAME =
   import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'nome-cloud-ficticio';
 const UPLOAD_PRESET =
   import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'preset-upload-ficticio';
 const API_KEY = import.meta.env.VITE_CLOUDINARY_API_KEY;
 const API_SECRET = import.meta.env.VITE_CLOUDINARY_API_SECRET;
-
-type CloudinaryUploadResponse = {
-  secure_url?: string;
-  error?: { message: string };
-};
-
-type CloudinaryDestroyResponse = {
-  result?: string;
-  error?: { message: string };
-};
 
 const sha1 = async (value: string) => {
   const data = new TextEncoder().encode(value);
@@ -28,9 +23,7 @@ export const publicIdFromUrl = (url: string) => {
     const { pathname } = new URL(url);
     const marker = '/upload/';
     const start = pathname.indexOf(marker);
-    if (start < 0) {
-      return null;
-    }
+    if (start < 0) return null;
 
     const parts = pathname
       .slice(start + marker.length)
@@ -38,14 +31,10 @@ export const publicIdFromUrl = (url: string) => {
       .filter(Boolean)
       .filter((part) => !part.includes(',') && !/^[a-z]+_/.test(part));
     const withoutVersion = parts[0]?.match(/^v\d+$/) ? parts.slice(1) : parts;
-    if (withoutVersion.length === 0) {
-      return null;
-    }
+    if (withoutVersion.length === 0) return null;
 
     const last = withoutVersion.at(-1)?.replace(/\.[a-zA-Z0-9]+$/, '');
-    if (!last) {
-      return null;
-    }
+    if (!last) return null;
 
     return [...withoutVersion.slice(0, -1), last].join('/');
   } catch {

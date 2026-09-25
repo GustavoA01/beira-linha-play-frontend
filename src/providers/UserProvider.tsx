@@ -105,16 +105,14 @@ export const UserProvider = ({
 
 export const useUserProvider = () => {
   const context = useContext(UserContext);
-  if (!context) {
+  if (!context)
     throw new Error('useUserProvider precisa estar dentro de UserProvider');
-  }
   return context;
 };
 
 export const useAuthUser = () => {
   const context = useUserProvider();
-  if (!context.user) {
+  if (!context.user)
     throw new Error('useAuthUser precisa estar dentro de RequireAuth');
-  }
   return context;
 };

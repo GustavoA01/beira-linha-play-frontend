@@ -82,11 +82,8 @@ export type CourseResponseType = Omit<CursoType, 'codigoAcesso' | 'modulos'> & {
 };
 
 export type SaveCoursePayloadType = Pick<CursoType, 'nome' | 'monitorIds'>;
-
 export type EnrollCoursePayloadType = Pick<CursoType, 'codigoAcesso'>;
-
 export type SaveModulePayloadType = Pick<ModuloType, 'nome'>;
-
 export type AlternativeResponseType = Omit<AlternativaType, 'correta'> & {
   correta: boolean | null;
 };
@@ -168,12 +165,25 @@ export type MonitoringResponseType = {
 };
 
 export type MedalResponseType = MedalhaType & { conquistada: boolean };
-
 export type SaveMedalPayloadType = Omit<MedalhaType, 'id'>;
+export type DeleteMedalPayloadType = {
+  id: string;
+  imagemUrl: string;
+};
 
 export type RankingResponseType = Pick<
   AlunoType,
   'id' | 'nome' | 'apelido' | 'pontos' | 'imagemPerfil'
 > & {
   posicao: number;
+};
+
+export type CloudinaryUploadResponse = {
+  secure_url?: string;
+  error?: { message: string };
+};
+
+export type CloudinaryDestroyResponse = {
+  result?: string;
+  error?: { message: string };
 };
