@@ -5,89 +5,17 @@ import {
   useState,
   type RefObject,
 } from 'react';
-import { toBlob } from 'html-to-image';
 import { toast } from '@/components/ui/toast';
 import { toastError } from '@/lib/utils';
-
-const CARD_SIZE = 1080;
-const FILE_NAME = 'conquista-beira-linha-play.png';
-const SHARE_TITLE = 'Beira Linha Play';
-
-export const achievementCaption = (
-  nome: string,
-  level: string,
-  points: number
-) => `${nome} concluiu o nível ${level} no Beira Linha Play com ${points} XP.`;
-
-const canShareFiles = (file: File) => {
-  if (typeof navigator.share !== 'function') return false;
-  const data: ShareData = { files: [file], title: SHARE_TITLE };
-  if (typeof navigator.canShare !== 'function') return true;
-  try {
-    return navigator.canShare(data);
-  } catch {
-    return false;
-  }
-};
-
-const blobToPngFile = (blob: Blob) =>
-  new File([blob], FILE_NAME, { type: 'image/png', lastModified: Date.now() });
-
-const IMAGE_WAIT_MS = 50;
-
-const waitForImages = async (card: HTMLElement) => {
-  const images = [...card.querySelectorAll('img')];
-  await Promise.all(
-    images.map(
-      (image) =>
-        new Promise<void>((resolve) => {
-          if (image.complete) {
-            resolve();
-            return;
-          }
-          const done = () => resolve();
-          image.addEventListener('load', done, { once: true });
-          image.addEventListener('error', done, { once: true });
-          // jsdom / assets ausentes: decode pode nunca resolver
-          setTimeout(done, IMAGE_WAIT_MS);
-        })
-    )
-  );
-};
-
-const exportCardBlob = async (card: HTMLElement) => {
-  // skipFonts: true — não bloquear em document.fonts.ready (trava no jsdom)
-  await waitForImages(card);
-
-  const blob = await toBlob(card, {
-    width: CARD_SIZE,
-    height: CARD_SIZE,
-    canvasWidth: CARD_SIZE,
-    canvasHeight: CARD_SIZE,
-    pixelRatio: 1,
-    cacheBust: false,
-    skipFonts: true,
-    type: 'image/png',
-    style: {
-      transform: 'none',
-      margin: '0',
-    },
-  });
-  if (!blob) throw new Error('Falha ao gerar o PNG da conquista');
-  return blob;
-};
-
-const downloadBlob = (blob: Blob) => {
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  link.download = FILE_NAME;
-  link.href = url;
-  link.click();
-  URL.revokeObjectURL(url);
-};
-
-const isShareAbort = (error: unknown) =>
-  error instanceof DOMException && error.name === 'AbortError';
+import {
+  achievementCaption,
+  blobToPngFile,
+  canShareFiles,
+  downloadBlob,
+  exportCardBlob,
+  isShareAbort,
+  SHARE_TITLE,
+} from '../utils';
 
 export const useShareAchievement = (
   cardRef: RefObject<HTMLDivElement | null>,

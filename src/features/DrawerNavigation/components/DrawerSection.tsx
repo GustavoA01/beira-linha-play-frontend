@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import type { DrawerSectionProps } from '../types';
+import { cn } from '@/lib/utils';
 
 export const DrawerSection = ({
   title,
@@ -32,16 +33,16 @@ export const DrawerSection = ({
                 key={label}
                 to={path}
                 onClick={onClick}
-                className={`flex pl-2 items-center py-2 space-x-4 ${
-                  pathName === path
-                    ? 'bg-blue-onSurface/50 rounded-md text-blue-500 font-semibold'
-                    : 'text-zinc-600'
-                }`}
+                className={cn('flex pl-2 items-center py-2 space-x-4', {
+                  'bg-blue-onSurface/50 rounded-md text-blue-500 font-semibold':
+                    pathName === path,
+                  'text-zinc-600': pathName !== path,
+                })}
               >
                 <Icon
-                  className={`${
+                  className={
                     pathName === path ? 'text-blue-500' : 'text-zinc-400'
-                  }`}
+                  }
                   size={20}
                 />
                 <p>{label}</p>

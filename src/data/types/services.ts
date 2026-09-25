@@ -82,11 +82,8 @@ export type CourseResponseType = Omit<CursoType, 'codigoAcesso' | 'modulos'> & {
 };
 
 export type SaveCoursePayloadType = Pick<CursoType, 'nome' | 'monitorIds'>;
-
 export type EnrollCoursePayloadType = Pick<CursoType, 'codigoAcesso'>;
-
 export type SaveModulePayloadType = Pick<ModuloType, 'nome'>;
-
 export type AlternativeResponseType = Omit<AlternativaType, 'correta'> & {
   correta: boolean | null;
 };

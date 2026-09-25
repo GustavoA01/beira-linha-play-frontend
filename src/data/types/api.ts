@@ -61,10 +61,10 @@ export interface QuestaoType {
   alternativas: AlternativaType[];
 }
 
+// null quando a API omite o gabarito para o aluno.
 export interface AlternativaType {
   id: string;
   descricao: string;
-  /** `null` quando a API omite o gabarito para o aluno. */
   correta: boolean | null;
 }
 

@@ -130,9 +130,7 @@ export const newAdminSchema = z
 
 export type RegisterFormType = z.infer<typeof registerSchema>;
 export type RegisterRoleType = RegisterFormType['tipo'];
-
 export type LoginFormType = z.infer<typeof loginSchema>;
 export type LoginRoleType = LoginFormType['tipo'];
-
 export type EditAccountFormType = z.infer<typeof editAccountSchema>;
 export type NewAdminFormType = z.infer<typeof newAdminSchema>;

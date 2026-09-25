@@ -4,8 +4,8 @@ import {
   type AxiosResponse,
   type InternalAxiosRequestConfig,
 } from 'axios';
-import { api, ApiError } from './api';
-import { endpoints } from './endpoints';
+import { api, ApiError } from '../api';
+import { endpoints } from '../endpoints';
 
 const withHeaders = (
   config: InternalAxiosRequestConfig

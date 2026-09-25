@@ -56,9 +56,7 @@ const refreshSession = () => {
 api.interceptors.response.use(
   (response) => response,
   async (error: unknown) => {
-    if (!isAxiosError(error)) {
-      return Promise.reject(error);
-    }
+    if (!isAxiosError(error)) return Promise.reject(error);
 
     const config = error.config as RetryConfig | undefined;
     const status = error.response?.status;

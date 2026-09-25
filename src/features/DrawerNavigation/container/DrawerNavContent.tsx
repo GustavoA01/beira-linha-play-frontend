@@ -1,4 +1,4 @@
-import { DrawerNavHeader } from '../components/DrawerNavHeader';
+import { DrawerNavHeader } from './DrawerNavHeader';
 import { DrawerSection } from '../components/DrawerSection';
 import { useDrawerItens } from '../hooks/useDrawerItens';
 import type { DrawerNavigationProps } from '../types';
