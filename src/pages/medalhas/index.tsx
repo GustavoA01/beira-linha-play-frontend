@@ -99,9 +99,7 @@ export const MedalsPage = () => {
                     imagemUrl={medal.imagemUrl}
                     pontosMin={medal.pontosMin}
                     canDelete={isAdmin}
-                    onDelete={() =>
-                      removeMedal({ id: medal.id, imagemUrl: medal.imagemUrl })
-                    }
+                    onDelete={() => removeMedal(medal.id)}
                   />
                 ) : (
                   <UnknownMedal minPoints={medal.pontosMin} />

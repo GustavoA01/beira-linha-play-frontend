@@ -169,7 +169,11 @@ export type MonitoringResponseType = {
 
 export type MedalResponseType = MedalhaType & { conquistada: boolean };
 
-export type SaveMedalPayloadType = Omit<MedalhaType, 'id'>;
+export type SaveMedalPayloadType = {
+  nome: string;
+  pontosMin: number;
+  imagem: File;
+};
 
 export type RankingResponseType = Pick<
   AlunoType,

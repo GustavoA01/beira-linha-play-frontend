@@ -22,10 +22,6 @@ jest.mock('@/services/medalhas', () => ({
   equipMedal: jest.fn(),
 }));
 
-jest.mock('@/services/cloudinary', () => ({
-  uploadImage: jest.fn(),
-}));
-
 jest.mock('@/components/ui/toast', () => ({
   toast: { add: jest.fn() },
 }));

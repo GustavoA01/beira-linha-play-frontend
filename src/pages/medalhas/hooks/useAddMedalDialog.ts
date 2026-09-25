@@ -1,7 +1,6 @@
 import { toast } from '@/components/ui/toast';
 import { addMedalSchema, type AddMedalFormType } from '@/data/schemas/medal';
 import { ApiError } from '@/services/api';
-import { uploadImage } from '@/services/cloudinary';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useCreateMedal } from './useMutation';
@@ -32,11 +31,10 @@ export const useAddMedalDialog = (onOpenChange: (open: boolean) => void) => {
     }
 
     try {
-      const imagemUrl = await uploadImage(imagem);
       await addMedal({
         nome: data.nome,
         pontosMin: data.pontosMin,
-        imagemUrl,
+        imagem,
       });
       handleOpenChange(false);
     } catch (error) {

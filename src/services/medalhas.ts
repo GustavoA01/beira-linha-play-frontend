@@ -1,5 +1,4 @@
 import { api } from './api';
-import { deleteImage } from './cloudinary';
 import { endpoints } from './endpoints';
 import type {
   MedalResponseType,
@@ -13,25 +12,21 @@ export const listMedals = async () => {
 };
 
 export const createMedal = async (payload: SaveMedalPayloadType) => {
+  const form = new FormData();
+  form.append('nome', payload.nome);
+  form.append('pontosMin', String(payload.pontosMin));
+  form.append('imagem', payload.imagem);
   const { data } = await api.post<MedalResponseType>(
     endpoints.medals.list,
-    payload
+    form,
+    {
+      headers: { 'Content-Type': false as unknown as string },
+    }
   );
   return data;
 };
 
-export const deleteMedal = async ({
-  id,
-  imagemUrl,
-}: {
-  id: string;
-  imagemUrl: string;
-}) => {
-  try {
-    await deleteImage(imagemUrl);
-  } catch (error) {
-    console.error(error);
-  }
+export const deleteMedal = async (id: string) => {
   await api.delete(endpoints.medals.byId(id));
 };
 

@@ -13,6 +13,9 @@ export const addMedalSchema = z.object({
     )
     .refine((files) => files[0].type.startsWith('image/'), {
       error: 'Envie um arquivo de imagem',
+    })
+    .refine((files) => files[0].size <= 2 * 1024 * 1024, {
+      error: 'A imagem deve ter no máximo 2 MB',
     }),
 });
 

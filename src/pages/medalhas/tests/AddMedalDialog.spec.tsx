@@ -3,13 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AddMedalDialog } from '../components/AddMedalDialog';
-import { uploadImage } from '@/services/cloudinary';
 import { createMedal } from '@/services/medalhas';
 import { toast } from '@/components/ui/toast';
-
-jest.mock('@/services/cloudinary', () => ({
-  uploadImage: jest.fn(),
-}));
 
 jest.mock('@/services/medalhas', () => ({
   listMedals: jest.fn(),
@@ -22,9 +17,6 @@ jest.mock('@/components/ui/toast', () => ({
   toast: { add: jest.fn() },
 }));
 
-const mockedUploadImage = uploadImage as jest.MockedFunction<
-  typeof uploadImage
->;
 const mockedCreateMedal = createMedal as jest.MockedFunction<
   typeof createMedal
 >;
@@ -47,7 +39,6 @@ describe('AddMedalDialog', () => {
   const file = new File(['medalha'], 'medalha.png', { type: 'image/png' });
 
   beforeEach(() => {
-    mockedUploadImage.mockReset();
     mockedCreateMedal.mockReset();
     mockedToastAdd.mockReset();
   });
@@ -82,7 +73,7 @@ describe('AddMedalDialog', () => {
       await screen.findByText('Informe o nome da medalha')
     ).toBeInTheDocument();
     expect(screen.getByText('Selecione uma imagem')).toBeInTheDocument();
-    expect(mockedUploadImage).not.toHaveBeenCalled();
+    expect(mockedCreateMedal).not.toHaveBeenCalled();
   });
 
   it('closes when cancelled', async () => {
@@ -95,12 +86,9 @@ describe('AddMedalDialog', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
-  it('creates the medal after uploading the image', async () => {
+  it('creates the medal sending the image to the API', async () => {
     const user = userEvent.setup();
     const onOpenChange = jest.fn();
-    mockedUploadImage.mockResolvedValue(
-      'https://res.cloudinary.com/nome-cloud-ficticio/image/upload/medalha.png'
-    );
     mockedCreateMedal.mockResolvedValue({
       id: 'medal-1',
       nome: 'PUC Minas',
@@ -121,8 +109,7 @@ describe('AddMedalDialog', () => {
         {
           nome: 'PUC Minas',
           pontosMin: 0,
-          imagemUrl:
-            'https://res.cloudinary.com/nome-cloud-ficticio/image/upload/medalha.png',
+          imagem: file,
         },
         expect.anything()
       );
@@ -134,10 +121,10 @@ describe('AddMedalDialog', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false);
   });
 
-  it('shows an error when the image upload fails', async () => {
+  it('shows an error when the API rejects the image', async () => {
     const user = userEvent.setup();
     const onOpenChange = jest.fn();
-    mockedUploadImage.mockRejectedValue(new Error('Falha ao enviar a imagem'));
+    mockedCreateMedal.mockRejectedValue(new Error('Falha ao enviar a imagem'));
 
     renderDialog(<AddMedalDialog open onOpenChange={onOpenChange} />);
 
@@ -154,7 +141,6 @@ describe('AddMedalDialog', () => {
       type: 'error',
       title: 'Não foi possível enviar a imagem.',
     });
-    expect(mockedCreateMedal).not.toHaveBeenCalled();
     expect(onOpenChange).not.toHaveBeenCalledWith(false);
   });
 });

@@ -1,0 +1,55 @@
+# Compose da VPS: só imagens já carregadas (docker load). Sem build, sem fonte.
+# docker compose -f docker-compose.prod.yml up -d
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: beira-linha-play-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-beira_linha_play}
+      POSTGRES_USER: ${POSTGRES_USER:-beira}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set_POSTGRES_PASSWORD}
+    volumes:
+      - beira_linha_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${POSTGRES_USER:-beira} -d ${POSTGRES_DB:-beira_linha_play}',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  api:
+    image: beira-linha-play-api:latest
+    container_name: beira-linha-play-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB:-beira_linha_play}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER:-beira}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD:?set_POSTGRES_PASSWORD}
+    restart: unless-stopped
+
+  frontend:
+    image: beira-linha-play-frontend:latest
+    container_name: beira-linha-play-frontend
+    ports:
+      - '80:80'
+    depends_on:
+      - api
+    restart: unless-stopped
+
+volumes:
+  beira_linha_pgdata:
+
+networks:
+  default:
+    name: beira-linha-play
+    driver: bridge
