@@ -1,5 +1,8 @@
 import { AnimatePresence, motion } from 'motion/react';
 import type { AtividadeType } from '@/data/types/api';
+import { Dialog } from '@/components/ui/dialog';
+import { PhaseProgressModal } from '@/pages/mapa/components/ProgressModal/PhaseProgressModal';
+import { useAuthUser } from '@/providers/UserProvider';
 import { useQuizPlay } from '../hooks/useQuizPlay';
 import { QuizHeader } from '../components/QuizHeader';
 import { QuestionStep } from '../components/QuestionStep';
@@ -12,6 +15,7 @@ type QuizPlayPropsType = {
 };
 
 export const QuizPlay = ({ activity, usedAttempts }: QuizPlayPropsType) => {
+  const { user, isAluno } = useAuthUser();
   const {
     phase,
     currentQuestion,
@@ -33,6 +37,8 @@ export const QuizPlay = ({ activity, usedAttempts }: QuizPlayPropsType) => {
     goNext,
     leaveQuiz,
     retry,
+    faseDesbloqueada,
+    fecharFaseDesbloqueada,
   } = useQuizPlay(activity, usedAttempts);
 
   return (
@@ -95,6 +101,17 @@ export const QuizPlay = ({ activity, usedAttempts }: QuizPlayPropsType) => {
             onNext={goNext}
           />
         </>
+      )}
+
+      {faseDesbloqueada && isAluno && (
+        <Dialog open onOpenChange={(open) => !open && fecharFaseDesbloqueada()}>
+          <PhaseProgressModal
+            id={faseDesbloqueada.id}
+            points={faseDesbloqueada.points}
+            minPoints={faseDesbloqueada.minPoints}
+            studentName={user.nome}
+          />
+        </Dialog>
       )}
     </div>
   );
