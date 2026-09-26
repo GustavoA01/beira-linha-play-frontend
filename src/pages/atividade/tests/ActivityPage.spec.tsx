@@ -182,6 +182,10 @@ describe('ActivityPage', () => {
       title: 'Você fez 10 pts',
     });
     expect(
+      await screen.findByRole('heading', { name: 'Nível 15' })
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Legal!' }));
+    expect(
       await screen.findByRole('heading', { name: 'Gabaritou!' })
     ).toBeInTheDocument();
   });
@@ -249,6 +253,10 @@ describe('ActivityPage', () => {
     await user.click(screen.getByRole('radio', { name: /D/ }));
     await user.click(screen.getByRole('button', { name: 'Enviar resposta' }));
 
+    expect(
+      await screen.findByRole('heading', { name: 'Nível 15' })
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Legal!' }));
     expect(
       await screen.findByRole('heading', { name: 'Gabaritou!' })
     ).toBeInTheDocument();

@@ -71,3 +71,16 @@ export const nodesPhases: PhaseNodeType[] = phaseLayouts.map(
 
 const nodeLastIndex = nodesPhases[nodesPhases.length - 1];
 export const nodesLastPosition = nodeLastIndex.position.y - 200;
+
+export const faseAvancada = (pontosAntes: number, pontosDepois: number) => {
+  let avancada: { id: string; minPoints: number } | null = null;
+
+  for (const phase of nodesPhases) {
+    const { id, minPoints } = phase.data;
+    if (pontosAntes < minPoints && pontosDepois >= minPoints) {
+      avancada = { id, minPoints };
+    }
+  }
+
+  return avancada;
+};

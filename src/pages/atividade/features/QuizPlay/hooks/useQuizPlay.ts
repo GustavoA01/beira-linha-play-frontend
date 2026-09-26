@@ -6,6 +6,13 @@ import { MAX_TENTATIVAS } from '@/data/constants';
 import type { QuizPhaseType } from '@/pages/atividade/features/QuizPlay/types';
 import { useSubmitAttempt } from '../../../hooks/useMutation';
 import { toast } from '@/components/ui/toast';
+import { faseAvancada } from '@/pages/mapa/constants/nodesPhases';
+
+export type FaseDesbloqueadaType = {
+  id: string;
+  minPoints: number;
+  points: number;
+};
 
 export type QuizAnswerType = {
   questaoId: string;
@@ -44,6 +51,8 @@ export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
   );
   const [revealCorrect, setRevealCorrect] = useState(usedAttempts >= 1);
   const [attemptNumber, setAttemptNumber] = useState(usedAttempts + 1);
+  const [faseDesbloqueada, setFaseDesbloqueada] =
+    useState<FaseDesbloqueadaType | null>(null);
 
   const questions = activity.questoes;
   const currentQuestion = questions[currentIndex];
@@ -80,6 +89,7 @@ export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
     }
 
     persistedAttempt.current = true;
+    const pontosAntes = auth.isAluno ? auth.user.pontos : 0;
     try {
       const result = await sendAttempt({
         respostas: finalAnswers.map(({ questaoId, alternativaId }) => ({
@@ -91,6 +101,10 @@ export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
       setAttemptsUsed(result.tentativasUsadas);
       auth.setUser({ ...auth.user, pontos: result.pontosTotais });
       lastScore.current = result.tentativa.pontuacaoObtida;
+      const fase = faseAvancada(pontosAntes, result.pontosTotais);
+      setFaseDesbloqueada(
+        fase ? { ...fase, points: result.pontosTotais } : null
+      );
 
       const scoredAnswers = finalAnswers.map((answer) => {
         const fromApi = (result.tentativa.respostas ?? []).find(
@@ -223,6 +237,7 @@ export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
 
     persistedAttempt.current = false;
     lastScore.current = null;
+    setFaseDesbloqueada(null);
     setRevealCorrect(attemptsUsed >= 1);
     setAttemptNumber(attemptsUsed + 1);
     setPhase('answering');
@@ -254,5 +269,7 @@ export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
     goNext,
     leaveQuiz,
     retry,
+    faseDesbloqueada,
+    fecharFaseDesbloqueada: () => setFaseDesbloqueada(null),
   };
 };
