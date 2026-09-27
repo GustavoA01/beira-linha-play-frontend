@@ -49,6 +49,7 @@ export const LoginPage = () => {
           isAluno={isAluno}
           isAdmin={isAdmin}
           register={register}
+          aceitaEmail
         />
         {errors.root?.message && (
           <ErrorFormMessage message={errors.root.message} />

@@ -20,6 +20,9 @@ describe('HeaderDesktopNav', () => {
       'href',
       '/medalhas'
     );
+    expect(
+      screen.queryByRole('link', { name: 'Importar' })
+    ).not.toBeInTheDocument();
   });
 
   it('sends the monitor to /mapa without medals', () => {
@@ -39,6 +42,9 @@ describe('HeaderDesktopNav', () => {
     expect(
       screen.queryByRole('link', { name: 'Medalhas' })
     ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('link', { name: 'Importar' })
+    ).not.toBeInTheDocument();
   });
 
   it('keeps medals for the admin', () => {
@@ -54,6 +60,10 @@ describe('HeaderDesktopNav', () => {
     expect(screen.getByRole('link', { name: 'Medalhas' })).toHaveAttribute(
       'href',
       '/medalhas'
+    );
+    expect(screen.getByRole('link', { name: 'Importar' })).toHaveAttribute(
+      'href',
+      '/importacao'
     );
   });
 

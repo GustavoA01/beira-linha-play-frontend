@@ -50,6 +50,29 @@ export type CreateAdminPayloadType = Pick<AdminType, 'nome'> & {
   senha: string;
 };
 
+export type EventoImportacaoType = {
+  referencia: string;
+  nome: string;
+  inicio: string | null;
+  fim: string | null;
+};
+
+export type LogImportacaoType = {
+  id: string;
+  nomeEvento: string;
+  urlEvento: string | null;
+  quantidadeAlunos: number;
+  quantidadeCursos: number;
+  dataImportacao: string;
+  adminNome: string;
+};
+
+export type AlunoResumoType = {
+  nome: string;
+  email: string | null;
+  apelido: string | null;
+};
+
 export type ActivitySummaryResponseType = Pick<
   AtividadeType,
   'id' | 'titulo' | 'quantQuestoes' | 'moduloId'

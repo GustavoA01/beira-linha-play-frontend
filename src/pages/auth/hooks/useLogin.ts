@@ -11,12 +11,19 @@ import { useNavigate } from 'react-router-dom';
 import { useLoginMutation } from './useMutation';
 
 const errorsMsgTipos: Record<LoginRoleType, string> = {
-  ALUNO: 'Apelido ou senha incorretos. Confira e tente de novo.',
+  ALUNO: 'Apelido, e-mail ou senha incorretos. Confira e tente de novo.',
   MONITOR: 'E-mail ou senha incorretos. Confira e tente de novo.',
   ADMIN: 'Nome ou senha incorretos. Confira e tente de novo.',
 } as const;
 
 const loginErrorMessage = (tipo: LoginRoleType, error: unknown) => {
+  if (
+    error instanceof ApiError &&
+    (error.message.startsWith('Este e-mail está em mais de uma conta') ||
+      error.message.startsWith('O acesso deste usuário expirou'))
+  ) {
+    return error.message;
+  }
   const unathorized =
     error instanceof ApiError && (error.status === 401 || error.status === 403);
   if (unathorized) return errorsMsgTipos[tipo];
@@ -57,7 +64,9 @@ export const useLogin = () => {
         tipo: data.tipo,
         senha: data.senha,
         ...(data.tipo === 'ALUNO'
-          ? { apelido: data.apelido }
+          ? data.apelido.includes('@')
+            ? { email: data.apelido.trim() }
+            : { apelido: data.apelido }
           : data.tipo === 'MONITOR'
             ? { email: data.email }
             : { nome: data.nome }),
