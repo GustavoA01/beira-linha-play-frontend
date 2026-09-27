@@ -10,6 +10,7 @@ export const endpoints = {
     list: '/api/cursos',
     byId: (id: string) => `/api/cursos/${id}`,
     enroll: '/api/cursos/inscrever',
+    students: (courseId: string) => `/api/cursos/${courseId}/alunos`,
     modules: (courseId: string) => `/api/cursos/${courseId}/modulos`,
   },
   modules: {
@@ -31,6 +32,12 @@ export const endpoints = {
     me: '/api/usuarios/me',
     admins: '/api/admins',
     monitors: '/api/monitores',
+  },
+  importacao: {
+    inscritos: '/api/importacao/inscritos',
+    eventos: '/api/importacao/eventos',
+    logs: '/api/importacao/logs',
+    alunos: (logId: string) => `/api/importacao/logs/${logId}/alunos`,
   },
   medals: {
     list: '/api/medalhas',

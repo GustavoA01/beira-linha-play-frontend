@@ -27,6 +27,7 @@ export const HeaderDesktopNav = ({ onLogout }: HeaderDesktopNavPropsType) => {
       {getHeaderItems({
         isAluno,
         showMedalhas: isAluno || isAdmin,
+        showImportacao: isAdmin,
         mapDisabled,
       }).map(({ name, path, disabled }) =>
         disabled ? (

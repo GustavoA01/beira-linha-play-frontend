@@ -55,7 +55,7 @@ describe('LoginPage', () => {
     renderPage();
 
     expect(screen.getByRole('heading', { name: 'Entrar' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Apelido')).toBeInTheDocument();
+    expect(screen.getByLabelText('Apelido ou e-mail')).toBeInTheDocument();
     expect(screen.queryByLabelText('E-mail')).not.toBeInTheDocument();
     expect(screen.getByLabelText('Senha')).toBeInTheDocument();
   });
@@ -64,10 +64,14 @@ describe('LoginPage', () => {
     const user = userEvent.setup();
     renderPage();
 
-    await user.click(screen.getByRole('button', { name: 'Entrar como admin' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Entrar como administrador' })
+    );
 
     expect(screen.getByLabelText('Nome')).toBeInTheDocument();
-    expect(screen.queryByLabelText('Apelido')).not.toBeInTheDocument();
+    expect(
+      screen.queryByLabelText('Apelido ou e-mail')
+    ).not.toBeInTheDocument();
     expect(screen.queryByLabelText('E-mail')).not.toBeInTheDocument();
   });
 
@@ -80,7 +84,9 @@ describe('LoginPage', () => {
     );
 
     expect(screen.getByLabelText('E-mail')).toBeInTheDocument();
-    expect(screen.queryByLabelText('Apelido')).not.toBeInTheDocument();
+    expect(
+      screen.queryByLabelText('Apelido ou e-mail')
+    ).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Entrar' })).toBeInTheDocument();
   });
 
@@ -93,7 +99,7 @@ describe('LoginPage', () => {
     );
     await user.click(screen.getByRole('button', { name: 'Entrar como aluno' }));
 
-    expect(screen.getByLabelText('Apelido')).toBeInTheDocument();
+    expect(screen.getByLabelText('Apelido ou e-mail')).toBeInTheDocument();
     expect(screen.queryByLabelText('E-mail')).not.toBeInTheDocument();
   });
 
@@ -103,7 +109,9 @@ describe('LoginPage', () => {
 
     await user.click(screen.getByRole('button', { name: 'Entrar' }));
 
-    expect(await screen.findByText('Informe o apelido')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Informe o apelido ou o e-mail')
+    ).toBeInTheDocument();
     expect(screen.getByText('Informe a senha')).toBeInTheDocument();
   });
 
@@ -129,13 +137,37 @@ describe('LoginPage', () => {
     );
     renderPage();
 
-    await user.type(screen.getByLabelText('Apelido'), 'Gu');
+    await user.type(screen.getByLabelText('Apelido ou e-mail'), 'Gu');
     await user.type(screen.getByLabelText('Senha'), 'senha-errada');
     await user.click(screen.getByRole('button', { name: 'Entrar' }));
 
     expect(
       await screen.findByText(
-        'Apelido ou senha incorretos. Confira e tente de novo.'
+        'Apelido, e-mail ou senha incorretos. Confira e tente de novo.'
+      )
+    ).toBeInTheDocument();
+  });
+
+  it('asks for the nickname when the email belongs to more than one account', async () => {
+    const user = userEvent.setup();
+    mockedLogin.mockRejectedValue(
+      new ApiError(
+        'Este e-mail está em mais de uma conta. Entre com o apelido.',
+        401
+      )
+    );
+    renderPage();
+
+    await user.type(
+      screen.getByLabelText('Apelido ou e-mail'),
+      'maria@email.com'
+    );
+    await user.type(screen.getByLabelText('Senha'), '123456');
+    await user.click(screen.getByRole('button', { name: 'Entrar' }));
+
+    expect(
+      await screen.findByText(
+        'Este e-mail está em mais de uma conta. Entre com o apelido.'
       )
     ).toBeInTheDocument();
   });
@@ -145,7 +177,7 @@ describe('LoginPage', () => {
     mockedLogin.mockResolvedValue(mockLoggedAluno);
     renderPage();
 
-    await user.type(screen.getByLabelText('Apelido'), 'Gu');
+    await user.type(screen.getByLabelText('Apelido ou e-mail'), 'Gu');
     await user.type(screen.getByLabelText('Senha'), '123456');
     await user.click(screen.getByRole('button', { name: 'Entrar' }));
 
@@ -161,7 +193,9 @@ describe('LoginPage', () => {
     const user = userEvent.setup();
     renderPage();
 
-    await user.click(screen.getByRole('button', { name: 'Entrar como admin' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Entrar como administrador' })
+    );
     await user.type(screen.getByLabelText('Senha'), '123456');
     await user.click(screen.getByRole('button', { name: 'Entrar' }));
 
@@ -193,7 +227,9 @@ describe('LoginPage', () => {
     mockedLogin.mockResolvedValue(mockLoggedAdmin);
     renderPage();
 
-    await user.click(screen.getByRole('button', { name: 'Entrar como admin' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Entrar como administrador' })
+    );
     await user.type(screen.getByLabelText('Nome'), 'Administrador');
     await user.type(screen.getByLabelText('Senha'), '123456');
     await user.click(screen.getByRole('button', { name: 'Entrar' }));

@@ -5,6 +5,7 @@ import { RequireGuest } from './components/layouts/RequireGuest';
 import { RequireMonitor } from './components/layouts/RequirePapel';
 import { Map } from './pages/mapa';
 import { CoursesPage } from './pages/cursos';
+import { ImportacaoPage } from './pages/importacao';
 import { MedalsPage } from './pages/medalhas';
 import { CoursePage } from './pages/curso';
 import { ModulePage } from './pages/modulo';
@@ -54,6 +55,10 @@ export const Router = createBrowserRouter([
               {
                 path: 'cursos',
                 Component: CoursesPage,
+              },
+              {
+                path: 'importacao',
+                Component: ImportacaoPage,
               },
               {
                 path: 'rankings',

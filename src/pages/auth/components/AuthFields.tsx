@@ -22,6 +22,7 @@ type AuthFieldsPropsType<T extends FieldValues & AuthFieldsValues> = {
   register: UseFormRegister<T>;
   autoFocus?: boolean;
   passwordAutoComplete?: 'current-password' | 'new-password';
+  aceitaEmail?: boolean;
 };
 
 export const AuthFields = <T extends FieldValues & AuthFieldsValues>({
@@ -31,6 +32,7 @@ export const AuthFields = <T extends FieldValues & AuthFieldsValues>({
   register,
   autoFocus = false,
   passwordAutoComplete = 'current-password',
+  aceitaEmail = false,
 }: AuthFieldsPropsType<T>) => (
   <>
     {isAdmin ? (
@@ -45,11 +47,13 @@ export const AuthFields = <T extends FieldValues & AuthFieldsValues>({
       />
     ) : isAluno ? (
       <LabelInput
-        label="Apelido"
+        label={aceitaEmail ? 'Apelido ou e-mail' : 'Apelido'}
         id={'apelido' as Path<T>}
         autoFocus={autoFocus}
-        autoComplete="nickname"
-        placeholder="Ex.: Joãozinho"
+        autoComplete={aceitaEmail ? 'username' : 'nickname'}
+        placeholder={
+          aceitaEmail ? 'Ex.: Joãozinho ou maria@email.com' : 'Ex.: Joãozinho'
+        }
         error={errors.apelido?.message}
         register={register}
       />
