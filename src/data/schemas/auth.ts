@@ -47,7 +47,7 @@ export const loginSchema = z
     if (data.tipo === 'ALUNO' && data.apelido.length === 0) {
       ctx.addIssue({
         code: 'custom',
-        message: 'Informe o apelido',
+        message: 'Informe o apelido ou o e-mail',
         path: ['apelido'],
       });
     }

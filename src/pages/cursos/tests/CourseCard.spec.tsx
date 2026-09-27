@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { CourseCard } from '../components/CourseCard';
 import type { CursoType } from '@/data/types/api';
 
@@ -24,6 +24,24 @@ describe('CourseCard', () => {
     expect(
       screen.queryByRole('button', { name: 'Ações do curso' })
     ).not.toBeInTheDocument();
+  });
+
+  it('shows the students action without edit or delete', () => {
+    render(
+      <CourseCard
+        curso={curso}
+        monitorNome="Maria Souza"
+        onClick={jest.fn()}
+        codCurso="ABC123"
+        onListStudents={jest.fn()}
+      />
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ações do curso' }));
+
+    expect(screen.getByText('Alunos')).toBeInTheDocument();
+    expect(screen.queryByText('Editar')).not.toBeInTheDocument();
+    expect(screen.queryByText('Excluir')).not.toBeInTheDocument();
   });
 
   it('shows the actions menu for the admin', () => {

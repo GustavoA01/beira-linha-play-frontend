@@ -10,7 +10,7 @@ import {
 import type { CursoType } from '@/data/types/api';
 import { countCourseActivities } from '@/data/atividades';
 import { cn } from '@/lib/utils';
-import { EllipsisVertical, Pencil, Trash2 } from 'lucide-react';
+import { EllipsisVertical, Pencil, Trash2, Users } from 'lucide-react';
 import { DeleteCourseDialog } from './DeleteCourseDialog';
 
 type CourseCardPropsType = {
@@ -22,6 +22,7 @@ type CourseCardPropsType = {
   canDelete?: boolean;
   onEdit?: () => void;
   onDelete?: () => void;
+  onListStudents?: () => void;
 };
 
 export const CourseCard = ({
@@ -33,6 +34,7 @@ export const CourseCard = ({
   canDelete = false,
   onEdit,
   onDelete,
+  onListStudents,
 }: CourseCardPropsType) => {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const atividadesCount = countCourseActivities(curso);
@@ -58,7 +60,7 @@ export const CourseCard = ({
             {curso.nome}
           </h1>
 
-          {canDelete && (onEdit || onDelete) && (
+          {(onListStudents || (canDelete && (onEdit || onDelete))) && (
             <DropdownMenu>
               <DropdownMenuTrigger
                 aria-label="Ações do curso"
@@ -73,7 +75,16 @@ export const CourseCard = ({
                 onClick={stopCardClick}
                 onPointerDown={stopCardClick}
               >
-                {onEdit && (
+                {onListStudents && (
+                  <DropdownMenuItem
+                    className="font-montserrat cursor-pointer"
+                    onClick={onListStudents}
+                  >
+                    <Users />
+                    Alunos
+                  </DropdownMenuItem>
+                )}
+                {canDelete && onEdit && (
                   <DropdownMenuItem
                     className="font-montserrat cursor-pointer"
                     onClick={onEdit}
@@ -82,7 +93,7 @@ export const CourseCard = ({
                     Editar
                   </DropdownMenuItem>
                 )}
-                {onDelete && (
+                {canDelete && onDelete && (
                   <DropdownMenuItem
                     variant="destructive"
                     className="font-montserrat cursor-pointer"

@@ -4,6 +4,7 @@ import type { UsuarioType } from '@/data/types/api';
 type NavOptions = {
   isAluno: boolean;
   showMedalhas: boolean;
+  showImportacao?: boolean;
   mapDisabled?: boolean;
 };
 
@@ -17,6 +18,7 @@ export const isMonitorMapDisabled = (user: UsuarioType | null) =>
 export const getHeaderItems = ({
   isAluno,
   showMedalhas,
+  showImportacao = false,
   mapDisabled = false,
 }: NavOptions) => {
   const items = [
@@ -26,6 +28,10 @@ export const getHeaderItems = ({
 
   if (showMedalhas) {
     items.push({ name: 'Medalhas', path: '/medalhas', disabled: false });
+  }
+
+  if (showImportacao) {
+    items.push({ name: 'Importar', path: '/importacao', disabled: false });
   }
 
   return items;

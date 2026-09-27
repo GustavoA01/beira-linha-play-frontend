@@ -1,6 +1,7 @@
 import { api } from './api';
 import { endpoints } from './endpoints';
 import type {
+  AlunoResumoType,
   CourseResponseType,
   EnrollCoursePayloadType,
   SaveCoursePayloadType,
@@ -39,6 +40,13 @@ export const updateCourse = async (
 
 export const deleteCourse = async (id: string) => {
   await api.delete(endpoints.courses.byId(id));
+};
+
+export const listCourseStudents = async (courseId: string) => {
+  const { data } = await api.get<AlunoResumoType[]>(
+    endpoints.courses.students(courseId)
+  );
+  return data;
 };
 
 export const enrollCourse = async (payload: EnrollCoursePayloadType) => {

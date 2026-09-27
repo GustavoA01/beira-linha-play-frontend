@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button';
 import type { UsuarioType } from '@/data/types/api';
-import { KeyRound, Plus, UserPlus } from 'lucide-react';
+import { Download, KeyRound, Plus, UserPlus } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 type CoursesHeaderProps = {
   role: UsuarioType['tipo'];
@@ -49,6 +50,12 @@ export const CoursesHeader = ({
         <Button className="max-sm:w-10" onClick={onAddCourse}>
           <Plus />
           <p className="max-sm:hidden">Adicionar Curso</p>
+        </Button>
+        <Button className="max-sm:w-10" asChild>
+          <Link to="/importacao">
+            <Download />
+            <p className="max-sm:hidden">Importar</p>
+          </Link>
         </Button>
       </div>
     )}

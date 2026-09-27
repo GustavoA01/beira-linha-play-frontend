@@ -5,6 +5,7 @@ import {
   Map as MapIcon,
   Trophy,
   UserPen,
+  Users,
 } from 'lucide-react';
 import { mapPath, isMonitorMapDisabled } from '@/data/constants';
 import { useAuthUser } from '@/providers/UserProvider';
@@ -24,6 +25,16 @@ export const useDrawerItens = ({
       icon: BookOpen,
       onClick: () => setOpenDrawer(false),
     },
+    ...(isAdmin
+      ? [
+          {
+            label: 'Importar',
+            path: '/importacao',
+            icon: Users,
+            onClick: () => setOpenDrawer(false),
+          },
+        ]
+      : []),
   ];
 
   const headerConquestItems = [

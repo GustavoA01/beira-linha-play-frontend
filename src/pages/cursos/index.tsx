@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { CourseCard } from '@/pages/cursos/components/CourseCard';
 import { CoursesHeader } from './components/CoursesHeader';
 import { CodeDialog } from './components/CodeDialog';
@@ -11,10 +12,15 @@ import { cn } from '@/lib/utils';
 import { CoursesPageSkeleton } from '@/components/PageSkeleton';
 import { emptyCoursesMessage, monitorNames } from './utils';
 import { useCursosMutation } from './hooks/useCursosMutation';
+import { CourseStudentsDialog } from './components/CourseStudentsDialog';
 
 export const CoursesPage = () => {
   const { containerClassName } = useMediaDevice();
-  const { user, isAdmin, isAluno } = useAuthUser();
+  const { user, isAdmin, isAluno, isMonitor } = useAuthUser();
+  const [alunosCurso, setAlunosCurso] = useState<{
+    id: string;
+    nome: string;
+  } | null>(null);
   const { cursos, isPending, isError, removeCourse, monitors } =
     useCursosMutation();
   const {
@@ -88,6 +94,11 @@ export const CoursesPage = () => {
                 setOpenCourseDialog(true);
               }}
               onDelete={() => removeCourse(curso.id)}
+              onListStudents={
+                isAdmin || (isMonitor && curso.monitorIds.includes(user.id))
+                  ? () => setAlunosCurso({ id: curso.id, nome: curso.nome })
+                  : undefined
+              }
             />
           </motion.div>
         ))}
@@ -106,6 +117,13 @@ export const CoursesPage = () => {
       <NewAdminDialog
         open={openAdminDialog}
         onOpenChange={setOpenAdminDialog}
+      />
+      <CourseStudentsDialog
+        cursoId={alunosCurso?.id ?? null}
+        nomeCurso={alunosCurso?.nome ?? ''}
+        onOpenChange={(aberto) => {
+          if (!aberto) setAlunosCurso(null);
+        }}
       />
     </div>
   );
