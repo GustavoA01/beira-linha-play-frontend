@@ -3,7 +3,7 @@ import { HeaderLayout } from './components/layouts/HeaderLayout';
 import { RequireAuth } from './components/layouts/RequireAuth';
 import { RequireGuest } from './components/layouts/RequireGuest';
 import { RequireMonitor } from './components/layouts/RequirePapel';
-import { Map } from './pages/mapa';
+import { MapFallback } from './pages/mapa/MapFallback';
 import { CoursesPage } from './pages/cursos';
 import { MedalsPage } from './pages/medalhas';
 import { CoursePage } from './pages/curso';
@@ -49,7 +49,11 @@ export const Router = createBrowserRouter([
               },
               {
                 path: 'mapa',
-                Component: Map,
+                HydrateFallback: MapFallback,
+                lazy: async () => {
+                  const { Map } = await import('./pages/mapa');
+                  return { Component: Map };
+                },
               },
               {
                 path: 'cursos',

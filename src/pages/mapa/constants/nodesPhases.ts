@@ -1,7 +1,4 @@
-import BackgroundNode from '@/pages/mapa/components/trail/BackgroundNode';
-import { PhaseNode } from '@/pages/mapa/components/trail/PhaseNode';
 import type { PhaseNodeType } from '@/data/types/reactFlow';
-import type { NodeTypes } from '@xyflow/react';
 
 export const LOCKED_GLOW = [
   { color: '#3a6ea5', strength: 0.4 },
@@ -21,11 +18,6 @@ const FIRST_PHASE_XP = 1;
 const EASY_STEP = 3;
 const HARD_STEP = 4;
 const EASY_UNTIL_PHASE = 9;
-
-export const nodeTypes: NodeTypes = {
-  phase: PhaseNode,
-  background: BackgroundNode,
-};
 
 const minPointsOf = (phase: number) => {
   if (phase === 1) return FIRST_PHASE_XP;
