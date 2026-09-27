@@ -1,69 +1,66 @@
 import { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
-import { toast } from '@/components/ui/toast';
 import {
   importacaoSchema,
   type ImportacaoFormType,
 } from '@/data/schemas/importacao';
-import { queryClientKeys } from '@/lib/queryClientKeys';
-import { toastError } from '@/lib/utils';
-import {
-  importarInscritos,
-  listarEventos,
-  listarLogs,
-} from '@/services/importacao';
-
-const anoAtual = new Date().getFullYear();
+import { listarEventos, listarLogs } from '@/services/importacao';
+import { anoAtual } from '../utils';
+import { useImportarInscritos } from './useMutation';
 
 export const useImportacao = () => {
-  const queryClient = useQueryClient();
   const [logAberto, setLogAberto] = useState<string | null>(null);
-  const methods = useForm<ImportacaoFormType>({
+  const {
+    watch,
+    setValue,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<ImportacaoFormType>({
     resolver: zodResolver(importacaoSchema),
     defaultValues: { ano: anoAtual, referencia: '' },
   });
-  const ano = methods.watch('ano');
+  const ano = watch('ano');
+  const referencia = watch('referencia');
+
   const eventos = useQuery({
     queryKey: ['importacao', 'eventos', ano],
     queryFn: () => listarEventos(ano),
   });
+
   const logs = useQuery({
     queryKey: ['importacao', 'logs'],
     queryFn: listarLogs,
   });
-  const { mutateAsync, isPending } = useMutation({
-    mutationFn: importarInscritos,
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['importacao', 'logs'] });
-      void queryClient.invalidateQueries({
-        queryKey: queryClientKeys.courseKeys.all,
-      });
-      toast.add({
-        type: 'success',
-        title: 'Participantes importados',
-      });
-    },
-    onError: (error) => {
-      toastError(error, 'Não foi possível importar os participantes');
-    },
-  });
 
-  const onSubmit = methods.handleSubmit(async (data) => {
+  const { mutateAsync, isPending } = useImportarInscritos();
+
+  const onSubmit = handleSubmit(async (data) => {
     await mutateAsync(data.referencia);
   });
 
-  const logSelecionado = logs.data?.find((log) => log.id === logAberto) ?? null;
+  const logSelecionado = logs.data?.find(({ id }) => id === logAberto) ?? null;
+
+  const trocarAno = (proximo: number) => {
+    setValue('ano', proximo);
+    setValue('referencia', '');
+  };
+
+  const trocarReferencia = (proxima: string) => {
+    setValue('referencia', proxima, { shouldValidate: true });
+  };
+
+  const anos = Array.from({ length: 2 }, (_, indice) => anoAtual - indice);
 
   return {
-    register: methods.register,
-    errors: methods.formState.errors,
-    isSubmitting: methods.formState.isSubmitting || isPending,
+    errors,
+    isSubmitting: isSubmitting || isPending,
     onSubmit,
     ano,
+    referencia,
     anoAtual,
-    anos: Array.from({ length: 2 }, (_, indice) => anoAtual - indice),
+    anos,
     eventos: eventos.data ?? [],
     eventosPendentes: eventos.isPending,
     eventosComErro: eventos.isError,
@@ -73,9 +70,7 @@ export const useImportacao = () => {
     logAberto,
     nomeLogAberto: logSelecionado?.nomeEvento ?? '',
     abrirLog: setLogAberto,
-    trocarAno: (proximo: number) => {
-      methods.setValue('ano', proximo);
-      methods.setValue('referencia', '');
-    },
+    trocarAno,
+    trocarReferencia,
   };
 };

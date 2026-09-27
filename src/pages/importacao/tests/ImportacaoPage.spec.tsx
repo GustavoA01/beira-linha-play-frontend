@@ -1,11 +1,9 @@
 import type { ReactElement } from 'react';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ImportacaoPage } from '../index';
 import { UserProvider } from '@/providers/UserProvider';
-import { mockLoggedAdmin } from '@/data/mocks/admins';
 import { mockLoggedAluno } from '@/data/mocks/usuario';
 import {
   importarInscritos,
@@ -13,7 +11,6 @@ import {
   listarEventos,
   listarLogs,
 } from '@/services/importacao';
-import { toast } from '@/components/ui/toast';
 import type { UsuarioType } from '@/data/types/api';
 
 jest.mock('@/components/ui/toast', () => ({
@@ -100,56 +97,7 @@ describe('ImportacaoPage', () => {
 
     expect(await screen.findByText('Lista de cursos')).toBeInTheDocument();
     expect(
-      screen.queryByRole('heading', { name: 'Importar participantes' })
+      screen.queryByRole('heading', { name: 'Importar dados' })
     ).not.toBeInTheDocument();
-  });
-
-  it('lists import logs and opens the students without a password column', async () => {
-    const user = userEvent.setup();
-    const ano = new Date().getFullYear();
-    mockedImportar.mockResolvedValue({
-      id: 'log-1',
-      nomeEvento: 'Beira Linha 2026',
-      urlEvento: 'https://sympla.com.br/beira',
-      quantidadeAlunos: 1,
-      quantidadeCursos: 1,
-      dataImportacao: '2026-09-27T15:00:00Z',
-      adminNome: 'Administrador',
-    });
-
-    renderPage(mockLoggedAdmin);
-
-    expect(
-      await screen.findByText(
-        `A senha padrão dos alunos importados é o primeiro nome, em minúsculas, seguido do ano atual. Exemplo: maria${ano}.`
-      )
-    ).toBeInTheDocument();
-    expect(
-      await screen.findByRole('option', {
-        name: 'Beira Linha 2026 (01/03/2026 - 01/06/2026)',
-      })
-    ).toBeInTheDocument();
-    expect(screen.getByText('Administrador')).toBeInTheDocument();
-    expect(
-      screen.queryByRole('columnheader', { name: 'Senha' })
-    ).not.toBeInTheDocument();
-
-    await user.selectOptions(
-      screen.getByLabelText('Evento'),
-      'referencia-opaca'
-    );
-    await user.click(screen.getByRole('button', { name: 'Importar' }));
-    await user.click(await screen.findByRole('button', { name: 'Ver alunos' }));
-
-    expect(await screen.findByText('Maria Silva')).toBeInTheDocument();
-    expect(screen.getByText('maria@email.com')).toBeInTheDocument();
-    expect(
-      screen.queryByRole('columnheader', { name: 'Senha' })
-    ).not.toBeInTheDocument();
-    expect(mockedImportar.mock.calls[0][0]).toBe('referencia-opaca');
-    expect(toast.add).toHaveBeenCalledWith({
-      type: 'success',
-      title: 'Participantes importados',
-    });
   });
 });

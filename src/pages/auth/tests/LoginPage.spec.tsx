@@ -64,7 +64,9 @@ describe('LoginPage', () => {
     const user = userEvent.setup();
     renderPage();
 
-    await user.click(screen.getByRole('button', { name: 'Entrar como admin' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Entrar como administrador' })
+    );
 
     expect(screen.getByLabelText('Nome')).toBeInTheDocument();
     expect(
@@ -191,7 +193,9 @@ describe('LoginPage', () => {
     const user = userEvent.setup();
     renderPage();
 
-    await user.click(screen.getByRole('button', { name: 'Entrar como admin' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Entrar como administrador' })
+    );
     await user.type(screen.getByLabelText('Senha'), '123456');
     await user.click(screen.getByRole('button', { name: 'Entrar' }));
 
@@ -223,7 +227,9 @@ describe('LoginPage', () => {
     mockedLogin.mockResolvedValue(mockLoggedAdmin);
     renderPage();
 
-    await user.click(screen.getByRole('button', { name: 'Entrar como admin' }));
+    await user.click(
+      screen.getByRole('button', { name: 'Entrar como administrador' })
+    );
     await user.type(screen.getByLabelText('Nome'), 'Administrador');
     await user.type(screen.getByLabelText('Senha'), '123456');
     await user.click(screen.getByRole('button', { name: 'Entrar' }));

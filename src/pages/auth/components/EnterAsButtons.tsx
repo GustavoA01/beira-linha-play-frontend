@@ -48,7 +48,7 @@ export const EnterAsButtons = ({
           className="h-auto whitespace-normal px-3 py-2 font-montserrat"
           onClick={onEnterAsAdmin}
         >
-          Entrar como admin
+          Entrar como administrador
         </Button>
       )}
     </div>
