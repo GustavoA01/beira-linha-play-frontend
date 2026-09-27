@@ -27,10 +27,10 @@ describe('ModalFooter', () => {
   });
 
   it('congratulates when the phase is completed', () => {
-    renderFooter(<ModalFooter concluded />);
+    renderFooter(<ModalFooter concluded level="3" />);
 
     expect(
-      screen.getByText('Parabéns! Você concluiu a fase com sucesso!')
+      screen.getByText('Parabéns! Você concluiu a fase 3!')
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Legal!' })).toBeInTheDocument();
     expect(
@@ -59,7 +59,7 @@ describe('ModalFooter', () => {
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Voltar' })).toBeInTheDocument();
     expect(
-      screen.queryByText('Parabéns! Você concluiu a fase com sucesso!')
+      screen.queryByText('Parabéns! Você concluiu a fase 3!')
     ).not.toBeInTheDocument();
   });
 });

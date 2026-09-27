@@ -4,18 +4,20 @@ type ModalFooterProps = {
   concluded: boolean;
   showProgress?: boolean;
   minPoints?: number;
+  level?: string;
 };
 
 export const ModalFooter = ({
   concluded,
   showProgress = true,
   minPoints,
+  level,
 }: ModalFooterProps) => (
   <>
     <p className="mt-8 mb-8 text-zinc-500 font-medium font-fredoka text-center">
       {showProgress
         ? concluded
-          ? 'Parabéns! Você concluiu a fase com sucesso!'
+          ? `Parabéns! Você concluiu a fase ${level}!`
           : 'Você está indo bem! Continue fazendo as atividades da disciplina para preencher a barra e liberar o próximo nível.'
         : `Os alunos liberam esta fase ao alcançar ${minPoints} pontos.`}
     </p>

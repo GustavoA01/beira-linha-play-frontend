@@ -101,6 +101,7 @@ export const PhaseProgressModal = ({
           concluded={concluded}
           showProgress={showProgress}
           minPoints={minPoints}
+          level={id}
         />
       </div>
       {exportCard}
