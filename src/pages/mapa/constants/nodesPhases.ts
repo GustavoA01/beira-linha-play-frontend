@@ -47,6 +47,14 @@ const phaseLayouts: Array<Pick<PhaseNodeType, 'id' | 'position'>> = [
   { id: '14', position: { x: 320, y: -6250 } },
   { id: '15', position: { x: 200, y: -6625 } },
   { id: '16', position: { x: 250, y: -7000 } },
+  { id: '17', position: { x: -160, y: -7375 } },
+  { id: '18', position: { x: -260, y: -7750 } },
+  { id: '19', position: { x: 210, y: -8125 } },
+  { id: '20', position: { x: 300, y: -8500 } },
+  { id: '21', position: { x: 160, y: -8875 } },
+  { id: '22', position: { x: -200, y: -9250 } },
+  { id: '23', position: { x: 200, y: -9625 } },
+  { id: '24', position: { x: 300, y: -10000 } },
 ];
 
 export const nodesPhases: PhaseNodeType[] = phaseLayouts.map(
