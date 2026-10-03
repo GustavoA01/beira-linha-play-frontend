@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
-import { RequirePapel } from '@/components/layouts/RequirePapel';
+import { RequirePapel, RequireStaff } from '@/components/layouts/RequirePapel';
+import { mockLoggedAdmin } from '@/data/mocks/admins';
 import { mockLoggedAluno } from '@/data/mocks/usuario';
 import { mockLoggedMonitor } from '@/data/mocks/monitores';
 import { useAuthUser } from '@/providers/UserProvider';
@@ -55,5 +56,34 @@ describe('RequirePapel', () => {
 
     renderGuard();
     expect(screen.getByText('Lista de cursos')).toBeInTheDocument();
+  });
+
+  it('lets the admin open staff routes', () => {
+    mockedUseAuthUser.mockReturnValue({
+      user: mockLoggedAdmin,
+      setUser: jest.fn(),
+      status: 'autenticado',
+      isAluno: false,
+      isMonitor: false,
+      isAdmin: true,
+    });
+
+    render(
+      <MemoryRouter
+        initialEntries={['/cursos/1/modulos/1/monitoramento/atividade-1']}
+      >
+        <Routes>
+          <Route path="/cursos" element={<p>Lista de cursos</p>} />
+          <Route element={<RequireStaff />}>
+            <Route
+              path="/cursos/:cursoId/modulos/:moduloId/monitoramento/:atividadeId"
+              element={<p>Monitoramento</p>}
+            />
+          </Route>
+        </Routes>
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText('Monitoramento')).toBeInTheDocument();
   });
 });

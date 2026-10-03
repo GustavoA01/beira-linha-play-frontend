@@ -27,7 +27,7 @@ export const useAtividade = () => {
   } = useQuery({
     queryKey: queryClientKeys.activityKeys.detail(atividadeId ?? ''),
     queryFn: async () => toActivity(await getActivity(atividadeId!)),
-    enabled: validIds && !auth.isMonitor,
+    enabled: validIds && auth.isAluno,
   });
 
   const attemptsEnabled = validIds && auth.isAluno;

@@ -54,7 +54,7 @@ export const useModulo = (
   const onClickActivity = (activityId?: string) => {
     if (!activityId || !cursoId || !moduloId) return;
     const basePath = `/cursos/${cursoId}/modulos/${moduloId}`;
-    if (isMonitor) navigate(`${basePath}/monitoramento/${activityId}`);
+    if (!isAluno) navigate(`${basePath}/monitoramento/${activityId}`);
     else navigate(`${basePath}/atividades/${activityId}`);
   };
 

@@ -2,7 +2,10 @@ import { createBrowserRouter } from 'react-router-dom';
 import { HeaderLayout } from './components/layouts/HeaderLayout';
 import { RequireAuth } from './components/layouts/RequireAuth';
 import { RequireGuest } from './components/layouts/RequireGuest';
-import { RequireMonitor } from './components/layouts/RequirePapel';
+import {
+  RequireMonitor,
+  RequireStaff,
+} from './components/layouts/RequirePapel';
 import { MapFallback } from './pages/mapa/MapFallback';
 import { CoursesPage } from './pages/cursos';
 import { ImportacaoPage } from './pages/importacao';
@@ -105,6 +108,11 @@ export const Router = createBrowserRouter([
                 path: '/cursos/:cursoId/modulos/:moduloId/nova-atividade/:atividadeId',
                 Component: NewActivityPage,
               },
+            ],
+          },
+          {
+            Component: RequireStaff,
+            children: [
               {
                 path: '/cursos/:cursoId/modulos/:moduloId/monitoramento/:atividadeId',
                 Component: ManagementPage,

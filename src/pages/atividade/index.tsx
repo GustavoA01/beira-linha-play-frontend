@@ -27,7 +27,7 @@ export const ActivityPage = () => {
     hasConcluded,
   } = useAtividade();
 
-  if (auth.isMonitor && validIds) {
+  if ((auth.isMonitor || auth.isAdmin) && validIds) {
     return (
       <Navigate
         to={`/cursos/${cursoId}/modulos/${moduloId}/monitoramento/${atividadeId}`}
