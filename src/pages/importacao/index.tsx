@@ -27,6 +27,12 @@ export const ImportacaoPage = () => {
     abrirLog,
     trocarAno,
     trocarReferencia,
+    cursos,
+    selecionados,
+    cursosPendentes,
+    cursosComErro,
+    alternarCurso,
+    alternarTodos,
   } = useImportacao();
 
   if (!isAdmin) return <Navigate to="/cursos" replace />;
@@ -45,6 +51,12 @@ export const ImportacaoPage = () => {
         eventosPendentes={eventosPendentes}
         eventosComErro={eventosComErro}
         erroReferencia={errors.referencia?.message}
+        cursos={cursos}
+        selecionados={selecionados}
+        cursosPendentes={cursosPendentes}
+        cursosComErro={cursosComErro}
+        alternarCurso={alternarCurso}
+        alternarTodos={alternarTodos}
         isSubmitting={isSubmitting}
         onSubmit={onSubmit}
       />

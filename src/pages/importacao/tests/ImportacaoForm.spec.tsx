@@ -28,6 +28,12 @@ const renderForm = (
       eventos={[evento]}
       eventosPendentes={false}
       eventosComErro={false}
+      cursos={[]}
+      selecionados={[]}
+      cursosPendentes={false}
+      cursosComErro={false}
+      alternarCurso={jest.fn()}
+      alternarTodos={jest.fn()}
       isSubmitting={false}
       onSubmit={onSubmit}
       {...props}
@@ -65,6 +71,12 @@ describe('ImportacaoForm', () => {
         eventos={[]}
         eventosPendentes={false}
         eventosComErro={false}
+        cursos={[]}
+        selecionados={[]}
+        cursosPendentes={false}
+        cursosComErro={false}
+        alternarCurso={jest.fn()}
+        alternarTodos={jest.fn()}
         isSubmitting={false}
         onSubmit={jest.fn()}
       />
@@ -103,5 +115,63 @@ describe('ImportacaoForm', () => {
     expect(trocarAno).toHaveBeenCalledWith(2025);
     expect(trocarReferencia).toHaveBeenCalledWith('referencia-opaca');
     expect(onSubmit).toHaveBeenCalled();
+  });
+
+  it('lists the courses checked and toggles all or one', () => {
+    const alternarCurso = jest.fn();
+    const alternarTodos = jest.fn();
+    renderForm({
+      referencia: 'referencia-opaca',
+      cursos: ['Cálculo', 'Física'],
+      selecionados: ['Cálculo', 'Física'],
+      alternarCurso,
+      alternarTodos,
+    });
+
+    expect(screen.getByRole('checkbox', { name: 'Todos' })).toBeChecked();
+    expect(screen.getByRole('checkbox', { name: 'Cálculo' })).toBeChecked();
+    expect(screen.getByRole('checkbox', { name: 'Física' })).toBeChecked();
+
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Física' }));
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Todos' }));
+
+    expect(alternarCurso).toHaveBeenCalledWith('Física');
+    expect(alternarTodos).toHaveBeenCalledWith(false);
+  });
+
+  it('blocks import while courses load or fail', () => {
+    const { rerender } = renderForm({
+      referencia: 'referencia-opaca',
+      cursosPendentes: true,
+    });
+
+    expect(screen.getByText('Carregando cursos…')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Importar' })).toBeDisabled();
+
+    rerender(
+      <ImportacaoForm
+        ano={2026}
+        anos={[2026, 2025]}
+        trocarAno={jest.fn()}
+        referencia="referencia-opaca"
+        trocarReferencia={jest.fn()}
+        eventos={[evento]}
+        eventosPendentes={false}
+        eventosComErro={false}
+        cursos={[]}
+        selecionados={[]}
+        cursosPendentes={false}
+        cursosComErro
+        alternarCurso={jest.fn()}
+        alternarTodos={jest.fn()}
+        isSubmitting={false}
+        onSubmit={jest.fn()}
+      />
+    );
+
+    expect(
+      screen.getByText('Não foi possível carregar os cursos.')
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Importar' })).toBeDisabled();
   });
 });

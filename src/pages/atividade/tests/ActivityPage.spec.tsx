@@ -5,12 +5,14 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ActivityPage } from '../index';
 import { UserProvider } from '@/providers/UserProvider';
+import { mockLoggedAdmin } from '@/data/mocks/admins';
 import { mockLoggedAluno } from '@/data/mocks/usuario';
+import { mockLoggedMonitor } from '@/data/mocks/monitores';
 import { getActivity } from '@/services/atividades';
 import { listMyAttempts, submitAttempt } from '@/services/tentativas';
 import { toast } from '@/components/ui/toast';
 import type { ActivityResponseType } from '@/data/types/services';
-import type { TentativaType } from '@/data/types/api';
+import type { TentativaType, UsuarioType } from '@/data/types/api';
 
 jest.mock('@/components/ui/toast', () => ({
   toast: { add: jest.fn() },
@@ -74,7 +76,7 @@ const attempt = (overrides: Partial<TentativaType> = {}): TentativaType => ({
   ...overrides,
 });
 
-const renderPage = () => {
+const renderPage = (user: UsuarioType = mockLoggedAluno) => {
   const client = new QueryClient({
     defaultOptions: {
       queries: { retry: false },
@@ -85,7 +87,7 @@ const renderPage = () => {
 
   return render(
     <QueryClientProvider client={client}>
-      <UserProvider initialUser={mockLoggedAluno}>
+      <UserProvider initialUser={user}>
         <MemoryRouter
           initialEntries={[
             '/cursos/curso-1/modulos/modulo-1/atividades/atividade-1',
@@ -95,6 +97,10 @@ const renderPage = () => {
             <Route
               path="/cursos/:cursoId/modulos/:moduloId/atividades/:atividadeId"
               element={ui}
+            />
+            <Route
+              path="/cursos/:cursoId/modulos/:moduloId/monitoramento/:atividadeId"
+              element={<p>Monitoramento</p>}
             />
             <Route
               path="/cursos/:cursoId/modulos/:moduloId"
@@ -128,6 +134,22 @@ describe('ActivityPage', () => {
     mockedToastAdd.mockReset();
     mockedGetActivity.mockResolvedValue(activityWithoutGabarito);
     mockedListMyAttempts.mockResolvedValue([]);
+  });
+
+  it('sends the monitor to the monitoring screen', async () => {
+    renderPage({ ...mockLoggedMonitor, cursoIds: ['curso-1'] });
+
+    expect(await screen.findByText('Monitoramento')).toBeInTheDocument();
+    expect(mockedGetActivity).not.toHaveBeenCalled();
+    expect(mockedListMyAttempts).not.toHaveBeenCalled();
+  });
+
+  it('sends the admin to the monitoring screen', async () => {
+    renderPage(mockLoggedAdmin);
+
+    expect(await screen.findByText('Monitoramento')).toBeInTheDocument();
+    expect(mockedGetActivity).not.toHaveBeenCalled();
+    expect(mockedListMyAttempts).not.toHaveBeenCalled();
   });
 
   it('shows the concluded screen when the student already finished', async () => {

@@ -17,3 +17,7 @@ export const RequirePapel = ({ papeis }: RequirePapelProps) => {
 };
 
 export const RequireMonitor = () => <RequirePapel papeis={['MONITOR']} />;
+
+export const RequireStaff = () => (
+  <RequirePapel papeis={['MONITOR', 'ADMIN']} />
+);

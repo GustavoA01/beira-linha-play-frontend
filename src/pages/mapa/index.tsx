@@ -4,7 +4,7 @@ import {
   type FitViewOptions as FitViewOptionsType,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
-import { nodeTypes } from './constants/nodesPhases';
+import { nodeTypes } from './constants/nodeTypes';
 import { RankTable } from '@/features/RanksTable/container/RanksTable';
 import { useMap } from './hooks/useMap';
 import { edgeTypes } from './constants/edges';

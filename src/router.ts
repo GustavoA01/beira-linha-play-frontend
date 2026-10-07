@@ -2,8 +2,11 @@ import { createBrowserRouter } from 'react-router-dom';
 import { HeaderLayout } from './components/layouts/HeaderLayout';
 import { RequireAuth } from './components/layouts/RequireAuth';
 import { RequireGuest } from './components/layouts/RequireGuest';
-import { RequireMonitor } from './components/layouts/RequirePapel';
-import { Map } from './pages/mapa';
+import {
+  RequireMonitor,
+  RequireStaff,
+} from './components/layouts/RequirePapel';
+import { MapFallback } from './pages/mapa/MapFallback';
 import { CoursesPage } from './pages/cursos';
 import { ImportacaoPage } from './pages/importacao';
 import { MedalsPage } from './pages/medalhas';
@@ -50,7 +53,11 @@ export const Router = createBrowserRouter([
               },
               {
                 path: 'mapa',
-                Component: Map,
+                HydrateFallback: MapFallback,
+                lazy: async () => {
+                  const { Map } = await import('./pages/mapa');
+                  return { Component: Map };
+                },
               },
               {
                 path: 'cursos',
@@ -101,6 +108,11 @@ export const Router = createBrowserRouter([
                 path: '/cursos/:cursoId/modulos/:moduloId/nova-atividade/:atividadeId',
                 Component: NewActivityPage,
               },
+            ],
+          },
+          {
+            Component: RequireStaff,
+            children: [
               {
                 path: '/cursos/:cursoId/modulos/:moduloId/monitoramento/:atividadeId',
                 Component: ManagementPage,

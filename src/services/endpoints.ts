@@ -36,6 +36,7 @@ export const endpoints = {
   importacao: {
     inscritos: '/api/importacao/inscritos',
     eventos: '/api/importacao/eventos',
+    cursos: '/api/importacao/cursos',
     logs: '/api/importacao/logs',
     alunos: (logId: string) => `/api/importacao/logs/${logId}/alunos`,
   },

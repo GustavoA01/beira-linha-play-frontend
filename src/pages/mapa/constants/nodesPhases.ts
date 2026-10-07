@@ -1,7 +1,4 @@
-import BackgroundNode from '@/pages/mapa/components/trail/BackgroundNode';
-import { PhaseNode } from '@/pages/mapa/components/trail/PhaseNode';
 import type { PhaseNodeType } from '@/data/types/reactFlow';
-import type { NodeTypes } from '@xyflow/react';
 
 export const LOCKED_GLOW = [
   { color: '#3a6ea5', strength: 0.4 },
@@ -21,11 +18,6 @@ const FIRST_PHASE_XP = 1;
 const EASY_STEP = 3;
 const HARD_STEP = 4;
 const EASY_UNTIL_PHASE = 9;
-
-export const nodeTypes: NodeTypes = {
-  phase: PhaseNode,
-  background: BackgroundNode,
-};
 
 const minPointsOf = (phase: number) => {
   if (phase === 1) return FIRST_PHASE_XP;
@@ -55,6 +47,14 @@ const phaseLayouts: Array<Pick<PhaseNodeType, 'id' | 'position'>> = [
   { id: '14', position: { x: 320, y: -6250 } },
   { id: '15', position: { x: 200, y: -6625 } },
   { id: '16', position: { x: 250, y: -7000 } },
+  { id: '17', position: { x: -160, y: -7375 } },
+  { id: '18', position: { x: -260, y: -7750 } },
+  { id: '19', position: { x: 210, y: -8125 } },
+  { id: '20', position: { x: 300, y: -8500 } },
+  { id: '21', position: { x: 160, y: -8875 } },
+  { id: '22', position: { x: -200, y: -9250 } },
+  { id: '23', position: { x: 200, y: -9625 } },
+  { id: '24', position: { x: 300, y: -10000 } },
 ];
 
 export const nodesPhases: PhaseNodeType[] = phaseLayouts.map(

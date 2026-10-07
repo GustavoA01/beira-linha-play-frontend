@@ -18,7 +18,7 @@ import { useModulo } from './hooks/useModulo';
 
 export const ModulePage = () => {
   const { cursoId, moduloId } = useParams();
-  const { isAluno, isMonitor, user } = useAuthUser();
+  const { isAluno, isMonitor, isAdmin, user } = useAuthUser();
   const { containerClassName } = useMediaDevice();
   const { mutate: removeActivity, isPending: isDeleting } = useDeleteActivity(
     moduloId ?? ''
@@ -88,7 +88,8 @@ export const ModulePage = () => {
               <ActivityCard
                 key={atividade.id}
                 activity={atividade}
-                isMonitor={isMonitor}
+                isStaff={isMonitor || isAdmin}
+                canManage={isMonitor}
                 onClick={() => onClickActivity(atividade.id)}
                 onEdit={() => {
                   setOpenActivityDialog(true);

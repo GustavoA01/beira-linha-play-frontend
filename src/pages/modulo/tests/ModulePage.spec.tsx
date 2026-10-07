@@ -4,8 +4,10 @@ import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ModulePage } from '../index';
 import { UserProvider } from '@/providers/UserProvider';
+import { mockLoggedAdmin } from '@/data/mocks/admins';
 import { mockLoggedAluno } from '@/data/mocks/usuario';
 import { mockLoggedMonitor } from '@/data/mocks/monitores';
+import userEvent from '@testing-library/user-event';
 import { getCourse } from '@/services/cursos';
 import { getModule } from '@/services/modulos';
 import { getActivity } from '@/services/atividades';
@@ -91,6 +93,14 @@ const renderPage = (user: UsuarioType) => {
         <MemoryRouter initialEntries={['/cursos/curso-1/modulos/modulo-1']}>
           <Routes>
             <Route path="/cursos/:cursoId/modulos/:moduloId" element={ui} />
+            <Route
+              path="/cursos/:cursoId/modulos/:moduloId/monitoramento/:atividadeId"
+              element={<p>Monitoramento</p>}
+            />
+            <Route
+              path="/cursos/:cursoId/modulos/:moduloId/atividades/:atividadeId"
+              element={<p>Quiz do aluno</p>}
+            />
           </Routes>
         </MemoryRouter>
       </UserProvider>
@@ -158,6 +168,22 @@ describe('ModulePage', () => {
     await waitFor(() => {
       expect(mockedGetCourse).toHaveBeenCalledWith('curso-1');
     });
+  });
+
+  it('opens monitoring for the admin without manage actions', async () => {
+    const user = userEvent.setup();
+    renderPage(mockLoggedAdmin);
+
+    expect(await screen.findByText('Noção de limite')).toBeInTheDocument();
+    expect(screen.queryByText(/tentativas/)).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: 'Ações da atividade' })
+    ).not.toBeInTheDocument();
+    expect(mockedListMyAttempts).not.toHaveBeenCalled();
+
+    await user.click(screen.getByText('Noção de limite'));
+
+    expect(await screen.findByText('Monitoramento')).toBeInTheDocument();
   });
 
   it('shows activity points from the detail when the module omits questions', async () => {

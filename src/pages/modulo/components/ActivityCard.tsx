@@ -19,7 +19,8 @@ type ActivityCardProps = {
   usedAttempts: number;
   bestScore: number;
   attempts?: TentativaType[];
-  isMonitor: boolean;
+  isStaff: boolean;
+  canManage: boolean;
   onClick: () => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -30,7 +31,8 @@ export const ActivityCard = ({
   usedAttempts,
   bestScore,
   attempts = [],
-  isMonitor,
+  isStaff,
+  canManage,
   onClick,
   onEdit,
   onDelete,
@@ -63,7 +65,7 @@ export const ActivityCard = ({
             : 'bg-zinc-100 text-zinc-400'
         )}
       >
-        {isMonitor ? <Notebook /> : <StudentIcon />}
+        {isStaff ? <Notebook /> : <StudentIcon />}
       </ItemMedia>
 
       <ItemContent className="min-w-0">
@@ -72,7 +74,7 @@ export const ActivityCard = ({
         </ItemTitle>
         <ItemDescription className="flex flex-wrap items-center gap-x-1.5 font-semibold text-xs text-zinc-400">
           <span>{questionsLabel}</span>
-          {!isMonitor && (
+          {!isStaff && (
             <>
               <span aria-hidden className="max-sm:hidden">
                 ·
@@ -84,7 +86,7 @@ export const ActivityCard = ({
       </ItemContent>
 
       <ItemActions>
-        {isMonitor && (
+        {canManage && (
           <EditDeleteActions
             label="atividade"
             onEdit={onEdit}
