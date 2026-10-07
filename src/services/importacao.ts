@@ -6,6 +6,13 @@ import type {
 import { api } from './api';
 import { endpoints } from './endpoints';
 
+export const listarCursos = async (referencia: string) => {
+  const { data } = await api.get<string[]>(endpoints.importacao.cursos, {
+    params: { referencia },
+  });
+  return data;
+};
+
 export const listarEventos = async (ano: number) => {
   const { data } = await api.get<EventoImportacaoType[]>(
     endpoints.importacao.eventos,
@@ -28,10 +35,13 @@ export const listarAlunosDoLog = async (logId: string) => {
   return data;
 };
 
-export const importarInscritos = async (referencia: string) => {
+export const importarInscritos = async (payload: {
+  referencia: string;
+  cursos: string[];
+}) => {
   const { data } = await api.post<LogImportacaoType>(
     endpoints.importacao.inscritos,
-    { referencia }
+    payload
   );
   return data;
 };
