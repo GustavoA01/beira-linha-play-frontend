@@ -82,6 +82,7 @@ describe('ImportacaoPage', () => {
     ]);
     mockedAlunos.mockResolvedValue([
       {
+        id: 'aluno-1',
         nome: 'Maria Silva',
         email: 'maria@email.com',
         apelido: 'maria',

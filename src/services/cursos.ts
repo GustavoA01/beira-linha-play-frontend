@@ -49,6 +49,13 @@ export const listCourseStudents = async (courseId: string) => {
   return data;
 };
 
+export const removeCourseStudent = async (
+  courseId: string,
+  alunoId: string
+) => {
+  await api.delete(endpoints.courses.removeStudent(courseId, alunoId));
+};
+
 export const enrollCourse = async (payload: EnrollCoursePayloadType) => {
   const { data } = await api.post<CourseResponseType>(
     endpoints.courses.enroll,

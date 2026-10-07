@@ -23,6 +23,7 @@ jest.mock('@/services/cursos', () => ({
   deleteCourse: jest.fn(),
   enrollCourse: jest.fn(),
   listCourseStudents: jest.fn(),
+  removeCourseStudent: jest.fn(),
 }));
 
 jest.mock('@/services/modulos', () => ({

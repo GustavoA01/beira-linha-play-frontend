@@ -68,6 +68,7 @@ export type LogImportacaoType = {
 };
 
 export type AlunoResumoType = {
+  id: string;
   nome: string;
   email: string | null;
   apelido: string | null;

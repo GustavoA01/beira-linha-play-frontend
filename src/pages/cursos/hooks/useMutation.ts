@@ -6,6 +6,7 @@ import {
   createCourse,
   deleteCourse,
   enrollCourse,
+  removeCourseStudent,
   updateCourse,
 } from '@/services/cursos';
 import { createAdmin } from '@/services/usuarios';
@@ -98,6 +99,26 @@ export const useEnrollCourse = () => {
         type: 'success',
         title: 'Você entrou na turma',
       });
+    },
+  });
+};
+
+export const useRemoveCourseStudent = (cursoId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (alunoId: string) => removeCourseStudent(cursoId, alunoId),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({
+        queryKey: queryClientKeys.courseKeys.students(cursoId),
+      });
+      toast.add({
+        type: 'success',
+        title: 'Aluno removido do curso',
+      });
+    },
+    onError: (error) => {
+      toastError(error, 'Não foi possível remover o aluno');
     },
   });
 };

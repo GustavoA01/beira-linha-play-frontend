@@ -11,6 +11,8 @@ export const endpoints = {
     byId: (id: string) => `/api/cursos/${id}`,
     enroll: '/api/cursos/inscrever',
     students: (courseId: string) => `/api/cursos/${courseId}/alunos`,
+    removeStudent: (courseId: string, alunoId: string) =>
+      `/api/cursos/${courseId}/alunos/${alunoId}`,
     modules: (courseId: string) => `/api/cursos/${courseId}/modulos`,
   },
   modules: {

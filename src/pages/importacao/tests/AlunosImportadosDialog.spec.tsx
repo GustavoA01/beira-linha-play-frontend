@@ -44,8 +44,13 @@ describe('AlunosImportadosDialog', () => {
 
   it('lists the students without a password column', async () => {
     mockedAlunos.mockResolvedValue([
-      { nome: 'Maria Silva', email: 'maria@email.com', apelido: 'maria' },
-      { nome: 'João', email: null, apelido: null },
+      {
+        id: 'aluno-1',
+        nome: 'Maria Silva',
+        email: 'maria@email.com',
+        apelido: 'maria',
+      },
+      { id: 'aluno-2', nome: 'João', email: null, apelido: null },
     ]);
     renderDialog('log-1');
 

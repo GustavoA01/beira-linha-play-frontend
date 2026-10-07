@@ -5,6 +5,8 @@ export const queryClientKeys = {
   courseKeys: {
     all: ['courses'] as const,
     detail: (id: string) => [...queryClientKeys.courseKeys.all, id] as const,
+    students: (id: string) =>
+      [...queryClientKeys.courseKeys.all, id, 'students'] as const,
   },
   rankingKeys: {
     all: ['rankings'] as const,
