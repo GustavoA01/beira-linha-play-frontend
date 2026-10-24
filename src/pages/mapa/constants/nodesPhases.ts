@@ -18,6 +18,8 @@ const FIRST_PHASE_XP = 1;
 const EASY_STEP = 3;
 const HARD_STEP = 4;
 const EASY_UNTIL_PHASE = 9;
+const ADVANCED_FROM_PHASE = 25;
+const ADVANCED_STEP = 5;
 
 const minPointsOf = (phase: number) => {
   if (phase === 1) return FIRST_PHASE_XP;
@@ -27,7 +29,13 @@ const minPointsOf = (phase: number) => {
   }
 
   const easyEndXp = FIRST_PHASE_XP + (EASY_UNTIL_PHASE - 1) * EASY_STEP;
-  return easyEndXp + (phase - EASY_UNTIL_PHASE) * HARD_STEP;
+  if (phase < ADVANCED_FROM_PHASE) {
+    return easyEndXp + (phase - EASY_UNTIL_PHASE) * HARD_STEP;
+  }
+
+  const previousPhaseXp =
+    easyEndXp + (ADVANCED_FROM_PHASE - 1 - EASY_UNTIL_PHASE) * HARD_STEP;
+  return previousPhaseXp + (phase - ADVANCED_FROM_PHASE + 1) * ADVANCED_STEP;
 };
 
 const phaseLayouts: Array<Pick<PhaseNodeType, 'id' | 'position'>> = [
@@ -55,6 +63,22 @@ const phaseLayouts: Array<Pick<PhaseNodeType, 'id' | 'position'>> = [
   { id: '22', position: { x: -200, y: -9250 } },
   { id: '23', position: { x: 200, y: -9625 } },
   { id: '24', position: { x: 300, y: -10000 } },
+  { id: '25', position: { x: 160, y: -10350 } },
+  { id: '26', position: { x: -200, y: -10700 } },
+  { id: '27', position: { x: 200, y: -11050 } },
+  { id: '28', position: { x: 300, y: -11400 } },
+  { id: '29', position: { x: 160, y: -11750 } },
+  { id: '30', position: { x: -200, y: -12100 } },
+  { id: '31', position: { x: 200, y: -12450 } },
+  { id: '32', position: { x: 300, y: -12800 } },
+  { id: '33', position: { x: 420, y: -13150 } },
+  { id: '34', position: { x: 600, y: -13500 } },
+  { id: '35', position: { x: 300, y: -13850 } },
+  { id: '36', position: { x: -650, y: -14200 } },
+  { id: '37', position: { x: -850, y: -14550 } },
+  { id: '38', position: { x: -100, y: -14900 } },
+  { id: '39', position: { x: 450, y: -15250 } },
+  { id: '40', position: { x: 600, y: -15600 } },
 ];
 
 export const nodesPhases: PhaseNodeType[] = phaseLayouts.map(

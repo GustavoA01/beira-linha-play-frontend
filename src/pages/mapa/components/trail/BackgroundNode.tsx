@@ -7,10 +7,23 @@ const BackgroundNode = ({
   data: { width, height, image, alt },
 }: BackgroundNodeProps) => (
   <div
-    className="relative"
-    style={{ width: width, height: height, pointerEvents: 'none' }}
+    className="relative overflow-hidden"
+    // Small overlap prevents subpixel gaps between tiles at different zoom levels.
+    style={{ width: width + 4, height: height + 4, pointerEvents: 'none' }}
   >
-    <img src={image} alt={alt} className="w-full h-full object-cover" />
+    <img
+      src={image}
+      alt={alt}
+      draggable={false}
+      className="absolute max-w-none object-cover"
+      // Trim the pale export borders without modifying the source assets.
+      style={{
+        left: -12,
+        top: -12,
+        width: 'calc(100% + 24px)',
+        height: 'calc(100% + 24px)',
+      }}
+    />
     <Handle
       id={`${id}-top`}
       type="source"

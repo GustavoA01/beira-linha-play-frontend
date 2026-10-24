@@ -24,9 +24,6 @@ export const useCreateMedal = () => {
         title: 'Medalha adicionada',
       });
     },
-    onError: (error) => {
-      toastError(error, 'Não foi possível adicionar a medalha');
-    },
   });
 };
 
