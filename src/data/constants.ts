@@ -1,4 +1,4 @@
-import { Map as MapIcon, NotebookPen, Trophy } from 'lucide-react';
+import { Map as MapIcon, Medal, NotebookPen, Trophy } from 'lucide-react';
 import type { UsuarioType } from '@/data/types/api';
 
 type NavOptions = {
@@ -39,9 +39,10 @@ export const getHeaderItems = ({
 
 export const getBottomNavigateButtons = ({
   isAluno,
+  showMedalhas = false,
   mapDisabled = false,
-}: Pick<NavOptions, 'isAluno' | 'mapDisabled'>) =>
-  [
+}: Pick<NavOptions, 'isAluno' | 'showMedalhas' | 'mapDisabled'>) => {
+  const items = [
     {
       icon: NotebookPen,
       to: '/cursos',
@@ -57,4 +58,11 @@ export const getBottomNavigateButtons = ({
       to: '/rankings',
       disabled: false,
     },
-  ] as const;
+  ];
+
+  if (showMedalhas) {
+    items.push({ icon: Medal, to: '/medalhas', disabled: false });
+  }
+
+  return items;
+};

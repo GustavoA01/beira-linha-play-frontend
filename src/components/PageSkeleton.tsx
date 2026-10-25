@@ -66,7 +66,7 @@ export const MedalsPageSkeleton = () => (
   <div
     role="status"
     aria-label="Carregando"
-    className="mx-auto mt-4 grid grid-cols-2 gap-4 pb-6 sm:grid-cols-3 sm:gap-6 md:grid-cols-4 lg:grid-cols-5"
+    className="mx-auto mt-2 grid w-full grid-cols-2 gap-3 pb-4 sm:mt-4 sm:grid-cols-3 sm:gap-6 sm:pb-6 md:grid-cols-4 lg:grid-cols-5"
   >
     {times(8).map((index) => (
       <div

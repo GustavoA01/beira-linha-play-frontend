@@ -15,22 +15,31 @@ describe('BottomNavigation', () => {
     const hrefs = screen
       .getAllByRole('link')
       .map((link) => link.getAttribute('href'));
-    expect(hrefs).toEqual(['/cursos', '/', '/rankings']);
+    expect(hrefs).toEqual(['/cursos', '/', '/rankings', '/medalhas']);
   });
 
-  it.each([
-    ['monitor', mockLoggedMonitor],
-    ['admin', mockLoggedAdmin],
-  ] as const)('renders the %s shortcuts with /mapa', (_role, user) => {
+  it('renders the monitor shortcuts with /mapa and without medals', () => {
     renderWithProviders(<BottomNavigation />, {
       route: '/cursos',
-      user,
+      user: mockLoggedMonitor,
     });
 
     const hrefs = screen
       .getAllByRole('link')
       .map((link) => link.getAttribute('href'));
     expect(hrefs).toEqual(['/cursos', '/mapa', '/rankings']);
+  });
+
+  it('renders the admin shortcuts with /mapa and medals', () => {
+    renderWithProviders(<BottomNavigation />, {
+      route: '/cursos',
+      user: mockLoggedAdmin,
+    });
+
+    const hrefs = screen
+      .getAllByRole('link')
+      .map((link) => link.getAttribute('href'));
+    expect(hrefs).toEqual(['/cursos', '/mapa', '/rankings', '/medalhas']);
   });
 
   it('disables the map shortcut when the monitor has no courses', () => {

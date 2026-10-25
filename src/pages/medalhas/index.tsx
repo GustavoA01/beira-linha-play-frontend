@@ -29,18 +29,18 @@ export const MedalsPage = () => {
   if (isMonitor) return <Navigate to="/cursos" replace />;
 
   return (
-    <div className="container mx-auto flex min-h-0 flex-1 flex-col items-center overflow-y-auto custom-bar px-4 pb-8 pt-6 sm:px-8">
-      <h1 className="font-fredoka text-3xl font-bold text-primary-dark">
+    <div className="container mx-auto flex min-h-0 flex-1 flex-col items-center overflow-y-auto custom-bar px-4 pb-32 pt-4 sm:px-8 sm:pb-8 sm:pt-6">
+      <h1 className="px-2 text-center font-fredoka text-2xl font-bold text-primary-dark sm:text-3xl">
         Galeria de Medalhas
       </h1>
 
       {isAluno ? (
-        <h2 className="my-3 text-center font-medium text-zinc-500">
+        <h2 className="my-3 max-w-md px-2 text-center text-sm font-medium text-zinc-500 sm:text-base">
           Selecione uma medalha alcançada para usar como foto de perfil
         </h2>
       ) : isAdmin ? (
         <>
-          <h2 className="my-3 text-center font-medium text-zinc-500">
+          <h2 className="my-3 max-w-md px-2 text-center text-sm font-medium text-zinc-500 sm:text-base">
             Use o botão direito do mouse para deletar uma medalha
           </h2>
           <Button className="mb-2" onClick={() => setOpenDialog(true)}>
@@ -75,7 +75,7 @@ export const MedalsPage = () => {
 
         <div
           className={cn(
-            'mx-auto mt-4 grid grid-cols-2 items-stretch gap-4 pb-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 sm:gap-6',
+            'mx-auto mt-2 grid w-full grid-cols-2 items-stretch gap-3 max-sm:pb-6 sm:mt-4 sm:grid-cols-3 sm:gap-6 md:grid-cols-4 lg:grid-cols-5',
             isSelectingMedal && 'pointer-events-none select-none'
           )}
           aria-busy={isSelectingMedal || undefined}

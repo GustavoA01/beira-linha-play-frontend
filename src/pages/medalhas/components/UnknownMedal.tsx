@@ -10,12 +10,12 @@ type UnknownMedalProps = {
 const MARKS = ['?', '?', '?'];
 
 export const UnknownMedal = ({ minPoints }: UnknownMedalProps) => (
-  <Card className="group h-full cursor-pointer select-none gap-2 border-2 border-dashed border-zinc-200 py-4">
-    <CardContent className="flex flex-1 flex-col items-center gap-2 select-none px-3">
-      <CircleQuestionMark className="size-20 shrink-0 text-zinc-400 transition-colors duration-300 group-hover:text-red-900 sm:size-15" />
+  <Card className="group h-full cursor-pointer select-none gap-2 border-2 border-dashed border-zinc-200 py-3 sm:py-4">
+    <CardContent className="flex flex-1 flex-col items-center gap-2 select-none px-2 sm:px-3">
+      <CircleQuestionMark className="size-16 shrink-0 text-zinc-400 transition-colors duration-300 group-hover:text-red-900 sm:size-20" />
       <p
         aria-hidden
-        className="flex min-h-6 items-center justify-center text-lg font-bold leading-none"
+        className="flex min-h-10 items-center justify-center text-lg font-bold leading-none sm:min-h-6"
       >
         {MARKS.map((mark, index) => (
           <motion.span

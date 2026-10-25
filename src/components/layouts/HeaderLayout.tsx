@@ -9,9 +9,10 @@ import { useAuthUser } from '@/providers/UserProvider';
 
 export const HeaderLayout = () => {
   const { pathname } = useLocation();
-  const { isAluno, user } = useAuthUser();
+  const { isAluno, isAdmin, user } = useAuthUser();
   const bottomNavigateButtons = getBottomNavigateButtons({
     isAluno,
+    showMedalhas: isAluno || isAdmin,
     mapDisabled: isMonitorMapDisabled(user),
   });
 

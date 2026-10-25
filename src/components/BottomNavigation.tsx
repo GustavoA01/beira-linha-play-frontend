@@ -9,53 +9,56 @@ import { cn } from '@/lib/utils';
 
 export const BottomNavigation = () => {
   const { pathname } = useLocation();
-  const { isAluno, user } = useAuthUser();
+  const { isAluno, isAdmin, user } = useAuthUser();
   const mapDisabled = isMonitorMapDisabled(user);
+  const showMedalhas = isAluno || isAdmin;
 
   return (
     <LayoutGroup>
       <motion.nav
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="fixed bottom-6 z-40 flex items-center justify-center gap-6 w-50 left-1/2 -translate-x-1/2 rounded-full bg-white shadow-md py-2 sm:hidden"
+        className="fixed bottom-6 left-1/2 z-40 flex -translate-x-1/2 items-center justify-center gap-2 overflow-visible rounded-full bg-white px-2 py-1.5 shadow-md sm:hidden"
       >
-        {getBottomNavigateButtons({ isAluno, mapDisabled }).map((button) => {
-          const selected = pathname === button.to;
+        {getBottomNavigateButtons({ isAluno, showMedalhas, mapDisabled }).map(
+          (button) => {
+            const selected = pathname === button.to;
 
-          if (button.disabled) {
+            if (button.disabled) {
+              return (
+                <span
+                  key={button.to}
+                  aria-disabled="true"
+                  className="relative flex size-11 shrink-0 items-center justify-center opacity-40"
+                >
+                  <button.icon className="relative z-10 text-zinc-400" />
+                </span>
+              );
+            }
+
             return (
-              <span
+              <Link
                 key={button.to}
-                aria-disabled="true"
-                className="relative flex size-11 items-center justify-center opacity-40"
+                to={button.to}
+                className="relative flex size-11 shrink-0 items-center justify-center"
               >
-                <button.icon className="relative z-10 text-zinc-400" />
-              </span>
+                {selected && (
+                  <motion.span
+                    layoutId="bottom-nav-ball"
+                    className="absolute inset-1 rounded-full bg-primary"
+                    transition={{ type: 'spring', stiffness: 380, damping: 28 }}
+                  />
+                )}
+                <button.icon
+                  className={cn(
+                    'relative z-10 transition-colors duration-200',
+                    selected ? 'text-white' : 'text-zinc-400'
+                  )}
+                />
+              </Link>
             );
           }
-
-          return (
-            <Link
-              key={button.to}
-              to={button.to}
-              className="relative flex size-11 items-center justify-center"
-            >
-              {selected && (
-                <motion.span
-                  layoutId="bottom-nav-ball"
-                  className="absolute inset-0 rounded-full bg-primary"
-                  transition={{ type: 'spring', stiffness: 380, damping: 28 }}
-                />
-              )}
-              <button.icon
-                className={cn(
-                  'relative z-10 transition-colors duration-200',
-                  selected ? 'text-white' : 'text-zinc-400'
-                )}
-              />
-            </Link>
-          );
-        })}
+        )}
       </motion.nav>
     </LayoutGroup>
   );
