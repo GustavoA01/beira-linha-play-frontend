@@ -101,6 +101,11 @@ describe('isActivityConcluded', () => {
     expect(isActivityConcluded(2, 0, 2)).toBe(true);
   });
 
+  it('concludes after the only attempt when the activity allows just one', () => {
+    expect(isActivityConcluded(1, 0, 2, [], 1)).toBe(true);
+    expect(isActivityConcluded(0, 0, 2, [], 1)).toBe(false);
+  });
+
   it('does not treat a zero-xp activity as aced', () => {
     expect(isActivityConcluded(1, 0, 0)).toBe(false);
   });

@@ -3,6 +3,7 @@ import {
   CircleStar,
   LogOut,
   Map as MapIcon,
+  Settings,
   Trophy,
   UserPen,
   Users,
@@ -31,6 +32,12 @@ export const useDrawerItens = ({
             label: 'Importar',
             path: '/importacao',
             icon: Users,
+            onClick: () => setOpenDrawer(false),
+          },
+          {
+            label: 'Configurações',
+            path: '/configuracoes',
+            icon: Settings,
             onClick: () => setOpenDrawer(false),
           },
         ]

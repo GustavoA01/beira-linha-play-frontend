@@ -5,6 +5,7 @@ type NavOptions = {
   isAluno: boolean;
   showMedalhas: boolean;
   showImportacao?: boolean;
+  showConfiguracao?: boolean;
   mapDisabled?: boolean;
 };
 
@@ -19,6 +20,7 @@ export const getHeaderItems = ({
   isAluno,
   showMedalhas,
   showImportacao = false,
+  showConfiguracao = false,
   mapDisabled = false,
 }: NavOptions) => {
   const items = [
@@ -32,6 +34,14 @@ export const getHeaderItems = ({
 
   if (showImportacao) {
     items.push({ name: 'Importar', path: '/importacao', disabled: false });
+  }
+
+  if (showConfiguracao) {
+    items.push({
+      name: 'Configurações',
+      path: '/configuracoes',
+      disabled: false,
+    });
   }
 
   return items;

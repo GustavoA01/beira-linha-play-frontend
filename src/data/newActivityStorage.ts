@@ -23,6 +23,7 @@ export const getNewActivityStorage = (): NewActivityStorageType | null => {
     return {
       activityName: data.activityName ?? '',
       qtdQuestions: data.qtdQuestions ?? 0,
+      permiteMaisTentativas: data.permiteMaisTentativas !== false,
       messages: Array.isArray(data.messages) ? data.messages : [],
     };
   } catch {

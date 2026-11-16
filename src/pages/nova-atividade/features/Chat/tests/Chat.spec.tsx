@@ -122,6 +122,7 @@ describe('Chat', () => {
     setNewActivityStorage({
       activityName: 'Listas',
       qtdQuestions: 2,
+      permiteMaisTentativas: true,
       messages: [{ role: 'user', content: 'Crie perguntas sobre listas' }],
     });
 
@@ -144,6 +145,7 @@ describe('Chat', () => {
     setNewActivityStorage({
       activityName: 'Listas',
       qtdQuestions: 2,
+      permiteMaisTentativas: true,
       messages: [],
     });
     renderChat();

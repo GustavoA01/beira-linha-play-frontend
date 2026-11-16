@@ -1,6 +1,7 @@
 import { Navigate } from 'react-router-dom';
 import { QuizPlay } from './features/QuizPlay/container/QuizPlay';
 import { ActivityConcluded } from './components/ActivityConcluded';
+import { ActivityBlocked } from './components/ActivityBlocked';
 import { ResourceNotFound } from '@/components/ResourceNotFound';
 import { QuizPageSkeleton } from '@/components/PageSkeleton';
 import { ApiError } from '@/services/api';
@@ -25,6 +26,7 @@ export const ActivityPage = () => {
     bestScore,
     totalXp,
     hasConcluded,
+    blocked,
   } = useAtividade();
 
   if ((auth.isMonitor || auth.isAdmin) && validIds) {
@@ -61,6 +63,10 @@ export const ActivityPage = () => {
 
   if (attemptsEnabled && isAttemptsError) {
     return <ResourceNotFound label="Não foi possível carregar as tentativas" />;
+  }
+
+  if (blocked && (!hasConcluded || stayOnQuiz)) {
+    return <ActivityBlocked title={atividade.titulo} />;
   }
 
   if (hasConcluded && !stayOnQuiz) {

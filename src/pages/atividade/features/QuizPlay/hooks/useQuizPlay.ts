@@ -1,8 +1,7 @@
 import { useMemo, useRef, useState } from 'react';
 import type { AtividadeType } from '@/data/types/api';
-import { activityXp } from '@/data/atividades';
+import { activityXp, maxAttemptsFor } from '@/data/atividades';
 import { useAuthUser } from '@/providers/UserProvider';
-import { MAX_TENTATIVAS } from '@/data/constants';
 import type { QuizPhaseType } from '@/pages/atividade/features/QuizPlay/types';
 import { useSubmitAttempt } from '../../../hooks/useMutation';
 import { toast } from '@/components/ui/toast';
@@ -36,6 +35,7 @@ const toCorrectFlag = (value: unknown): boolean | null => {
 
 export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
   const auth = useAuthUser();
+  const maxAttempts = maxAttemptsFor(activity.permiteMaisTentativas);
   const { mutateAsync: sendAttempt, isPending: isSubmitting } =
     useSubmitAttempt(activity.id);
   const persistedAttempt = useRef(false);
@@ -227,11 +227,11 @@ export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
   };
 
   const canRetry =
-    phase === 'summary' && attemptsUsed < MAX_TENTATIVAS && score < totalXp;
+    phase === 'summary' && attemptsUsed < maxAttempts && score < totalXp;
 
   const retry = () => {
     const hasBoasted = score >= totalXp;
-    const retryLimit = attemptsUsed >= MAX_TENTATIVAS;
+    const retryLimit = attemptsUsed >= maxAttempts;
 
     if (retryLimit || hasBoasted) return;
 
@@ -262,6 +262,7 @@ export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
     isLastQuestion,
     progressPercent,
     attemptNumber,
+    maxAttempts,
     canRetry,
     isSubmitting,
     selectAlternative,

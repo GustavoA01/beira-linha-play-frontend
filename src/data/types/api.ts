@@ -43,6 +43,7 @@ export interface ModuloType {
   id: string;
   nome: string;
   cursoId: string;
+  bloqueado?: boolean;
   atividades: AtividadeType[];
 }
 
@@ -51,6 +52,9 @@ export interface AtividadeType {
   titulo: string;
   quantQuestoes: number;
   moduloId: string;
+  permiteMaisTentativas?: boolean;
+  bloqueada?: boolean;
+  moduloBloqueado?: boolean;
   questoes: QuestaoType[];
 }
 

@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { ResourceNotFound } from '@/components/ResourceNotFound';
 import { HeaderListPageSkeleton } from '@/components/PageSkeleton';
 import { courseProgressPercent, isModuleConcluded } from '@/data/atividades';
-import { useDeleteModule } from './hooks/useMutation';
+import { useDeleteModule, useSetModuleBlocked } from './hooks/useMutation';
 import { useCurso } from './hooks/useCurso';
 
 export const CoursePage = () => {
@@ -33,6 +33,7 @@ export const CoursePage = () => {
   const { mutate: removeModule, isPending: isDeleting } = useDeleteModule(
     cursoId ?? ''
   );
+  const { mutate: toggleModuleBlock } = useSetModuleBlocked(cursoId ?? '');
 
   if (bloqueado) return null;
   if (!cursoId || isError)
@@ -69,6 +70,16 @@ export const CoursePage = () => {
                   isMonitor={isMonitor}
                   concluded={
                     isAluno && isModuleConcluded(modulo, attempts, alunoId)
+                  }
+                  interactionLocked={isAluno && Boolean(modulo.bloqueado)}
+                  onToggleBlock={
+                    isMonitor
+                      ? () =>
+                          toggleModuleBlock({
+                            id: modulo.id,
+                            bloqueado: !modulo.bloqueado,
+                          })
+                      : undefined
                   }
                   onEdit={() => {
                     setEditingModule(modulo);

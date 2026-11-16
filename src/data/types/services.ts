@@ -76,7 +76,13 @@ export type AlunoResumoType = {
 
 export type ActivitySummaryResponseType = Pick<
   AtividadeType,
-  'id' | 'titulo' | 'quantQuestoes' | 'moduloId'
+  | 'id'
+  | 'titulo'
+  | 'quantQuestoes'
+  | 'moduloId'
+  | 'permiteMaisTentativas'
+  | 'bloqueada'
+  | 'moduloBloqueado'
 > & {
   xpTotal?: number;
   xp?: number;
@@ -91,7 +97,7 @@ export type ModuleResponseType = Omit<ModuloType, 'atividades'> & {
 
 export type CourseModuleResponseType = Pick<
   ModuloType,
-  'id' | 'nome' | 'cursoId'
+  'id' | 'nome' | 'cursoId' | 'bloqueado'
 > & {
   quantAtividades?: number;
   quantidadeAtividades?: number;
@@ -122,6 +128,7 @@ export type ActivityResponseType = Omit<AtividadeType, 'questoes'> & {
 
 export type SaveActivityPayloadType = {
   titulo: AtividadeType['titulo'];
+  permiteMaisTentativas: boolean;
   questoes: {
     enunciado: QuestaoType['enunciado'];
     valor: QuestaoType['valor'];
@@ -146,6 +153,15 @@ export type AttemptResultResponseType = {
   pontosTotais: number;
   concluida: boolean;
 };
+
+export type ConfiguracaoType = {
+  quantidadeQuestoesPadrao: number;
+  quantidadeQuestoesTravada: boolean;
+  pontosQuestaoPadrao: number;
+  pontosQuestaoTravados: boolean;
+};
+
+export type SaveConfiguracaoPayloadType = ConfiguracaoType;
 
 export type SubmitAttemptPayloadType = {
   respostas: Pick<RespostaType, 'questaoId' | 'alternativaId'>[];

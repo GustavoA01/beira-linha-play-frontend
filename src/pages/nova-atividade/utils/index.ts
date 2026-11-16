@@ -29,9 +29,11 @@ export const toQuestionForm = (
 
 export const toSaveActivityPayload = (
   titulo: string,
-  questions: QuestionFormType['questions']
+  questions: QuestionFormType['questions'],
+  permiteMaisTentativas = true
 ): SaveActivityPayloadType => ({
   titulo,
+  permiteMaisTentativas,
   questoes: questions.map((question) => ({
     enunciado: question.statement,
     valor: question.xp,
@@ -44,9 +46,9 @@ export const toSaveActivityPayload = (
   })),
 });
 
-export const emptyQuestion = () => ({
+export const emptyQuestion = (xp = 1) => ({
   statement: '',
-  xp: 1,
+  xp,
   alternatives: [
     { text: '', isCorrect: false },
     { text: '', isCorrect: false },

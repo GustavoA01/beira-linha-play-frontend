@@ -39,6 +39,14 @@ export const deleteActivity = async (id: string) => {
   await api.delete(endpoints.activities.byId(id));
 };
 
+export const setActivityBlocked = async (id: string, bloqueada: boolean) => {
+  const { data } = await api.patch<ActivityResponseType>(
+    endpoints.activities.block(id),
+    { bloqueada }
+  );
+  return data;
+};
+
 export const getActivityMonitoring = async (id: string) => {
   const { data } = await api.get<MonitoringResponseType>(
     endpoints.activities.monitoring(id)

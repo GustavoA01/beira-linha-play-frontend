@@ -169,6 +169,31 @@ describe('ActivityPage', () => {
     expect(mockedListMyAttempts).toHaveBeenCalledWith('atividade-1');
   });
 
+  it('shows 1/1 when the activity allows a single attempt', async () => {
+    mockedGetActivity.mockResolvedValue({
+      ...activityWithoutGabarito,
+      permiteMaisTentativas: false,
+    });
+
+    renderPage();
+
+    expect(await screen.findByText('1/1')).toBeInTheDocument();
+  });
+
+  it('blocks the quiz when the activity is locked', async () => {
+    mockedGetActivity.mockResolvedValue({
+      ...activityWithoutGabarito,
+      bloqueada: true,
+    });
+
+    renderPage();
+
+    expect(
+      await screen.findByRole('heading', { name: 'Atividade bloqueada' })
+    ).toBeInTheDocument();
+    expect(screen.queryByText('Quanto vale o limite?')).not.toBeInTheDocument();
+  });
+
   it('submits the attempt and goes to the result without per-question feedback', async () => {
     const user = userEvent.setup();
     mockedListMyAttempts

@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { queryClientKeys } from '@/lib/queryClientKeys';
-import { activityXp, isActivityConcluded } from '@/data/atividades';
+import {
+  activityXp,
+  isActivityBlocked,
+  isActivityConcluded,
+  maxAttemptsFor,
+} from '@/data/atividades';
 import {
   countStudentAttempts,
   bestStudentScore,
@@ -50,13 +55,20 @@ export const useAtividade = () => {
     ? bestStudentScore(attempts, studentId, atividade.id)
     : 0;
   const totalXp = atividade ? activityXp(atividade) : 0;
+  const maxAttempts = atividade
+    ? maxAttemptsFor(atividade.permiteMaisTentativas)
+    : 1;
   const hasConcluded = atividade
     ? isActivityConcluded(
         usedAttempts,
         bestScore,
         totalXp,
-        studentAttemptsOnActivity(attempts, studentId, atividade.id)
+        studentAttemptsOnActivity(attempts, studentId, atividade.id),
+        maxAttempts
       )
+    : false;
+  const blocked = atividade
+    ? isActivityBlocked(atividade, atividade.moduloBloqueado)
     : false;
 
   useEffect(() => {
@@ -81,5 +93,6 @@ export const useAtividade = () => {
     bestScore,
     totalXp,
     hasConcluded,
+    blocked,
   };
 };

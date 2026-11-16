@@ -37,3 +37,11 @@ export const updateModule = async (
 export const deleteModule = async (id: string) => {
   await api.delete(endpoints.modules.byId(id));
 };
+
+export const setModuleBlocked = async (id: string, bloqueado: boolean) => {
+  const { data } = await api.patch<ModuleResponseType>(
+    endpoints.modules.block(id),
+    { bloqueado }
+  );
+  return data;
+};

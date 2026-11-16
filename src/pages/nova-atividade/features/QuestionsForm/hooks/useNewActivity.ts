@@ -7,10 +7,11 @@ import {
   getNewActivityStorage,
   type NewActivityStorageType,
 } from '@/data/newActivityStorage';
+import { useConfiguracao } from '@/hooks/useConfiguracao';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useQuery } from '@tanstack/react-query';
 import { queryClientKeys } from '@/lib/queryClientKeys';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useFieldArray, useForm } from 'react-hook-form';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getActivity } from '@/services/atividades';
@@ -29,6 +30,15 @@ export const useNewActivity = () => {
   const navigate = useNavigate();
   const { cursoId, moduloId = '', atividadeId } = useParams();
   const { bloqueado } = useCursoAlocado(cursoId);
+  const configQuery = useConfiguracao();
+  const pontos = configQuery.data?.pontosQuestaoPadrao ?? 1;
+  const pontosTravados = Boolean(configQuery.data?.pontosQuestaoTravados);
+  const isEditing = Boolean(atividadeId);
+  const schemaRef = useRef(questionFormSchema());
+  schemaRef.current = questionFormSchema({
+    lockXp: !isEditing && pontosTravados,
+    xp: pontos,
+  });
   const { mutateAsync: addActivity, isPending: isCreating } =
     useCreateActivity(moduloId);
   const { mutateAsync: editActivity, isPending: isUpdating } =
@@ -43,7 +53,8 @@ export const useNewActivity = () => {
   });
 
   const methods = useForm<QuestionFormType>({
-    resolver: zodResolver(questionFormSchema),
+    resolver: (values, context, options) =>
+      zodResolver(schemaRef.current)(values, context, options),
     defaultValues: { questions: [] },
   });
   const { reset, control } = methods;
@@ -64,12 +75,13 @@ export const useNewActivity = () => {
     }
 
     setLocalStorageActivityData(newActivityData);
+    if (methods.formState.isDirty) return;
     reset({
       questions: Array.from({
         length: newActivityData.qtdQuestions ?? 0,
-      }).map(emptyQuestion),
+      }).map(() => emptyQuestion(pontos)),
     });
-  }, [reset, atividadeId]);
+  }, [reset, atividadeId, pontos, methods.formState.isDirty]);
 
   useEffect(() => {
     if (!atividadeId || !existing) return;
@@ -78,6 +90,9 @@ export const useNewActivity = () => {
     setLocalStorageActivityData({
       activityName: draft?.activityName || existing.titulo,
       qtdQuestions: existing.questoes?.length ?? existing.quantQuestoes,
+      permiteMaisTentativas:
+        draft?.permiteMaisTentativas ??
+        existing.permiteMaisTentativas !== false,
       messages: draft?.messages ?? [],
     });
     reset(toQuestionForm(existing));
@@ -88,7 +103,8 @@ export const useNewActivity = () => {
 
     const payload = toSaveActivityPayload(
       localStorageActivityData.activityName,
-      data.questions
+      data.questions,
+      localStorageActivityData.permiteMaisTentativas
     );
 
     if (atividadeId) await editActivity({ id: atividadeId, payload });
@@ -98,9 +114,9 @@ export const useNewActivity = () => {
     navigate(`/cursos/${cursoId}/modulos/${moduloId}`, { replace: true });
   };
 
-  const isEditing = Boolean(atividadeId);
-  const isLoading = isEditing && isActivityPending;
-  const isReady = isEditing
+  const isEditingActivity = Boolean(atividadeId);
+  const isLoading = isEditingActivity && isActivityPending;
+  const isReady = isEditingActivity
     ? Boolean(existing)
     : Boolean(localStorageActivityData);
   const isMissing = !isLoading && !isReady;
@@ -114,5 +130,6 @@ export const useNewActivity = () => {
     isMissing,
     handleCreateActivity,
     bloqueado,
+    pontosTravados,
   };
 };

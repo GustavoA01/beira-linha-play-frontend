@@ -8,11 +8,16 @@ import {
 } from '@/components/ui/item';
 import { Badge } from '@/components/ui/badge';
 import { EditDeleteActions } from '@/components/EditDeleteActions';
-import { Check, CircleDashed, Notebook } from 'lucide-react';
+import { Check, CircleDashed, Lock, Notebook } from 'lucide-react';
 import type { AtividadeType, TentativaType } from '@/data/types/api';
-import { activityXp, isActivityConcluded } from '@/data/atividades';
+import {
+  activityXp,
+  isActivityBlocked,
+  isActivityConcluded,
+  maxAttemptsFor,
+} from '@/data/atividades';
 import { cn } from '@/lib/utils';
-import { MAX_TENTATIVAS } from '@/data/constants';
+import { BlockToggle } from '@/components/BlockToggle';
 
 type ActivityCardProps = {
   activity: AtividadeType;
@@ -21,6 +26,8 @@ type ActivityCardProps = {
   attempts?: TentativaType[];
   isStaff: boolean;
   canManage: boolean;
+  moduloBloqueado?: boolean;
+  onToggleBlock?: () => void;
   onClick: () => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -33,27 +40,38 @@ export const ActivityCard = ({
   attempts = [],
   isStaff,
   canManage,
+  moduloBloqueado = false,
+  onToggleBlock,
   onClick,
   onEdit,
   onDelete,
 }: ActivityCardProps) => {
   const xpTotal = activityXp(activity);
+  const blocked = isActivityBlocked(activity, moduloBloqueado);
+  const studentLocked = blocked && !isStaff;
   const questionsLabel = `${activity.quantQuestoes} ${activity.quantQuestoes === 1 ? 'PERGUNTA' : 'PERGUNTAS'}`;
-  const attemptsLabel = `${usedAttempts}/${MAX_TENTATIVAS} tentativas`;
+  const attemptsLabel = `${usedAttempts}/${maxAttemptsFor(activity.permiteMaisTentativas)} tentativas`;
   const concluded = isActivityConcluded(
     usedAttempts,
     bestScore,
     xpTotal,
-    attempts
+    attempts,
+    maxAttemptsFor(activity.permiteMaisTentativas)
   );
 
   const StudentIcon = concluded ? Check : CircleDashed;
 
   return (
     <Item
-      onClick={onClick}
+      onClick={() => {
+        if (studentLocked) return;
+        onClick();
+      }}
       className={cn(
-        'border-2 rounded-lg hover:shadow-md transition-all duration-150 ease-in cursor-pointer',
+        'border-2 rounded-lg hover:shadow-md transition-all duration-150 ease-in',
+        studentLocked
+          ? 'cursor-default opacity-60 hover:shadow-none'
+          : 'cursor-pointer',
         concluded ? 'border-green-200' : 'border-zinc-200'
       )}
     >
@@ -86,6 +104,18 @@ export const ActivityCard = ({
       </ItemContent>
 
       <ItemActions>
+        {canManage && onToggleBlock && (
+          <BlockToggle
+            blocked={Boolean(activity.bloqueada)}
+            label="atividade"
+            onToggle={onToggleBlock}
+          />
+        )}
+        {studentLocked && (
+          <span title="Atividade indisponível para realização">
+            <Lock className="text-zinc-400" aria-label="Atividade bloqueada" />
+          </span>
+        )}
         {canManage && (
           <EditDeleteActions
             label="atividade"

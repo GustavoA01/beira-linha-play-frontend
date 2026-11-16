@@ -35,4 +35,7 @@ export const queryClientKeys = {
         activityId ?? 'all',
       ] as const,
   },
+  configKeys: {
+    all: ['configuracao'] as const,
+  },
 };

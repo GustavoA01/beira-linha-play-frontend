@@ -4,6 +4,7 @@ import type { AtividadeType } from '@/data/types/api';
 import { Header } from '../components/Header';
 import { Form } from '../components/Form';
 import { useNewActivityDialog } from '../hooks/useNewActivityDialog';
+import { Spinner } from '@/components/ui/spinner';
 
 type NewActivityDialogProps = {
   openActivityDialog: boolean;
@@ -16,19 +17,31 @@ export const NewActivityDialog = ({
   setOpenActivityDialog,
   atividade,
 }: NewActivityDialogProps) => {
-  const { methods, handleNewActivity, isEditing } =
-    useNewActivityDialog(atividade);
+  const {
+    methods,
+    handleNewActivity,
+    isEditing,
+    quantidadeTravada,
+    configPending,
+  } = useNewActivityDialog(atividade);
 
   return (
     <Dialog open={openActivityDialog} onOpenChange={setOpenActivityDialog}>
       <DialogContent>
         <Header isEditing={isEditing} />
-        <FormProvider {...methods}>
-          <Form
-            isEditing={isEditing}
-            onSubmit={methods.handleSubmit(handleNewActivity)}
-          />
-        </FormProvider>
+        {configPending ? (
+          <div className="flex justify-center py-6">
+            <Spinner />
+          </div>
+        ) : (
+          <FormProvider {...methods}>
+            <Form
+              isEditing={isEditing}
+              quantidadeTravada={quantidadeTravada}
+              onSubmit={methods.handleSubmit(handleNewActivity)}
+            />
+          </FormProvider>
+        )}
       </DialogContent>
     </Dialog>
   );

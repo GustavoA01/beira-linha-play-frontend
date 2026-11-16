@@ -6,10 +6,11 @@ import path from 'path';
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), 'VITE_');
-  const apiUrl =
+  const rawApiUrl =
     process.env.VITE_API_URL !== undefined
       ? process.env.VITE_API_URL
       : (env.VITE_API_URL ?? 'http://localhost:8080');
+  const apiUrl = rawApiUrl.replace(/\/$/, '');
 
   return {
     plugins: [react(), tailwindcss()],
@@ -20,7 +21,7 @@ export default defineConfig(({ mode }) => {
       host: true,
       proxy: {
         '/api': {
-          target: 'http://localhost:8080',
+          target: apiUrl || 'http://localhost:8080',
           changeOrigin: true,
         },
       },

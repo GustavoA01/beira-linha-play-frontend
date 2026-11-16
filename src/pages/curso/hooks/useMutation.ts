@@ -2,7 +2,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { queryClientKeys } from '@/lib/queryClientKeys';
 import { toast } from '@/components/ui/toast';
 import { toastError } from '@/lib/utils';
-import { createModule, deleteModule, updateModule } from '@/services/modulos';
+import {
+  createModule,
+  deleteModule,
+  setModuleBlocked,
+  updateModule,
+} from '@/services/modulos';
 import type {
   CourseResponseType,
   ModuleResponseType,
@@ -117,6 +122,25 @@ export const useDeleteModule = (courseId: string) => {
     },
     onError: (error) => {
       toastError(error, 'Não foi possível excluir o módulo');
+    },
+  });
+};
+
+export const useSetModuleBlocked = (courseId: string) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, bloqueado }: { id: string; bloqueado: boolean }) =>
+      setModuleBlocked(id, bloqueado),
+    onSuccess: (_data, variables) => {
+      invalidateModuleQueries(queryClient, courseId);
+      toast.add({
+        type: 'success',
+        title: variables.bloqueado ? 'Módulo bloqueado' : 'Módulo liberado',
+      });
+    },
+    onError: (error) => {
+      toastError(error, 'Não foi possível alterar o bloqueio do módulo');
     },
   });
 };

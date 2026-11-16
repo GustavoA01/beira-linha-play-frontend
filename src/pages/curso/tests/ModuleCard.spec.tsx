@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { ModuleCard } from '../components/ModuleCard';
 import type { ModuloType } from '@/data/types/api';
 
@@ -31,6 +32,47 @@ describe('ModuleCard', () => {
 
     expect(screen.getByText('2 atividades')).toBeInTheDocument();
     expect(screen.getByText('0 XP')).toBeInTheDocument();
+  });
+
+  it('does not open the module when the student clicks a locked card', async () => {
+    const user = userEvent.setup();
+    const onClick = jest.fn();
+
+    render(
+      <ModuleCard
+        modulo={{ ...modulo([atividade('atv-1')]), bloqueado: true }}
+        isMonitor={false}
+        interactionLocked
+        onClick={onClick}
+        onEdit={jest.fn()}
+        onDelete={jest.fn()}
+      />
+    );
+
+    expect(screen.getByLabelText('Módulo bloqueado')).toBeInTheDocument();
+    await user.click(screen.getByText('Limites'));
+    expect(onClick).not.toHaveBeenCalled();
+  });
+
+  it('toggles the lock without opening the module', async () => {
+    const user = userEvent.setup();
+    const onClick = jest.fn();
+    const onToggleBlock = jest.fn();
+
+    render(
+      <ModuleCard
+        modulo={modulo([atividade('atv-1')])}
+        isMonitor
+        onToggleBlock={onToggleBlock}
+        onClick={onClick}
+        onEdit={jest.fn()}
+        onDelete={jest.fn()}
+      />
+    );
+
+    await user.click(screen.getByRole('button', { name: 'Bloquear módulo' }));
+    expect(onToggleBlock).toHaveBeenCalledTimes(1);
+    expect(onClick).not.toHaveBeenCalled();
   });
 
   it('uses the singular label for one activity', () => {

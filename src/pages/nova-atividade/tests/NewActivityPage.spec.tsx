@@ -103,6 +103,7 @@ describe('NewActivityPage', () => {
     setNewActivityStorage({
       activityName: 'Limites',
       qtdQuestions: 1,
+      permiteMaisTentativas: true,
       messages: [],
     });
     mockedCreateActivity.mockResolvedValue({
@@ -136,6 +137,7 @@ describe('NewActivityPage', () => {
     await waitFor(() => {
       expect(mockedCreateActivity).toHaveBeenCalledWith('modulo-1', {
         titulo: 'Limites',
+        permiteMaisTentativas: true,
         questoes: [
           {
             enunciado: 'O que é um limite?',
@@ -163,6 +165,7 @@ describe('NewActivityPage', () => {
     setNewActivityStorage({
       activityName: 'Limites 2',
       qtdQuestions: 1,
+      permiteMaisTentativas: true,
       messages: [],
     });
     mockedGetActivity.mockResolvedValue({
@@ -206,6 +209,7 @@ describe('NewActivityPage', () => {
     await waitFor(() => {
       expect(mockedUpdateActivity).toHaveBeenCalledWith('atividade-1', {
         titulo: 'Limites 2',
+        permiteMaisTentativas: true,
         questoes: [
           {
             enunciado: 'Quanto vale o limite?',

@@ -17,6 +17,7 @@ export const endpoints = {
   },
   modules: {
     byId: (id: string) => `/api/modulos/${id}`,
+    block: (id: string) => `/api/modulos/${id}/bloqueio`,
     activities: (moduleId: string) => `/api/modulos/${moduleId}/atividades`,
     generateQuestions: (moduleId: string) =>
       `/api/modulos/${moduleId}/gerar-questoes`,
@@ -24,6 +25,7 @@ export const endpoints = {
   activities: {
     byId: (id: string) => `/api/atividades/${id}`,
     monitoring: (id: string) => `/api/atividades/${id}/monitoramento`,
+    block: (id: string) => `/api/atividades/${id}/bloqueio`,
     attempts: (activityId: string) =>
       `/api/atividades/${activityId}/tentativas`,
   },
@@ -49,5 +51,8 @@ export const endpoints = {
   },
   rankings: {
     list: '/api/rankings',
+  },
+  configuracao: {
+    current: '/api/configuracoes',
   },
 } as const;

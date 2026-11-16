@@ -1,16 +1,19 @@
 import { DescriptionCircle } from '@/components/DescriptionCircle';
 import { EditDeleteActions } from '@/components/EditDeleteActions';
 import { Card } from '@/components/ui/card';
-import { Check, ChevronRight, Layers, Notebook } from 'lucide-react';
+import { Check, ChevronRight, Layers, Lock, Notebook } from 'lucide-react';
 import { motion } from 'motion/react';
 import type { ModuloType } from '@/data/types/api';
 import { countModuleActivities, moduleXp } from '@/data/atividades';
 import { cn } from '@/lib/utils';
+import { BlockToggle } from '@/components/BlockToggle';
 
 type ModuleCardProps = {
   modulo: ModuloType;
   isMonitor: boolean;
   concluded?: boolean;
+  interactionLocked?: boolean;
+  onToggleBlock?: () => void;
   onClick: () => void;
   onEdit: () => void;
   onDelete: () => void;
@@ -20,6 +23,8 @@ export const ModuleCard = ({
   modulo,
   isMonitor,
   concluded = false,
+  interactionLocked = false,
+  onToggleBlock,
   onClick,
   onEdit,
   onDelete,
@@ -33,9 +38,17 @@ export const ModuleCard = ({
       initial={{ scale: 0.9, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
       transition={{ duration: 0.3 }}
-      onClick={onClick}
+      onClick={() => {
+        if (interactionLocked) return;
+        onClick();
+      }}
     >
-      <Card className="group flex flex-row justify-between items-center py-4 pl-2 pr-4 cursor-pointer mt-4 shadow-sm hover:shadow-md transition-all ease-in">
+      <Card
+        className={cn(
+          'group flex flex-row justify-between items-center py-4 pl-2 pr-4 mt-4 shadow-sm hover:shadow-md transition-all ease-in',
+          interactionLocked ? 'cursor-default' : 'cursor-pointer'
+        )}
+      >
         <div className="flex items-center gap-4 pl-2 min-w-0">
           <div
             className={cn(
@@ -69,11 +82,28 @@ export const ModuleCard = ({
 
         <div className="flex items-center gap-0.5 shrink-0 ml-2">
           {isMonitor ? (
-            <EditDeleteActions
-              label="módulo"
-              onEdit={onEdit}
-              onDelete={onDelete}
-            />
+            <>
+              {onToggleBlock && (
+                <BlockToggle
+                  blocked={Boolean(modulo.bloqueado)}
+                  label="módulo"
+                  onToggle={onToggleBlock}
+                />
+              )}
+              <EditDeleteActions
+                label="módulo"
+                onEdit={onEdit}
+                onDelete={onDelete}
+              />
+            </>
+          ) : interactionLocked ? (
+            <span title="Módulo indisponível para realização">
+              <Lock
+                size={16}
+                className="text-zinc-400"
+                aria-label="Módulo bloqueado"
+              />
+            </span>
           ) : (
             <ChevronRight size={16} className="text-zinc-400" />
           )}

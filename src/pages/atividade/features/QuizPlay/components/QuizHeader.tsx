@@ -1,12 +1,12 @@
 import { GoBack } from '@/components/GoBack';
 import { Progress } from '@/components/ui/progress';
-import { MAX_TENTATIVAS } from '@/data/constants';
 import { useParams } from 'react-router-dom';
 
 type QuizHeaderPropsType = {
   title: string;
   progressPercent: number;
   attemptNumber: number;
+  maxAttempts: number;
   onLeave?: () => boolean | Promise<boolean>;
 };
 
@@ -14,6 +14,7 @@ export const QuizHeader = ({
   title,
   progressPercent,
   attemptNumber,
+  maxAttempts,
   onLeave,
 }: QuizHeaderPropsType) => {
   const { cursoId, moduloId } = useParams();
@@ -27,7 +28,7 @@ export const QuizHeader = ({
         />
         <h1 className="truncate font-semibold text-sm sm:text-base">{title}</h1>
         <p className="shrink-0 text-xs font-semibold">
-          {attemptNumber}/{MAX_TENTATIVAS}
+          {attemptNumber}/{maxAttempts}
         </p>
       </div>
       <div className="container mx-auto px-4 pb-4 pt-3 sm:px-8">

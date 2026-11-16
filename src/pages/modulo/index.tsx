@@ -13,7 +13,7 @@ import { useAuthUser } from '@/providers/UserProvider';
 import { cn } from '@/lib/utils';
 import { ResourceNotFound } from '@/components/ResourceNotFound';
 import { HeaderListPageSkeleton } from '@/components/PageSkeleton';
-import { useDeleteActivity } from './hooks/useMutation';
+import { useDeleteActivity, useSetActivityBlocked } from './hooks/useMutation';
 import { useModulo } from './hooks/useModulo';
 
 export const ModulePage = () => {
@@ -23,6 +23,7 @@ export const ModulePage = () => {
   const { mutate: removeActivity, isPending: isDeleting } = useDeleteActivity(
     moduloId ?? ''
   );
+  const { mutate: toggleActivityBlock } = useSetActivityBlocked(moduloId ?? '');
   const {
     modulo,
     isPending,
@@ -90,6 +91,16 @@ export const ModulePage = () => {
                 activity={atividade}
                 isStaff={isMonitor || isAdmin}
                 canManage={isMonitor}
+                moduloBloqueado={Boolean(modulo.bloqueado)}
+                onToggleBlock={
+                  isMonitor
+                    ? () =>
+                        toggleActivityBlock({
+                          id: atividade.id,
+                          bloqueada: !atividade.bloqueada,
+                        })
+                    : undefined
+                }
                 onClick={() => onClickActivity(atividade.id)}
                 onEdit={() => {
                   setOpenActivityDialog(true);

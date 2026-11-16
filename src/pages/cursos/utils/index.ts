@@ -32,6 +32,7 @@ export const toCourse = (course: CourseResponseType): CursoType => ({
     id: modulo.id,
     nome: modulo.nome,
     cursoId: modulo.cursoId,
+    bloqueado: modulo.bloqueado ?? false,
     atividades: toCourseActivities(modulo),
   })),
 });

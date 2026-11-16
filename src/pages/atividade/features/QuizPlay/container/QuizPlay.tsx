@@ -30,6 +30,7 @@ export const QuizPlay = ({ activity, usedAttempts }: QuizPlayPropsType) => {
     isLastQuestion,
     progressPercent,
     attemptNumber,
+    maxAttempts,
     canRetry,
     isSubmitting,
     selectAlternative,
@@ -47,6 +48,7 @@ export const QuizPlay = ({ activity, usedAttempts }: QuizPlayPropsType) => {
         title={activity.titulo}
         progressPercent={progressPercent}
         attemptNumber={attemptNumber}
+        maxAttempts={maxAttempts}
         onLeave={leaveQuiz}
       />
 

@@ -41,9 +41,10 @@ export const isActivityConcluded = (
   usedAttempts: number,
   bestScore: number,
   xpTotal: number,
-  attempts: AttemptLike[] = []
+  attempts: AttemptLike[] = [],
+  maxAttempts: number = MAX_TENTATIVAS
 ) => {
-  if (usedAttempts >= MAX_TENTATIVAS) return true;
+  if (usedAttempts >= maxAttempts) return true;
   if (usedAttempts <= 0) return false;
 
   if (attempts.some(attemptHasAnswers)) {
@@ -52,6 +53,14 @@ export const isActivityConcluded = (
 
   return xpTotal > 0 && bestScore >= xpTotal;
 };
+
+export const maxAttemptsFor = (permiteMaisTentativas?: boolean) =>
+  permiteMaisTentativas === false ? 1 : MAX_TENTATIVAS;
+
+export const isActivityBlocked = (
+  atividade: { bloqueada?: boolean },
+  moduloBloqueado?: boolean
+) => Boolean(atividade.bloqueada || moduloBloqueado);
 
 export const isStudentActivityConcluded = (
   atividade: AtividadeType,
@@ -62,7 +71,8 @@ export const isStudentActivityConcluded = (
     countStudentAttempts(tentativas, alunoId, atividade.id),
     bestStudentScore(tentativas, alunoId, atividade.id),
     activityXp(atividade),
-    studentAttemptsOnActivity(tentativas, alunoId, atividade.id)
+    studentAttemptsOnActivity(tentativas, alunoId, atividade.id),
+    maxAttemptsFor(atividade.permiteMaisTentativas)
   );
 
 export const isModuleConcluded = (
