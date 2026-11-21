@@ -19,6 +19,19 @@ export const toGlowShadow = (color: string, strength: number) => {
   return `0 0 ${blur}px ${spread}px ${color}${core}, 0 ${offset}px ${blur + 4}px ${color}${drop}`;
 };
 
+export const DESAFIO_PHRASE =
+  'DESAFIO BEIRA LINHA PLAY: Compartilhe essa medalha no grupo para participar do desafio.';
+
+export const achievementCode = (alunoId: string, level: string) => {
+  let hash = 5381;
+  const seed = `${alunoId}|${level}`;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 33) ^ seed.charCodeAt(i);
+  }
+  const code = (hash >>> 0) % 1000;
+  return code.toString().padStart(3, '0');
+};
+
 export const achievementCaption = (
   nome: string,
   level: string,

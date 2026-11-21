@@ -6,6 +6,7 @@ import { BarProgress } from './BarProgress';
 import { ModalFooter } from './ModalFooter';
 import { AchievementCard } from './AchievementCard';
 import { ShareButtons } from './ShareButtons';
+import { achievementCode } from '@/pages/mapa/utils';
 import {
   CourseProgressList,
   type CourseProgressItemType,
@@ -17,6 +18,7 @@ type PhaseProgressModalProps = {
   minPoints: number;
   showProgress?: boolean;
   studentName?: string;
+  studentId?: string;
   courses?: CourseProgressItemType[];
   coursesPending?: boolean;
 };
@@ -27,6 +29,7 @@ export const PhaseProgressModal = ({
   minPoints,
   showProgress = true,
   studentName = '',
+  studentId = '',
   courses = [],
   coursesPending = false,
 }: PhaseProgressModalProps) => {
@@ -53,6 +56,7 @@ export const PhaseProgressModal = ({
               level={id}
               points={points}
               minPoints={minPoints}
+              code={achievementCode(studentId, id)}
             />
           </div>,
           document.body

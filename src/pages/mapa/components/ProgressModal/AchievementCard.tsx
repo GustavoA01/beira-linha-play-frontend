@@ -1,16 +1,18 @@
 import { forwardRef } from 'react';
+import { DESAFIO_PHRASE } from '@/pages/mapa/utils';
 
 type AchievementCardProps = {
   nome: string;
   level: string;
   points: number;
   minPoints: number;
+  code: string;
 };
 
 const EXPORT_SIZE = 1080;
 
 export const AchievementCard = forwardRef<HTMLDivElement, AchievementCardProps>(
-  ({ nome, level, points, minPoints }, ref) => (
+  ({ nome, level, points, minPoints, code }, ref) => (
     <div
       ref={ref}
       style={{
@@ -21,7 +23,7 @@ export const AchievementCard = forwardRef<HTMLDivElement, AchievementCardProps>(
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: 96,
+        padding: 64,
         color: '#ffffff',
         textAlign: 'center',
         background:
@@ -95,6 +97,38 @@ export const AchievementCard = forwardRef<HTMLDivElement, AchievementCardProps>(
       >
         {points} / {minPoints} XP
       </p>
+      <div
+        style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          background: '#fef9c3',
+          color: '#14532d',
+          borderRadius: 24,
+          padding: '28px 36px',
+        }}
+      >
+        <p
+          style={{
+            margin: 0,
+            fontSize: 30,
+            fontWeight: 800,
+            lineHeight: 1.35,
+          }}
+        >
+          {DESAFIO_PHRASE}
+        </p>
+        <p
+          style={{
+            margin: '20px 0 0',
+            fontSize: 40,
+            fontWeight: 800,
+            letterSpacing: '0.12em',
+            fontFamily: 'Fredoka, sans-serif',
+          }}
+        >
+          Código {code}
+        </p>
+      </div>
     </div>
   )
 );

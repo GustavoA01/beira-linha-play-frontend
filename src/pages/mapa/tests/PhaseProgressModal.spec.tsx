@@ -2,6 +2,7 @@ import { render, screen, within } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { Dialog } from '@/components/ui/dialog';
 import { PhaseProgressModal } from '../components/ProgressModal/PhaseProgressModal';
+import { DESAFIO_PHRASE, achievementCode } from '../utils';
 
 jest.mock('html-to-image', () => ({
   toBlob: jest.fn(() =>
@@ -58,6 +59,10 @@ describe('PhaseProgressModal', () => {
     expect(screen.getByText('Concluído')).toBeInTheDocument();
     expect(screen.getByText('100%')).toBeInTheDocument();
     expect(await findShareButton()).toBeInTheDocument();
+    expect(screen.getByText(DESAFIO_PHRASE)).toBeInTheDocument();
+    expect(
+      screen.getByText(`Código ${achievementCode('', '1')}`)
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Legal!' })).toBeInTheDocument();
     expect(
       within(screen.getByRole('dialog')).queryByText('Gustavo Aguiar')

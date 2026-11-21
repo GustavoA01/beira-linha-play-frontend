@@ -112,6 +112,7 @@ export const QuizPlay = ({ activity, usedAttempts }: QuizPlayPropsType) => {
             points={faseDesbloqueada.points}
             minPoints={faseDesbloqueada.minPoints}
             studentName={user.nome}
+            studentId={user.id}
           />
         </Dialog>
       )}
