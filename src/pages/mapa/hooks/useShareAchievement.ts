@@ -8,7 +8,6 @@ import {
 import { toast } from '@/components/ui/toast';
 import { toastError } from '@/lib/utils';
 import {
-  achievementCaption,
   blobToPngFile,
   canShareFiles,
   downloadBlob,
@@ -19,15 +18,13 @@ import {
 
 export const useShareAchievement = (
   cardRef: RefObject<HTMLDivElement | null>,
-  nome: string,
-  level: string,
-  points: number
+  caption: string,
+  fileName?: string
 ) => {
   const [sharing, setSharing] = useState(false);
   const [ready, setReady] = useState(false);
   const preparedBlobRef = useRef<Blob | null>(null);
   const preparePromiseRef = useRef<Promise<Blob> | null>(null);
-  const caption = achievementCaption(nome, level, points);
 
   useEffect(() => {
     preparedBlobRef.current = null;
@@ -61,7 +58,7 @@ export const useShareAchievement = (
       cancelAnimationFrame(frame);
       preparePromiseRef.current = null;
     };
-  }, [cardRef, nome, level, points]);
+  }, [cardRef, caption, fileName]);
 
   const resolveBlob = useCallback(async () => {
     if (preparedBlobRef.current) return preparedBlobRef.current;
@@ -102,7 +99,7 @@ export const useShareAchievement = (
 
   const shareNative = useCallback(() => {
     void withCardBlob(async (blob) => {
-      const file = blobToPngFile(blob);
+      const file = blobToPngFile(blob, fileName);
       try {
         if (canShareFiles(file)) {
           await navigator.share({
@@ -116,10 +113,10 @@ export const useShareAchievement = (
         if (isShareAbort(error)) return;
       }
 
-      downloadBlob(blob);
+      downloadBlob(blob, fileName);
       toast.add({ type: 'success', title: 'Imagem baixada.' });
     });
-  }, [caption, withCardBlob]);
+  }, [caption, fileName, withCardBlob]);
 
   return { sharing, ready, shareNative };
 };

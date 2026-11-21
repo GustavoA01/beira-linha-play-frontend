@@ -49,8 +49,8 @@ export const canShareFiles = (file: File) => {
   }
 };
 
-export const blobToPngFile = (blob: Blob) =>
-  new File([blob], FILE_NAME, { type: 'image/png', lastModified: Date.now() });
+export const blobToPngFile = (blob: Blob, fileName = FILE_NAME) =>
+  new File([blob], fileName, { type: 'image/png', lastModified: Date.now() });
 
 export const waitForImages = async (card: HTMLElement) => {
   const images = [...card.querySelectorAll('img')];
@@ -95,10 +95,10 @@ export const exportCardBlob = async (card: HTMLElement) => {
   return blob;
 };
 
-export const downloadBlob = (blob: Blob) => {
+export const downloadBlob = (blob: Blob, fileName = FILE_NAME) => {
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  link.download = FILE_NAME;
+  link.download = fileName;
   link.href = url;
   link.click();
   URL.revokeObjectURL(url);

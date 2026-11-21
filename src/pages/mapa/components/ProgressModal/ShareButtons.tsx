@@ -2,6 +2,7 @@ import type { RefObject } from 'react';
 import { Loader2Icon, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useShareAchievement } from '@/pages/mapa/hooks/useShareAchievement';
+import { achievementCaption } from '@/pages/mapa/utils';
 
 type ShareButtonsProps = {
   cardRef: RefObject<HTMLDivElement | null>;
@@ -18,9 +19,7 @@ export const ShareButtons = ({
 }: ShareButtonsProps) => {
   const { sharing, ready, shareNative } = useShareAchievement(
     cardRef,
-    nome,
-    level,
-    points
+    achievementCaption(nome, level, points)
   );
 
   const preparing = !ready && !sharing;

@@ -7,7 +7,8 @@ import {
 } from '@/components/ui/context-menu';
 import type { MedalhaType } from '@/data/types/api';
 import { cn } from '@/lib/utils';
-import { Trash2 } from 'lucide-react';
+import { Loader2Icon, Share2, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 type WonMedalPropsType = {
   nome: MedalhaType['nome'];
@@ -17,6 +18,9 @@ type WonMedalPropsType = {
   disabled?: boolean;
   onDelete?: () => void;
   selectImage?: () => void;
+  onShare?: () => void;
+  sharing?: boolean;
+  preparing?: boolean;
 };
 
 export const WonMedal = ({
@@ -27,7 +31,15 @@ export const WonMedal = ({
   disabled = false,
   onDelete,
   selectImage,
+  onShare,
+  sharing = false,
+  preparing = false,
 }: WonMedalPropsType) => {
+  const shareLabel = sharing
+    ? 'Abrindo…'
+    : preparing
+      ? 'Preparando…'
+      : 'Compartilhar';
   const card = (
     <Card
       onClick={disabled ? undefined : selectImage}
@@ -49,10 +61,30 @@ export const WonMedal = ({
           {nome}
         </p>
       </CardContent>
-      <CardFooter className="justify-center px-3 pt-0">
+      <CardFooter className="flex-col gap-2 px-3 pt-0">
         <p className="text-center text-sm text-muted-foreground">
           {pontosMin} xp
         </p>
+        {onShare && (
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            disabled={sharing}
+            aria-busy={sharing || preparing}
+            onClick={(event) => {
+              event.stopPropagation();
+              onShare();
+            }}
+          >
+            {sharing || preparing ? (
+              <Loader2Icon className="size-4 animate-spin" aria-hidden />
+            ) : (
+              <Share2 />
+            )}
+            {shareLabel}
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );

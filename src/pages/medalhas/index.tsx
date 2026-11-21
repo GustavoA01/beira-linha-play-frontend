@@ -2,6 +2,7 @@ import { Button } from '@/components/ui/button';
 import { MedalsPageSkeleton } from '@/components/PageSkeleton';
 import { Spinner } from '@/components/ui/spinner';
 import { UnknownMedal } from './components/UnknownMedal';
+import { AlunoWonMedal } from './components/AlunoWonMedal';
 import { WonMedal } from './components/WonMedal';
 import { AddMedalDialog } from './components/AddMedalDialog';
 import { motion } from 'framer-motion';
@@ -16,7 +17,7 @@ import {
 } from './hooks/useMutation';
 
 export const MedalsPage = () => {
-  const { isMonitor, isAdmin, isAluno } = useAuthUser();
+  const { isMonitor, isAdmin, isAluno, user } = useAuthUser();
   const {
     data: medals = [],
     isPending: isGetingMedals,
@@ -91,7 +92,15 @@ export const MedalsPage = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.08, duration: 0.3 }}
               >
-                {showAsWon ? (
+                {showAsWon && isAluno && user?.tipo === 'ALUNO' ? (
+                  <AlunoWonMedal
+                    medalha={medal}
+                    alunoId={user.id}
+                    alunoNome={user.nome}
+                    disabled={isSelectingMedal}
+                    onSelect={() => selectMedal(medal.id)}
+                  />
+                ) : showAsWon ? (
                   <WonMedal
                     selectImage={() => selectMedal(medal.id)}
                     disabled={isSelectingMedal}

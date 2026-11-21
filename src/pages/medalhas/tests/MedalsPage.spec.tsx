@@ -81,7 +81,7 @@ describe('MedalsPage', () => {
     expect(
       screen.getByRole('heading', { name: 'Galeria de Medalhas' })
     ).toBeInTheDocument();
-    expect(await screen.findByText('PUC Minas')).toBeInTheDocument();
+    expect(await screen.findByAltText('PUC Minas')).toBeInTheDocument();
     expect(screen.getByText('20 xp')).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: 'Adicionar medalha' })
@@ -137,7 +137,7 @@ describe('MedalsPage', () => {
 
     renderPage(<MedalsPage />);
 
-    await user.click(await screen.findByText('PUC Minas'));
+    await user.click(await screen.findByAltText('PUC Minas'));
 
     expect(
       await screen.findByText('Atualizando foto de perfil...')
@@ -156,7 +156,7 @@ describe('MedalsPage', () => {
       cursoOrigem: null,
     });
 
-    await screen.findByText('PUC Minas');
+    await screen.findByAltText('PUC Minas');
     expect(setUser).toHaveBeenCalledWith({
       ...mockLoggedAluno,
       imagemPerfil: 'https://example.com/puc.png',
