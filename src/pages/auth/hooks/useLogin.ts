@@ -9,6 +9,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useLoginMutation } from './useMutation';
+import { limparEntradaDesafio } from '@/data/desafioEntrada';
 
 const errorsMsgTipos: Record<LoginRoleType, string> = {
   ALUNO: 'Apelido, e-mail ou senha incorretos. Confira e tente de novo.',
@@ -71,6 +72,7 @@ export const useLogin = () => {
             ? { email: data.email }
             : { nome: data.nome }),
       });
+      limparEntradaDesafio();
       setUser(user);
       navigate(user.tipo === 'ALUNO' ? '/' : '/cursos', { replace: true });
     } catch (error) {

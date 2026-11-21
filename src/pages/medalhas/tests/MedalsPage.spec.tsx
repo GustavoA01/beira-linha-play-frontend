@@ -160,6 +160,7 @@ describe('MedalsPage', () => {
     expect(setUser).toHaveBeenCalledWith({
       ...mockLoggedAluno,
       imagemPerfil: 'https://example.com/puc.png',
+      cursoPontuadoId: null,
     });
     expect(toast.add).toHaveBeenCalledWith({
       type: 'success',

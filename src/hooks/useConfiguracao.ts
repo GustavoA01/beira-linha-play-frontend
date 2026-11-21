@@ -8,6 +8,7 @@ export const CONFIGURACAO_PADRAO: ConfiguracaoType = {
   quantidadeQuestoesTravada: false,
   pontosQuestaoPadrao: 1,
   pontosQuestaoTravados: false,
+  desafioAtivo: false,
 };
 
 export const useConfiguracao = () =>

@@ -55,6 +55,7 @@ describe('ConfiguracoesPage', () => {
       quantidadeQuestoesTravada: true,
       pontosQuestaoPadrao: 2,
       pontosQuestaoTravados: false,
+      desafioAtivo: false,
     });
   });
 
@@ -93,6 +94,7 @@ describe('ConfiguracoesPage', () => {
       quantidadeQuestoesTravada: true,
       pontosQuestaoPadrao: 3,
       pontosQuestaoTravados: false,
+      desafioAtivo: false,
     });
   });
 });

@@ -8,6 +8,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useRegisterMutation } from './useMutation';
+import { limparEntradaDesafio } from '@/data/desafioEntrada';
 
 const registerErrorMessage = (error: unknown) =>
   error instanceof Error &&
@@ -49,6 +50,7 @@ export const useRegister = () => {
           ? { apelido: data.apelido }
           : { email: data.email }),
       });
+      limparEntradaDesafio();
       setUser(user);
       navigate(user.tipo === 'ALUNO' ? '/' : '/cursos', { replace: true });
     } catch (error) {

@@ -17,6 +17,7 @@ export const toUser = (data: UserResponseType): UsuarioType => {
       pontos: data.pontos ?? 0,
       imagemPerfil: data.imagemPerfil ?? '',
       cursoIds: data.cursoIds ?? [],
+      cursoPontuadoId: data.cursoPontuadoId ?? null,
     };
   }
 

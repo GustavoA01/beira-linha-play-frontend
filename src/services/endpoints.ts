@@ -34,6 +34,7 @@ export const endpoints = {
   },
   users: {
     me: '/api/usuarios/me',
+    cursoPontuado: '/api/alunos/me/curso-pontuado',
     admins: '/api/admins',
     monitors: '/api/monitores',
   },

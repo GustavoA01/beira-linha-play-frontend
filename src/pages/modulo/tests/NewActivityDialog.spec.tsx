@@ -22,6 +22,7 @@ const configSolta = {
   quantidadeQuestoesTravada: false,
   pontosQuestaoPadrao: 1,
   pontosQuestaoTravados: false,
+  desafioAtivo: false,
 };
 
 const atividade: AtividadeType = {

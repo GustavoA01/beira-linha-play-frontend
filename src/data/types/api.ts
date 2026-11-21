@@ -9,6 +9,7 @@ export interface AlunoType extends UsuarioBaseType {
   apelido: string;
   pontos: number;
   imagemPerfil: string;
+  cursoPontuadoId?: string | null;
 }
 
 export interface MonitorType extends UsuarioBaseType {

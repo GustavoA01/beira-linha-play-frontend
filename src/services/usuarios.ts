@@ -23,6 +23,14 @@ export const createAdmin = async (payload: CreateAdminPayloadType) => {
   return toUser(data);
 };
 
+export const escolherCursoPontuado = async (cursoId: string) => {
+  const { data } = await api.put<UserResponseType>(
+    endpoints.users.cursoPontuado,
+    { cursoId }
+  );
+  return toUser(data);
+};
+
 export const listMonitors = async () => {
   const { data } = await api.get<UserResponseType[]>(endpoints.users.monitors);
   return data.map(toUser);

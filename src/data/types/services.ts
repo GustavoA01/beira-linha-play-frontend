@@ -23,6 +23,7 @@ export type UserResponseType = {
   pontos: number | null;
   imagemPerfil: string | null;
   cursoOrigem: string | null;
+  cursoPontuadoId?: string | null;
 };
 
 export type LoginPayloadType = {
@@ -159,6 +160,7 @@ export type ConfiguracaoType = {
   quantidadeQuestoesTravada: boolean;
   pontosQuestaoPadrao: number;
   pontosQuestaoTravados: boolean;
+  desafioAtivo: boolean;
 };
 
 export type SaveConfiguracaoPayloadType = ConfiguracaoType;

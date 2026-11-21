@@ -40,6 +40,7 @@ describe('toUser', () => {
       pontos: 0,
       imagemPerfil: '',
       cursoIds: ['curso-1'],
+      cursoPontuadoId: null,
     });
   });
 

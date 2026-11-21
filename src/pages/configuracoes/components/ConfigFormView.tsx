@@ -67,6 +67,8 @@ export const ConfigFormView = ({
   isLoading,
   isSaving,
 }: ConfigFormViewProps) => {
+  const { control } = useFormContext<ConfiguracaoType>();
+
   if (isLoading) {
     return (
       <div className="mt-8 flex justify-center">
@@ -91,6 +93,21 @@ export const ConfigFormView = ({
         min={1}
         max={3}
       />
+      <div className="flex items-center justify-between gap-4 rounded-lg border border-zinc-200 p-4">
+        <Label htmlFor="desafioAtivo">Desafio Beira Linha Play ativo</Label>
+        <Controller
+          name="desafioAtivo"
+          control={control}
+          render={({ field }) => (
+            <Switch
+              id="desafioAtivo"
+              checked={field.value}
+              onCheckedChange={(checked) => field.onChange(checked === true)}
+              aria-label="Desafio Beira Linha Play ativo"
+            />
+          )}
+        />
+      </div>
       <Button type="submit" disabled={isSaving}>
         {isSaving ? <Spinner /> : 'Salvar'}
       </Button>
