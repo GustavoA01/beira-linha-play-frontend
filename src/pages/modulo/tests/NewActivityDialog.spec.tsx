@@ -23,6 +23,7 @@ const configSolta = {
   pontosQuestaoPadrao: 1,
   pontosQuestaoTravados: false,
   desafioAtivo: false,
+  trocaCursoLiberada: false,
 };
 
 const atividade: AtividadeType = {

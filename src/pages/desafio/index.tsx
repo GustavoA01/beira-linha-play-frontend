@@ -12,14 +12,20 @@ import { enrollCourse, listCourses } from '@/services/cursos';
 import { escolherCursoPontuado } from '@/services/usuarios';
 import { ApiError } from '@/services/api';
 import { CodeDialog } from '@/pages/cursos/components/CodeDialog';
+import { LogoutDialog } from '@/components/LogoutDialog';
+import { useConfiguracao } from '@/hooks/useConfiguracao';
 
 export const DesafioPage = () => {
   const { user, setUser } = useAuthUser();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const aluno = user?.tipo === 'ALUNO' ? user : null;
-  const [cursoId, setCursoId] = useState(aluno?.cursoPontuadoId ?? '');
+  const { data: config } = useConfiguracao();
+  const cursoEscolhido = aluno?.cursoPontuadoId ?? '';
+  const trocaBloqueada = !config?.trocaCursoLiberada && Boolean(cursoEscolhido);
+  const [cursoId, setCursoId] = useState(cursoEscolhido);
   const [openCode, setOpenCode] = useState(false);
+  const [openLogout, setOpenLogout] = useState(false);
 
   const { data: courses = [], isPending } = useQuery({
     queryKey: queryClientKeys.courseKeys.all,
@@ -53,7 +59,7 @@ export const DesafioPage = () => {
             : [...aluno.cursoIds, curso.id],
         });
       }
-      setCursoId(curso.id);
+      if (!trocaBloqueada) setCursoId(curso.id);
       await queryClient.invalidateQueries({
         queryKey: queryClientKeys.courseKeys.all,
       });
@@ -69,9 +75,18 @@ export const DesafioPage = () => {
   return (
     <div className="flex min-h-dvh items-center justify-center bg-zinc-50 px-4 py-10">
       <div className="w-full max-w-lg rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm">
-        <h1 className="font-fredoka text-2xl font-semibold text-primary-dark">
-          Desafio Beira Linha Play
-        </h1>
+        <div className="flex items-start justify-between gap-4">
+          <h1 className="font-fredoka text-2xl font-semibold text-primary-dark">
+            Desafio Beira Linha Play
+          </h1>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => setOpenLogout(true)}
+          >
+            Sair
+          </Button>
+        </div>
         <p className="mt-2 text-sm text-zinc-500">
           Escolha o curso em que você vai pontuar. Os outros cursos continuam
           liberados, mas não entram no seu XP.
@@ -102,25 +117,36 @@ export const DesafioPage = () => {
           >
             <fieldset className="space-y-2">
               <legend className="sr-only">Curso em que você pontua</legend>
-              {inscritos.map((course) => (
-                <label
-                  key={course.id}
-                  className={`flex cursor-pointer items-center gap-3 rounded-lg border px-4 py-3 ${
-                    cursoId === course.id ? 'border-primary' : 'border-zinc-200'
-                  }`}
-                >
-                  <input
-                    type="radio"
-                    name="curso"
-                    value={course.id}
-                    checked={cursoId === course.id}
-                    onChange={() => setCursoId(course.id)}
-                  />
-                  <span className="text-sm font-medium text-zinc-800">
-                    {course.nome}
-                  </span>
-                </label>
-              ))}
+              {inscritos.map((course) => {
+                const bloqueado =
+                  trocaBloqueada && course.id !== cursoEscolhido;
+                return (
+                  <label
+                    key={course.id}
+                    className={`flex items-center gap-3 rounded-lg border px-4 py-3 ${
+                      bloqueado
+                        ? 'cursor-not-allowed opacity-50'
+                        : 'cursor-pointer'
+                    } ${
+                      cursoId === course.id
+                        ? 'border-primary'
+                        : 'border-zinc-200'
+                    }`}
+                  >
+                    <input
+                      type="radio"
+                      name="curso"
+                      value={course.id}
+                      checked={cursoId === course.id}
+                      disabled={bloqueado}
+                      onChange={() => setCursoId(course.id)}
+                    />
+                    <span className="text-sm font-medium text-zinc-800">
+                      {course.nome}
+                    </span>
+                  </label>
+                );
+              })}
             </fieldset>
             <Button type="submit" disabled={!cursoId || isSaving}>
               {isSaving ? <Spinner /> : 'Confirmar'}
@@ -133,6 +159,7 @@ export const DesafioPage = () => {
         onOpenChange={setOpenCode}
         onSubmit={entrarComCodigo}
       />
+      <LogoutDialog openDialog={openLogout} setOpenDialog={setOpenLogout} />
     </div>
   );
 };

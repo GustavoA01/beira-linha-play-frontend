@@ -1,5 +1,4 @@
 import { forwardRef } from 'react';
-import { DESAFIO_PHRASE } from '@/pages/mapa/utils';
 
 type AchievementCardProps = {
   nome: string;
@@ -110,16 +109,6 @@ export const AchievementCard = forwardRef<HTMLDivElement, AchievementCardProps>(
         <p
           style={{
             margin: 0,
-            fontSize: 30,
-            fontWeight: 800,
-            lineHeight: 1.35,
-          }}
-        >
-          {DESAFIO_PHRASE}
-        </p>
-        <p
-          style={{
-            margin: '20px 0 0',
             fontSize: 40,
             fontWeight: 800,
             letterSpacing: '0.12em',

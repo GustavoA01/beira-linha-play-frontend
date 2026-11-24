@@ -51,14 +51,18 @@ const aluno: AlunoType = {
   cursoPontuadoId: null,
 };
 
-const renderComRotas = (ui: ReactElement, path = '/desafio') => {
+const renderComRotas = (
+  ui: ReactElement,
+  path = '/desafio',
+  current: AlunoType = aluno
+) => {
   const client = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
   });
 
   return render(
     <QueryClientProvider client={client}>
-      <UserProvider initialUser={aluno}>
+      <UserProvider initialUser={current}>
         <MemoryRouter initialEntries={[path]}>
           <Routes>
             <Route path="/desafio" element={ui} />
@@ -75,6 +79,14 @@ describe('DesafioPage', () => {
     limparEntradaDesafio();
     mockedListCourses.mockReset();
     mockedEscolher.mockReset();
+    mockedGetConfiguracao.mockResolvedValue({
+      quantidadeQuestoesPadrao: 1,
+      quantidadeQuestoesTravada: false,
+      pontosQuestaoPadrao: 1,
+      pontosQuestaoTravados: false,
+      desafioAtivo: true,
+      trocaCursoLiberada: false,
+    });
     mockedListCourses.mockResolvedValue([
       {
         id: 'curso-calculo-1',
@@ -117,6 +129,19 @@ describe('DesafioPage', () => {
     expect(await screen.findByText('Mapa do aluno')).toBeInTheDocument();
     expect(mockedEscolher.mock.calls[0][0]).toBe('curso-algebra');
   });
+
+  it('keeps the other courses disabled after the first choice', async () => {
+    renderComRotas(<DesafioPage />, '/desafio', {
+      ...aluno,
+      cursoPontuadoId: 'curso-calculo-1',
+    });
+
+    expect(
+      await screen.findByRole('radio', { name: 'Cálculo 1' })
+    ).toBeChecked();
+    expect(screen.getByRole('radio', { name: 'Álgebra' })).toBeDisabled();
+    expect(screen.getByRole('button', { name: 'Sair' })).toBeInTheDocument();
+  });
 });
 
 describe('DesafioGate', () => {
@@ -157,6 +182,7 @@ describe('DesafioGate', () => {
       pontosQuestaoPadrao: 1,
       pontosQuestaoTravados: false,
       desafioAtivo: true,
+      trocaCursoLiberada: false,
     });
 
     renderGate(aluno);
@@ -171,6 +197,7 @@ describe('DesafioGate', () => {
       pontosQuestaoPadrao: 1,
       pontosQuestaoTravados: false,
       desafioAtivo: false,
+      trocaCursoLiberada: false,
     });
 
     renderGate(aluno);
@@ -185,6 +212,7 @@ describe('DesafioGate', () => {
       pontosQuestaoPadrao: 1,
       pontosQuestaoTravados: false,
       desafioAtivo: true,
+      trocaCursoLiberada: false,
     });
 
     renderGate(mockLoggedMonitor);
@@ -200,6 +228,7 @@ describe('DesafioGate', () => {
       pontosQuestaoPadrao: 1,
       pontosQuestaoTravados: false,
       desafioAtivo: true,
+      trocaCursoLiberada: false,
     });
 
     renderGate({ ...aluno, cursoPontuadoId: 'curso-calculo-1' });

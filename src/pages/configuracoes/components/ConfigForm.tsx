@@ -52,9 +52,11 @@ export const ConfigForm = () => {
     if (invalid) return;
 
     mutate({
-      ...values,
       quantidadeQuestoesPadrao: quantidade,
+      quantidadeQuestoesTravada: values.quantidadeQuestoesTravada,
       pontosQuestaoPadrao: pontos,
+      pontosQuestaoTravados: values.pontosQuestaoTravados,
+      desafioAtivo: values.desafioAtivo,
     });
   });
 

@@ -56,6 +56,7 @@ describe('ConfiguracoesPage', () => {
       pontosQuestaoPadrao: 2,
       pontosQuestaoTravados: false,
       desafioAtivo: false,
+      trocaCursoLiberada: true,
     });
   });
 
@@ -70,7 +71,10 @@ describe('ConfiguracoesPage', () => {
 
   it('shows the saved defaults to the admin', async () => {
     const user = userEvent.setup();
-    mockedUpdateConfiguracao.mockImplementation(async (payload) => payload);
+    mockedUpdateConfiguracao.mockImplementation(async (payload) => ({
+      ...payload,
+      trocaCursoLiberada: true,
+    }));
 
     renderPage(mockLoggedAdmin);
 

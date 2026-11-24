@@ -161,9 +161,13 @@ export type ConfiguracaoType = {
   pontosQuestaoPadrao: number;
   pontosQuestaoTravados: boolean;
   desafioAtivo: boolean;
+  trocaCursoLiberada: boolean;
 };
 
-export type SaveConfiguracaoPayloadType = ConfiguracaoType;
+export type SaveConfiguracaoPayloadType = Omit<
+  ConfiguracaoType,
+  'trocaCursoLiberada'
+>;
 
 export type SubmitAttemptPayloadType = {
   respostas: Pick<RespostaType, 'questaoId' | 'alternativaId'>[];

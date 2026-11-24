@@ -9,6 +9,7 @@ export const CONFIGURACAO_PADRAO: ConfiguracaoType = {
   pontosQuestaoPadrao: 1,
   pontosQuestaoTravados: false,
   desafioAtivo: false,
+  trocaCursoLiberada: false,
 };
 
 export const useConfiguracao = () =>

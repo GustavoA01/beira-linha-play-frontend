@@ -59,7 +59,7 @@ describe('PhaseProgressModal', () => {
     expect(screen.getByText('Concluído')).toBeInTheDocument();
     expect(screen.getByText('100%')).toBeInTheDocument();
     expect(await findShareButton()).toBeInTheDocument();
-    expect(screen.getByText(DESAFIO_PHRASE)).toBeInTheDocument();
+    expect(screen.queryByText(DESAFIO_PHRASE)).not.toBeInTheDocument();
     expect(
       screen.getByText(`Código ${achievementCode('', '1')}`)
     ).toBeInTheDocument();
