@@ -6,6 +6,7 @@ import type { QuizPhaseType } from '@/pages/atividade/features/QuizPlay/types';
 import { useSubmitAttempt } from '../../../hooks/useMutation';
 import { toast } from '@/components/ui/toast';
 import { faseAvancada } from '@/pages/mapa/constants/nodesPhases';
+import { useConfiguracao } from '@/hooks/useConfiguracao';
 
 export type FaseDesbloqueadaType = {
   id: string;
@@ -38,6 +39,7 @@ export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
   const maxAttempts = maxAttemptsFor(activity.permiteMaisTentativas);
   const { mutateAsync: sendAttempt, isPending: isSubmitting } =
     useSubmitAttempt(activity.id);
+  const { data: configuracao } = useConfiguracao();
   const persistedAttempt = useRef(false);
   const lastScore = useRef<number | null>(null);
 
@@ -101,10 +103,12 @@ export const useQuizPlay = (activity: AtividadeType, usedAttempts: number) => {
       setAttemptsUsed(result.tentativasUsadas);
       auth.setUser({ ...auth.user, pontos: result.pontosTotais });
       lastScore.current = result.tentativa.pontuacaoObtida;
-      const fase = faseAvancada(pontosAntes, result.pontosTotais);
-      setFaseDesbloqueada(
-        fase ? { ...fase, points: result.pontosTotais } : null
-      );
+      if (!configuracao?.desafioAtivo) {
+        const fase = faseAvancada(pontosAntes, result.pontosTotais);
+        setFaseDesbloqueada(
+          fase ? { ...fase, points: result.pontosTotais } : null
+        );
+      }
 
       const scoredAnswers = finalAnswers.map((answer) => {
         const fromApi = (result.tentativa.respostas ?? []).find(

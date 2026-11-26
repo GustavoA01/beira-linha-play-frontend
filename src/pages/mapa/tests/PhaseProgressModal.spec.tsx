@@ -3,6 +3,19 @@ import { MemoryRouter } from 'react-router-dom';
 import { Dialog } from '@/components/ui/dialog';
 import { PhaseProgressModal } from '../components/ProgressModal/PhaseProgressModal';
 import { DESAFIO_PHRASE, achievementCode } from '../utils';
+import { CONFIGURACAO_PADRAO, useConfiguracao } from '@/hooks/useConfiguracao';
+
+jest.mock('@/hooks/useConfiguracao', () => ({
+  useConfiguracao: jest.fn(),
+  CONFIGURACAO_PADRAO: {
+    quantidadeQuestoesPadrao: 1,
+    quantidadeQuestoesTravada: false,
+    pontosQuestaoPadrao: 1,
+    pontosQuestaoTravados: false,
+    desafioAtivo: false,
+    trocaCursoLiberada: false,
+  },
+}));
 
 jest.mock('html-to-image', () => ({
   toBlob: jest.fn(() =>
@@ -10,6 +23,10 @@ jest.mock('html-to-image', () => ({
   ),
   toPng: jest.fn(() => Promise.resolve('data:image/png;base64,xx')),
 }));
+
+const mockedUseConfiguracao = useConfiguracao as jest.MockedFunction<
+  typeof useConfiguracao
+>;
 
 const findShareButton = () =>
   screen.findByRole('button', { name: /Compartilhar|Preparando|Abrindo/ });
@@ -36,6 +53,14 @@ const renderModal = (
   );
 
 describe('PhaseProgressModal', () => {
+  beforeEach(() => {
+    mockedUseConfiguracao.mockReturnValue({
+      data: CONFIGURACAO_PADRAO,
+      isPending: false,
+      isError: false,
+    } as ReturnType<typeof useConfiguracao>);
+  });
+
   it('shows in-progress copy when points are below the minimum', () => {
     renderModal(40, 100);
 
@@ -69,6 +94,21 @@ describe('PhaseProgressModal', () => {
     ).not.toBeInTheDocument();
     expect(
       within(screen.getByRole('dialog')).queryByText('Beira Linha Play')
+    ).not.toBeInTheDocument();
+  });
+
+  it('hides the share button while the challenge is active', () => {
+    mockedUseConfiguracao.mockReturnValue({
+      data: { ...CONFIGURACAO_PADRAO, desafioAtivo: true },
+      isPending: false,
+      isError: false,
+    } as ReturnType<typeof useConfiguracao>);
+
+    renderModal(80, 80, '1');
+
+    expect(screen.getByText('Concluído')).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Compartilhar|Preparando|Abrindo/ })
     ).not.toBeInTheDocument();
   });
 

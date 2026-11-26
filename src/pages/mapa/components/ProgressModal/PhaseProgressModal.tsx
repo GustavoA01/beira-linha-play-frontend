@@ -7,6 +7,7 @@ import { ModalFooter } from './ModalFooter';
 import { AchievementCard } from './AchievementCard';
 import { ShareButtons } from './ShareButtons';
 import { achievementCode } from '@/pages/mapa/utils';
+import { useConfiguracao } from '@/hooks/useConfiguracao';
 import {
   CourseProgressList,
   type CourseProgressItemType,
@@ -34,10 +35,13 @@ export const PhaseProgressModal = ({
   coursesPending = false,
 }: PhaseProgressModalProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
+  const { data: configuracao } = useConfiguracao();
+  const desafioAtivo = Boolean(configuracao?.desafioAtivo);
   const progress = Math.min(100, Math.round((points / minPoints) * 100));
   const concluded = showProgress && progress === 100;
+  const podeCompartilhar = concluded && !desafioAtivo;
   const exportCard =
-    concluded && typeof document !== 'undefined'
+    podeCompartilhar && typeof document !== 'undefined'
       ? createPortal(
           <div
             aria-hidden
@@ -88,7 +92,7 @@ export const PhaseProgressModal = ({
           />
         )}
 
-        {concluded && (
+        {podeCompartilhar && (
           <ShareButtons
             cardRef={cardRef}
             nome={studentName}
